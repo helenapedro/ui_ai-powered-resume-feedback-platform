@@ -17,6 +17,13 @@ export const resumeService = {
   async uploadResume(file: File, description?: string): Promise<{ message: string; resume: Resume }> {
     const formData = new FormData();
     formData.append('resume', file);
+    
+    // Determine format from file type
+    const fileExtension = file.name.split('.').pop()?.toLowerCase();
+    const format = fileExtension === 'pdf' ? 'pdf' : 
+                   ['jpg', 'jpeg', 'png'].includes(fileExtension || '') ? 'image' : 'pdf';
+    formData.append('format', format);
+    
     if (description) {
       formData.append('description', description);
     }
