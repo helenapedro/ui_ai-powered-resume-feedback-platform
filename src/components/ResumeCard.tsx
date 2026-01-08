@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { FileText, User, Calendar, MessageSquare } from 'lucide-react';
+import { User, Calendar, MessageSquare } from 'lucide-react';
 import type { Resume } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -15,24 +15,24 @@ interface ResumeCardProps {
 }
 
 export function ResumeCard({ resume }: ResumeCardProps) {
-  const feedbackStatus = resume.aiGeneratedFeedback
+  const feedbackStatus = resume.aiFeedback && resume.aiFeedback.length > 0
     ? 'ready'
     : 'pending';
 
   return (
-    <Link to={`/resume/${resume.id}`}>
+    <Link to={`/resume/${resume._id}`}>
       <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full">
         <div className="aspect-[3/4] bg-muted relative overflow-hidden">
-          {resume.fileType === 'application/pdf' ? (
+          {resume.format === 'pdf' ? (
             <iframe
-              src={`${resume.filePath}#page=1&view=FitH`}
+              src={`${resume.url}#page=1&view=FitH`}
               className="w-full h-full pointer-events-none"
-              title={`Preview de ${resume.username}`}
+              title={`Preview de ${resume.posterId?.username || 'Usuário'}`}
             />
           ) : (
             <img
-              src={resume.filePath}
-              alt={`Currículo de ${resume.username}`}
+              src={resume.url}
+              alt={`Currículo de ${resume.posterId?.username || 'Usuário'}`}
               className="w-full h-full object-cover object-top"
             />
           )}
@@ -47,7 +47,7 @@ export function ResumeCard({ resume }: ResumeCardProps) {
         <CardContent className="p-4">
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
             <User className="h-4 w-4" />
-            <span className="font-medium">{resume.username}</span>
+            <span className="font-medium">{resume.posterId?.username || 'Usuário'}</span>
           </div>
           {resume.description && (
             <p className="text-sm text-muted-foreground line-clamp-2 mb-2">

@@ -74,7 +74,7 @@ export function VersionHistory({ versions, isLoading, onRestore }: VersionHistor
       <CardContent className="space-y-3">
         {versions.map((version, index) => (
           <div
-            key={version.id}
+            key={version._id}
             className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
           >
             <div>
@@ -89,7 +89,7 @@ export function VersionHistory({ versions, isLoading, onRestore }: VersionHistor
             </div>
             <div className="flex items-center gap-2">
               <a
-                href={version.filePath}
+                href={version.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-primary hover:underline"
@@ -112,7 +112,7 @@ export function VersionHistory({ versions, isLoading, onRestore }: VersionHistor
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => onRestore(version.id)}>
+                    <AlertDialogAction onClick={() => onRestore(version._id)}>
                       Restaurar
                     </AlertDialogAction>
                   </AlertDialogFooter>

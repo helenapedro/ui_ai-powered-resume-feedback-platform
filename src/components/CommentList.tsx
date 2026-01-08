@@ -119,16 +119,16 @@ export function CommentList({
       ) : (
         <div className="space-y-4">
           {comments.map((comment) => (
-            <div key={comment.id} className="flex gap-3">
+            <div key={comment._id} className="flex gap-3">
               <Avatar>
                 <AvatarFallback className="bg-secondary text-secondary-foreground">
-                  {comment.username.charAt(0).toUpperCase()}
+                  {comment.commenterId?.username?.charAt(0).toUpperCase() || 'U'}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-sm">{comment.username}</span>
+                    <span className="font-medium text-sm">{comment.commenterId?.username || 'Usuário'}</span>
                     <span className="text-xs text-muted-foreground">
                       {formatDistanceToNow(new Date(comment.createdAt), {
                         addSuffix: true,
@@ -136,14 +136,14 @@ export function CommentList({
                       })}
                     </span>
                   </div>
-                  {user?.id === comment.userId && (
+                  {user?._id === comment.commenterId?._id && (
                     <div className="flex items-center gap-1">
                       <Button
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
                         onClick={() => {
-                          setEditingId(comment.id);
+                          setEditingId(comment._id);
                           setEditText(comment.text);
                         }}
                       >
@@ -169,7 +169,7 @@ export function CommentList({
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancelar</AlertDialogCancel>
                             <AlertDialogAction
-                              onClick={() => handleDelete(comment.id)}
+                              onClick={() => handleDelete(comment._id)}
                               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             >
                               Deletar
@@ -180,7 +180,7 @@ export function CommentList({
                     </div>
                   )}
                 </div>
-                {editingId === comment.id ? (
+                {editingId === comment._id ? (
                   <div className="space-y-2 mt-2">
                     <Textarea
                       value={editText}
@@ -190,7 +190,7 @@ export function CommentList({
                     <div className="flex gap-2">
                       <Button
                         size="sm"
-                        onClick={() => handleEdit(comment.id)}
+                        onClick={() => handleEdit(comment._id)}
                         disabled={isSubmitting}
                       >
                         Salvar
