@@ -73,10 +73,13 @@ export default function ResumeDetails() {
   }, [id]);
 
   useEffect(() => {
-    if (isOwner && id) {
+    // Only fetch versions after resume loads AND user is the owner
+    if (resume && user && user._id === resume.posterId?._id && id) {
       fetchVersions();
+    } else {
+      setIsLoadingVersions(false);
     }
-  }, [isOwner, id]);
+  }, [resume, user, id]);
 
   const fetchResume = async () => {
     try {
