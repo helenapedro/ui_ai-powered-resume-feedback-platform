@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { CommentList } from '@/components/CommentList';
 import { VersionHistory } from '@/components/VersionHistory';
@@ -34,14 +34,12 @@ import { useToast } from '@/hooks/use-toast';
 import type { Resume, ResumeVersion, Comment } from '@/types';
 import {
   ArrowLeft,
-  Download,
   Edit,
   Trash2,
   Sparkles,
   MessageSquare,
   User,
   Calendar,
-  FileText,
   Loader2,
   ExternalLink,
 } from 'lucide-react';
@@ -65,7 +63,7 @@ export default function ResumeDetails() {
   const [editDescription, setEditDescription] = useState('');
   const [isSavingDescription, setIsSavingDescription] = useState(false);
 
-  const isOwner = user?.id === resume?.userId;
+  const isOwner = user?._id === resume?.posterId?._id;
 
   useEffect(() => {
     if (id) {
@@ -127,13 +125,13 @@ export default function ResumeDetails() {
 
   const handleEditComment = async (commentId: string, text: string) => {
     const result = await commentService.updateComment(commentId, text);
-    setComments(comments.map((c) => (c.id === commentId ? result.comment : c)));
+    setComments(comments.map((c) => (c._id === commentId ? result.comment : c)));
     toast({ title: 'Comentário atualizado!' });
   };
 
   const handleDeleteComment = async (commentId: string) => {
     await commentService.deleteComment(commentId);
-    setComments(comments.filter((c) => c.id !== commentId));
+    setComments(comments.filter((c) => c._id !== commentId));
     toast({ title: 'Comentário removido!' });
   };
 
@@ -264,15 +262,15 @@ export default function ResumeDetails() {
             <Card>
               <CardContent className="p-0">
                 <div className="aspect-[3/4] bg-muted relative overflow-hidden rounded-lg">
-                  {resume.fileType === 'application/pdf' ? (
+                  {resume.format === 'pdf' ? (
                     <iframe
-                      src={resume.filePath}
+                      src={resume.url}
                       className="w-full h-full"
                       title="Currículo"
                     />
                   ) : (
                     <img
-                      src={resume.filePath}
+                      src={resume.url}
                       alt="Currículo"
                       className="w-full h-full object-contain"
                     />
@@ -281,7 +279,7 @@ export default function ResumeDetails() {
               </CardContent>
             </Card>
             <Button variant="outline" className="w-full" asChild>
-              <a href={resume.filePath} target="_blank" rel="noopener noreferrer">
+              <a href={resume.url} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="h-4 w-4 mr-2" />
                 Abrir em Nova Aba
               </a>
@@ -297,7 +295,7 @@ export default function ResumeDetails() {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <User className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">{resume.username}</span>
+                      <span className="font-medium">{resume.posterId?.username || 'Usuário'}</span>
                       {isOwner && (
                         <Badge variant="secondary">Seu currículo</Badge>
                       )}
@@ -311,8 +309,8 @@ export default function ResumeDetails() {
                       </span>
                     </div>
                   </div>
-                  <Badge variant={resume.aiGeneratedFeedback ? 'default' : 'secondary'}>
-                    {resume.aiGeneratedFeedback ? 'Feedback Pronto' : 'Pendente'}
+                  <Badge variant={resume.aiFeedback && resume.aiFeedback.length > 0 ? 'default' : 'secondary'}>
+                    {resume.aiFeedback && resume.aiFeedback.length > 0 ? 'Feedback Pronto' : 'Pendente'}
                   </Badge>
                 </div>
               </CardHeader>
@@ -332,9 +330,9 @@ export default function ResumeDetails() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {resume.aiGeneratedFeedback ? (
+                {resume.aiFeedback && resume.aiFeedback.length > 0 ? (
                   <div className="prose prose-sm max-w-none">
-                    <p className="whitespace-pre-wrap">{resume.aiGeneratedFeedback}</p>
+                    <p className="whitespace-pre-wrap">{resume.aiFeedback}</p>
                   </div>
                 ) : (
                   <div className="text-center py-8">

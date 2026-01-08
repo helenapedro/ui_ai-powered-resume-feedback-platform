@@ -1,7 +1,9 @@
 export interface User {
-  id: string;
+  _id: string;
   username: string;
   email: string;
+  isAdmin?: boolean;
+  isActive?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -12,45 +14,40 @@ export interface AuthResponse {
 }
 
 export interface Resume {
-  id: string;
-  userId: string;
-  username: string;
-  filePath: string;
-  fileType: string;
-  description: string | null;
-  aiGeneratedFeedback: string | null;
+  _id: string;
+  posterId: User;
+  format: 'pdf' | 'image';
+  url: string;
+  description?: string;
+  aiFeedback: string;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface ResumeVersion {
-  id: string;
+  _id: string;
   resumeId: string;
-  filePath: string;
-  fileType: string;
-  description: string | null;
-  aiGeneratedFeedback: string | null;
+  format: 'pdf' | 'image';
+  url: string;
+  description?: string;
+  aiFeedback: string;
   createdAt: string;
 }
 
 export interface Comment {
-  id: string;
+  _id: string;
   resumeId: string;
-  userId: string;
-  username: string;
+  commenterId: User;
   text: string;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface PaginatedResponse<T> {
-  data: T[];
-  pagination: {
-    currentPage: number;
-    totalPages: number;
-    totalItems: number;
-    itemsPerPage: number;
-  };
+export interface PaginatedResponse<Resume> {
+  resumes: Resume[];
+  totalResumes: number;
+  currentPage: number;
+  totalPages: number;
 }
 
 export interface ApiError {

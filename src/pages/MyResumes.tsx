@@ -24,8 +24,8 @@ export default function MyResumes() {
     setIsLoading(true);
     try {
       const response = await resumeService.getMyResumes(currentPage, 12);
-      setResumes(response.data);
-      setTotalPages(response.pagination.totalPages);
+      setResumes(response.resumes);
+      setTotalPages(response.totalPages);
     } catch (error) {
       toast({
         variant: 'destructive',
@@ -84,7 +84,7 @@ export default function MyResumes() {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {resumes.map((resume) => (
-                <ResumeCard key={resume.id} resume={resume} showActions />
+                <ResumeCard key={resume._id} resume={resume} showActions />
               ))}
             </div>
             <PaginationControls
