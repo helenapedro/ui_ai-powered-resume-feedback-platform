@@ -15,7 +15,7 @@ interface ResumeCardProps {
 }
 
 export function ResumeCard({ resume }: ResumeCardProps) {
-  const feedbackStatus = resume.aiFeedback && resume.aiFeedback.length > 0
+  const feedbackStatus = resume?.aiFeedback && resume.aiFeedback.length > 0
     ? 'ready'
     : 'pending';
 
