@@ -95,7 +95,7 @@ export default function Upload() {
       });
 
       setTimeout(() => {
-        navigate(`/resume/${result.resume._id}`);
+        navigate('/my-resumes');
       }, 500);
     } catch (error) {
       clearInterval(progressInterval);
