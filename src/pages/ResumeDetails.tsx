@@ -101,7 +101,12 @@ export default function ResumeDetails() {
   const fetchComments = async () => {
     try {
       const data = await commentService.getComments(id!);
-      setComments(data);
+      const normalized = Array.isArray(data)
+        ? data
+        : Array.isArray((data as unknown as { comments?: unknown }).comments)
+          ? ((data as unknown as { comments: Comment[] }).comments)
+          : [];
+      setComments(normalized);
     } catch (error) {
       console.error('Error fetching comments:', error);
     } finally {

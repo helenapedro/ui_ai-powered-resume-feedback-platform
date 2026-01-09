@@ -24,8 +24,8 @@ export default function MyResumes() {
     setIsLoading(true);
     try {
       const response = await resumeService.getMyResumes(currentPage, 12);
-      setResumes(response.resumes);
-      setTotalPages(response.totalPages);
+      setResumes(Array.isArray(response.resumes) ? response.resumes : []);
+      setTotalPages(typeof response.totalPages === 'number' ? response.totalPages : 1);
     } catch (error) {
       toast({
         variant: 'destructive',
