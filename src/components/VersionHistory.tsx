@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -13,10 +14,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { History, RotateCcw } from 'lucide-react';
+import { History, RotateCcw, Eye, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { ResumeVersion } from '@/types';
+import { resumeService } from '@/services/resumes';
+import { useToast } from '@/hooks/use-toast';
 
 interface VersionHistoryProps {
   versions: ResumeVersion[];
@@ -25,6 +28,25 @@ interface VersionHistoryProps {
 }
 
 export function VersionHistory({ versions, isLoading, onRestore }: VersionHistoryProps) {
+  const { toast } = useToast();
+  const [loadingVersionId, setLoadingVersionId] = useState<string | null>(null);
+
+  const handleViewVersion = async (versionId: string) => {
+    setLoadingVersionId(versionId);
+    try {
+      const { url } = await resumeService.getVersionUrl(versionId);
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Erro ao abrir versão',
+        description: error instanceof Error ? error.message : 'Tente novamente.',
+      });
+    } finally {
+      setLoadingVersionId(null);
+    }
+  };
+
   if (isLoading) {
     return (
       <Card>
@@ -98,6 +120,19 @@ export function VersionHistory({ versions, isLoading, onRestore }: VersionHistor
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleViewVersion(version.versionId)}
+                disabled={loadingVersionId === version.versionId}
+              >
+                {loadingVersionId === version.versionId ? (
+                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                ) : (
+                  <Eye className="h-4 w-4 mr-1" />
+                )}
+                Ver
+              </Button>
               {!version.isLatest && (
                 <AlertDialog>
                   <AlertDialogTrigger asChild>

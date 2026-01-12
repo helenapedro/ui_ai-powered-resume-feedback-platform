@@ -48,6 +48,10 @@ export const resumeService = {
     return apiClient.get<ResumeVersion[]>('/resumes/versions');
   },
 
+  async getVersionUrl(versionId: string): Promise<{ url: string }> {
+    return apiClient.get<{ url: string }>(`/resumes/versions/${versionId}/url`);
+  },
+
   async restoreVersion(versionId: string): Promise<{ message: string; resume: Resume }> {
     return apiClient.post(`/resumes/restore/${versionId}`);
   },
