@@ -25,26 +25,25 @@ export interface Resume {
 }
 
 export interface ResumeVersion {
-  _id: string;
-  resumeId: string;
-  format: 'pdf' | 'image';
-  url: string;
-  description?: string;
-  aiFeedback: string;
-  createdAt: string;
+  key: string;
+  versionId: string;
+  lastModified: string;
+  size: number;
+  isLatest: boolean;
+  name: string;
 }
 
 export interface Comment {
   _id: string;
   resumeId: string;
   commenterId: User;
-  text: string;
+  content: string;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface PaginatedResponse<Resume> {
-  resumes: Resume[];
+export interface PaginatedResponse<T> {
+  resumes: T[];
   totalResumes: number;
   currentPage: number;
   totalPages: number;

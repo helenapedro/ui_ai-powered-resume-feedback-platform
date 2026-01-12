@@ -6,12 +6,12 @@ export const commentService = {
     return apiClient.get<Comment[]>(`/comments/${resumeId}`);
   },
 
-  async addComment(resumeId: string, text: string): Promise<{ message: string; comment: Comment }> {
-    return apiClient.post('/comments/add', { resumeId, text });
+  async addComment(resumeId: string, content: string): Promise<{ message: string; comment: Comment }> {
+    return apiClient.post('/comments/add', { resumeId, content });
   },
 
-  async updateComment(commentId: string, text: string): Promise<{ message: string; comment: Comment }> {
-    return apiClient.put(`/comments/${commentId}`, { text });
+  async updateComment(commentId: string, content: string): Promise<{ message: string; comment: Comment }> {
+    return apiClient.put(`/comments/${commentId}`, { content });
   },
 
   async deleteComment(commentId: string): Promise<{ message: string }> {

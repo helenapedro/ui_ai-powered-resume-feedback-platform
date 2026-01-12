@@ -74,12 +74,12 @@ export default function ResumeDetails() {
 
   useEffect(() => {
     // Only fetch versions after resume loads AND user is the owner
-    if (resume && user && user._id === resume.posterId?._id && id) {
+    if (resume && user && user._id === resume.posterId?._id) {
       fetchVersions();
     } else {
       setIsLoadingVersions(false);
     }
-  }, [resume, user, id]);
+  }, [resume, user]);
 
   const fetchResume = async () => {
     try {
@@ -116,8 +116,9 @@ export default function ResumeDetails() {
 
   const fetchVersions = async () => {
     try {
-      const data = await resumeService.getVersions(id!);
-      setVersions(data);
+      // Uses authenticated user's resume - no resumeId needed
+      const data = await resumeService.getVersions();
+      setVersions(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching versions:', error);
     } finally {
@@ -125,14 +126,14 @@ export default function ResumeDetails() {
     }
   };
 
-  const handleAddComment = async (text: string) => {
-    const result = await commentService.addComment(id!, text);
+  const handleAddComment = async (content: string) => {
+    const result = await commentService.addComment(id!, content);
     setComments([result.comment, ...comments]);
     toast({ title: 'Comentário adicionado!' });
   };
 
-  const handleEditComment = async (commentId: string, text: string) => {
-    const result = await commentService.updateComment(commentId, text);
+  const handleEditComment = async (commentId: string, content: string) => {
+    const result = await commentService.updateComment(commentId, content);
     setComments(comments.map((c) => (c._id === commentId ? result.comment : c)));
     toast({ title: 'Comentário atualizado!' });
   };
@@ -145,7 +146,8 @@ export default function ResumeDetails() {
 
   const handleRestoreVersion = async (versionId: string) => {
     try {
-      const result = await resumeService.restoreVersion(id!, versionId);
+      // Uses authenticated user's resume - no resumeId needed
+      const result = await resumeService.restoreVersion(versionId);
       setResume(result.resume);
       fetchVersions();
       toast({ title: 'Versão restaurada com sucesso!' });
@@ -161,7 +163,8 @@ export default function ResumeDetails() {
   const handleUpdateDescription = async () => {
     setIsSavingDescription(true);
     try {
-      const result = await resumeService.updateDescription(id!, editDescription);
+      // Uses authenticated user's resume - no resumeId needed
+      const result = await resumeService.updateDescription(editDescription);
       setResume(result.resume);
       setEditDialogOpen(false);
       toast({ title: 'Descrição atualizada!' });
@@ -179,7 +182,8 @@ export default function ResumeDetails() {
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      await resumeService.deleteResume(id!);
+      // Uses authenticated user's resume - no resumeId needed
+      await resumeService.deleteResume();
       toast({ title: 'Currículo removido!' });
       navigate('/my-resumes');
     } catch (error) {
