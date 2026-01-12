@@ -23,8 +23,8 @@ import { useAuth } from '@/contexts/AuthContext';
 interface CommentListProps {
   comments: Comment[];
   isLoading: boolean;
-  onAddComment: (text: string) => Promise<void>;
-  onEditComment: (commentId: string, text: string) => Promise<void>;
+  onAddComment: (content: string) => Promise<void>;
+  onEditComment: (commentId: string, content: string) => Promise<void>;
   onDeleteComment: (commentId: string) => Promise<void>;
 }
 
@@ -144,7 +144,7 @@ export function CommentList({
                         className="h-8 w-8"
                         onClick={() => {
                           setEditingId(comment._id);
-                          setEditText(comment.text);
+                          setEditText(comment.content);
                         }}
                       >
                         <Edit className="h-4 w-4" />
@@ -208,7 +208,7 @@ export function CommentList({
                     </div>
                   </div>
                 ) : (
-                  <p className="text-sm mt-1 text-muted-foreground">{comment.text}</p>
+                  <p className="text-sm mt-1 text-muted-foreground">{comment.content}</p>
                 )}
               </div>
             </div>

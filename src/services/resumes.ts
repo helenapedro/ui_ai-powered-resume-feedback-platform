@@ -6,8 +6,14 @@ export const resumeService = {
     return apiClient.get<PaginatedResponse<Resume>>(`/resumes/all?page=${page}&limit=${limit}`);
   },
 
-  async getMyResumes(page: number = 1, limit: number = 10): Promise<PaginatedResponse<Resume>> {
-    return apiClient.get<PaginatedResponse<Resume>>(`/resumes?page=${page}&limit=${limit}`);
+  async getMyResume(): Promise<Resume | null> {
+    try {
+      const data = await apiClient.get<Resume>('/resumes/');
+      return data;
+    } catch (error) {
+      // If no resume found, return null instead of throwing
+      return null;
+    }
   },
 
   async getResumeById(id: string): Promise<Resume> {
@@ -30,19 +36,19 @@ export const resumeService = {
     return apiClient.post('/resumes/upload', formData);
   },
 
-  async updateDescription(resumeId: string, description: string): Promise<{ message: string; resume: Resume }> {
-    return apiClient.put('/resumes/update-description', { resumeId, description });
+  async updateDescription(description: string): Promise<{ message: string; resume: Resume }> {
+    return apiClient.put('/resumes/update-description', { description });
   },
 
-  async deleteResume(resumeId: string): Promise<{ message: string }> {
-    return apiClient.delete('/resumes', { resumeId });
+  async deleteResume(): Promise<{ message: string }> {
+    return apiClient.delete('/resumes');
   },
 
-  async getVersions(resumeId: string): Promise<ResumeVersion[]> {
-    return apiClient.get<ResumeVersion[]>(`/resumes/${resumeId}/versions`);
+  async getVersions(): Promise<ResumeVersion[]> {
+    return apiClient.get<ResumeVersion[]>('/resumes/versions');
   },
 
-  async restoreVersion(resumeId: string, versionId: string): Promise<{ message: string; resume: Resume }> {
-    return apiClient.post(`/resumes/${resumeId}/restore/${versionId}`);
+  async restoreVersion(versionId: string): Promise<{ message: string; resume: Resume }> {
+    return apiClient.post(`/resumes/restore/${versionId}`);
   },
 };

@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -68,56 +69,59 @@ export function VersionHistory({ versions, isLoading, onRestore }: VersionHistor
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <History className="h-5 w-5" />
-          Histórico de Versões
+          Histórico de Versões ({versions.length})
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         {versions.map((version, index) => (
           <div
-            key={version._id}
+            key={version.versionId}
             className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
           >
-            <div>
-              <p className="font-medium text-sm">
-                Versão {versions.length - index}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {format(new Date(version.createdAt), "dd 'de' MMMM 'de' yyyy 'às' HH:mm", {
-                  locale: ptBR,
-                })}
-              </p>
+            <div className="flex items-center gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <p className="font-medium text-sm">
+                    {version.name || `Versão ${versions.length - index}`}
+                  </p>
+                  {version.isLatest && (
+                    <Badge variant="secondary" className="text-xs">
+                      Atual
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {format(new Date(version.lastModified), "dd 'de' MMMM 'de' yyyy 'às' HH:mm", {
+                    locale: ptBR,
+                  })}
+                </p>
+              </div>
             </div>
             <div className="flex items-center gap-2">
-              <a
-                href={version.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-primary hover:underline"
-              >
-                Ver
-              </a>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <RotateCcw className="h-4 w-4 mr-1" />
-                    Restaurar
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Restaurar esta versão?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      A versão atual será salva no histórico e esta versão se tornará a atual.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => onRestore(version._id)}>
+              {!version.isLatest && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <RotateCcw className="h-4 w-4 mr-1" />
                       Restaurar
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Restaurar esta versão?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        A versão atual será salva no histórico e esta versão se tornará a atual.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => onRestore(version.versionId)}>
+                        Restaurar
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
             </div>
           </div>
         ))}
