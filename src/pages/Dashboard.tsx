@@ -1,29 +1,25 @@
 import { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { ResumeCard, ResumeCardSkeleton } from '@/components/ResumeCard';
-import { PaginationControls } from '@/components/PaginationControls';
 import { resumeService } from '@/services/resumes';
 import { useToast } from '@/hooks/use-toast';
-import type { Resume } from '@/types';
+import type { ResumeSummary } from '@/types';
 import { FileText } from 'lucide-react';
 
 export default function Dashboard() {
-  const [resumes, setResumes] = useState<Resume[]>([]);
+  const [resumes, setResumes] = useState<ResumeSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const { toast } = useToast();
 
   useEffect(() => {
     fetchResumes();
-  }, [currentPage]);
+  }, []);
 
   const fetchResumes = async () => {
     setIsLoading(true);
     try {
-      const response = await resumeService.getAllResumes(currentPage, 12);
-      setResumes(Array.isArray(response.resumes) ? response.resumes : []);
-      setTotalPages(typeof response.totalPages === 'number' ? response.totalPages : 1);
+      const data = await resumeService.getAllResumes();
+      setResumes(data);
     } catch (error) {
       toast({
         variant: 'destructive',
@@ -67,18 +63,11 @@ export default function Dashboard() {
             </p>
           </div>
         ) : (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {resumes.map((resume) => (
-                <ResumeCard key={resume._id} resume={resume} />
-              ))}
-            </div>
-            <PaginationControls
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
-          </>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {resumes.map((resume) => (
+              <ResumeCard key={resume.id} resume={resume} />
+            ))}
+          </div>
         )}
       </main>
     </div>

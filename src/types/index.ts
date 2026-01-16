@@ -1,11 +1,11 @@
 export interface User {
-  _id: string;
+  id: string;
   username: string;
   email: string;
   isAdmin?: boolean;
   isActive?: boolean;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 export interface AuthResponse {
@@ -13,33 +13,51 @@ export interface AuthResponse {
   user: User;
 }
 
-export interface Resume {
-  _id: string;
-  posterId: User;
-  format: 'pdf' | 'image';
-  url: string;
-  description?: string;
-  aiFeedback: string;
+// Spring Boot Resume DTOs
+export interface ResumeSummary {
+  id: string;
+  title: string;
+  currentVersionId: string | null;
   createdAt: string;
-  updatedAt: string;
 }
 
 export interface ResumeVersion {
-  key: string;
-  versionId: string;
-  lastModified: string;
-  size: number;
-  isLatest: boolean;
-  name: string;
+  id: string;
+  versionNumber: number;
+  originalFilename: string;
+  contentType: string;
+  createdAt: string;
+}
+
+export interface ResumeWithVersions {
+  resume: ResumeSummary;
+  versions: ResumeVersion[];
+}
+
+// Legacy Resume interface for backward compatibility
+export interface Resume {
+  _id?: string;
+  id: string;
+  title: string;
+  currentVersionId: string | null;
+  posterId?: User;
+  format?: 'pdf' | 'image';
+  url?: string;
+  description?: string;
+  aiFeedback?: string;
+  createdAt: string;
+  updatedAt?: string;
 }
 
 export interface Comment {
-  _id: string;
+  id: string;
+  _id?: string;
   resumeId: string;
-  commenterId: User;
+  resumeVersionId?: string;
+  commenterId?: User;
   content: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 export interface PaginatedResponse<T> {

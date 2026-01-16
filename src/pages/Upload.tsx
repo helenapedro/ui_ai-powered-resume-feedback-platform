@@ -1,8 +1,8 @@
 import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -13,11 +13,14 @@ import { cn } from '@/lib/utils';
 
 export default function Upload() {
   const [file, setFile] = useState<File | null>(null);
-  const [description, setDescription] = useState('');
+  const [title, setTitle] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const resumeId = searchParams.get('resumeId');
+  const isAddingVersion = !!resumeId;
   const { toast } = useToast();
 
   const acceptedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
@@ -85,18 +88,23 @@ export default function Upload() {
     }, 200);
 
     try {
-      const result = await resumeService.uploadResume(file, description);
+      if (isAddingVersion) {
+        await resumeService.addVersion(resumeId, file);
+        toast({
+          title: 'Nova versão adicionada!',
+          description: 'A versão foi adicionada com sucesso.',
+        });
+        navigate(`/resume/${resumeId}`);
+      } else {
+        const resume = await resumeService.createResume(file, title || undefined);
+        toast({
+          title: 'Currículo criado!',
+          description: 'Seu currículo foi enviado com sucesso.',
+        });
+        navigate(`/resume/${resume.id}`);
+      }
       clearInterval(progressInterval);
       setProgress(100);
-
-      toast({
-        title: 'Currículo enviado!',
-        description: 'O feedback de IA está sendo processado.',
-      });
-
-      setTimeout(() => {
-        navigate('/my-resumes');
-      }, 500);
     } catch (error) {
       clearInterval(progressInterval);
       toast({
@@ -118,14 +126,30 @@ export default function Upload() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <UploadIcon className="h-6 w-6 text-primary" />
-              Enviar Currículo
+              {isAddingVersion ? 'Adicionar Nova Versão' : 'Enviar Currículo'}
             </CardTitle>
             <CardDescription>
-              Faça upload do seu currículo e receba feedback de IA em minutos
+              {isAddingVersion 
+                ? 'Adicione uma nova versão ao currículo existente'
+                : 'Faça upload do seu currículo e receba feedback de IA em minutos'}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Title (only for new resumes) */}
+              {!isAddingVersion && (
+                <div className="space-y-2">
+                  <Label htmlFor="title">Título (opcional)</Label>
+                  <Input
+                    id="title"
+                    placeholder="Ex: Currículo Backend Developer"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    disabled={isUploading}
+                  />
+                </div>
+              )}
+
               {/* File Upload Area */}
               <div
                 onDrop={handleDrop}
@@ -184,22 +208,6 @@ export default function Upload() {
                 )}
               </div>
 
-              {/* Description */}
-              <div className="space-y-2">
-                <Label htmlFor="description">Descrição (opcional)</Label>
-                <Textarea
-                  id="description"
-                  placeholder="Adicione uma descrição ou contexto sobre seu currículo..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  maxLength={500}
-                  className="min-h-[100px]"
-                />
-                <p className="text-xs text-muted-foreground text-right">
-                  {description.length}/500 caracteres
-                </p>
-              </div>
-
               {/* Progress */}
               {isUploading && (
                 <div className="space-y-2">
@@ -225,7 +233,7 @@ export default function Upload() {
                 ) : (
                   <>
                     <UploadIcon className="mr-2 h-4 w-4" />
-                    Enviar Currículo
+                    {isAddingVersion ? 'Adicionar Versão' : 'Enviar Currículo'}
                   </>
                 )}
               </Button>

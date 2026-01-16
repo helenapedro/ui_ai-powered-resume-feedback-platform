@@ -2,90 +2,82 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { User, Calendar, MessageSquare } from 'lucide-react';
-import type { Resume } from '@/types';
-import { formatDistanceToNow } from 'date-fns';
+import { Button } from '@/components/ui/button';
+import { FileText, Calendar, Eye, Upload } from 'lucide-react';
+import type { ResumeSummary } from '@/types';
+import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 interface ResumeCardProps {
-  resume: Resume;
+  resume: ResumeSummary;
   showActions?: boolean;
-  onEdit?: () => void;
-  onDelete?: () => void;
 }
 
-export function ResumeCard({ resume }: ResumeCardProps) {
-  const feedbackStatus = resume?.aiFeedback && resume.aiFeedback.length > 0
-    ? 'ready'
-    : 'pending';
-
+export function ResumeCard({ resume, showActions }: ResumeCardProps) {
   return (
-    <Link to={`/resume/${resume._id}`}>
-      <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full">
-        <div className="aspect-[3/4] bg-muted relative overflow-hidden">
-          {resume.format === 'pdf' ? (
-            <iframe
-              src={`${resume.url}#page=1&view=FitH`}
-              className="w-full h-full pointer-events-none"
-              title={`Preview de ${resume.posterId?.username || 'Usuário'}`}
-            />
-          ) : (
-            <img
-              src={resume.url}
-              alt={`Currículo de ${resume.posterId?.username || 'Usuário'}`}
-              className="w-full h-full object-cover object-top"
-            />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-          <Badge
-            variant={feedbackStatus === 'ready' ? 'default' : 'secondary'}
-            className="absolute top-2 right-2"
-          >
-            {feedbackStatus === 'ready' ? 'Feedback Pronto' : 'Pendente'}
-          </Badge>
-        </div>
-        <CardContent className="p-4">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-            <User className="h-4 w-4" />
-            <span className="font-medium">{resume.posterId?.username || 'Usuário'}</span>
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full">
+      <CardContent className="p-6">
+        <div className="flex items-start gap-4">
+          <div className="p-3 bg-primary/10 rounded-lg">
+            <FileText className="h-8 w-8 text-primary" />
           </div>
-          {resume.description && (
-            <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
-              {resume.description}
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-lg truncate">
+              {resume.title || 'Currículo sem título'}
+            </h3>
+            <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
+              <Calendar className="h-3.5 w-3.5" />
+              <span>
+                {format(new Date(resume.createdAt), "dd 'de' MMM, yyyy", {
+                  locale: ptBR,
+                })}
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2 font-mono">
+              ID: {resume.id.slice(0, 8)}...
             </p>
+          </div>
+          {resume.currentVersionId && (
+            <Badge variant="secondary" className="text-xs shrink-0">
+              Ativo
+            </Badge>
           )}
-        </CardContent>
-        <CardFooter className="px-4 pb-4 pt-0 flex items-center justify-between text-xs text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <Calendar className="h-3 w-3" />
-            <span>
-              {formatDistanceToNow(new Date(resume.createdAt), {
-                addSuffix: true,
-                locale: ptBR,
-              })}
-            </span>
-          </div>
-          <div className="flex items-center gap-1">
-            <MessageSquare className="h-3 w-3" />
-            <span>Comentários</span>
-          </div>
-        </CardFooter>
-      </Card>
-    </Link>
+        </div>
+      </CardContent>
+      <CardFooter className="px-6 pb-6 pt-0 flex gap-2">
+        <Button asChild variant="outline" className="flex-1">
+          <Link to={`/resume/${resume.id}`}>
+            <Eye className="h-4 w-4 mr-2" />
+            Ver Detalhes
+          </Link>
+        </Button>
+        {showActions && (
+          <Button asChild variant="default" size="icon">
+            <Link to={`/upload?resumeId=${resume.id}`}>
+              <Upload className="h-4 w-4" />
+            </Link>
+          </Button>
+        )}
+      </CardFooter>
+    </Card>
   );
 }
 
 export function ResumeCardSkeleton() {
   return (
     <Card className="overflow-hidden">
-      <Skeleton className="aspect-[3/4]" />
-      <CardContent className="p-4">
-        <Skeleton className="h-4 w-24 mb-2" />
-        <Skeleton className="h-3 w-full mb-1" />
-        <Skeleton className="h-3 w-2/3" />
+      <CardContent className="p-6">
+        <div className="flex items-start gap-4">
+          <Skeleton className="h-14 w-14 rounded-lg" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-5 w-32" />
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-3 w-20" />
+          </div>
+        </div>
       </CardContent>
-      <CardFooter className="px-4 pb-4 pt-0">
-        <Skeleton className="h-3 w-20" />
+      <CardFooter className="px-6 pb-6 pt-0">
+        <Skeleton className="h-9 w-full" />
       </CardFooter>
     </Card>
   );
