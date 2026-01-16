@@ -1,52 +1,18 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { History, RotateCcw, Eye, Loader2 } from 'lucide-react';
+import { History, FileText } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { ResumeVersion } from '@/types';
-import { resumeService } from '@/services/resumes';
-import { useToast } from '@/hooks/use-toast';
 
 interface VersionHistoryProps {
   versions: ResumeVersion[];
+  currentVersionId: string | null;
   isLoading: boolean;
-  onRestore: (versionId: string) => Promise<void>;
 }
 
-export function VersionHistory({ versions, isLoading, onRestore }: VersionHistoryProps) {
-  const { toast } = useToast();
-  const [loadingVersionId, setLoadingVersionId] = useState<string | null>(null);
-
-  const handleViewVersion = async (versionId: string) => {
-    setLoadingVersionId(versionId);
-    try {
-      const { url } = await resumeService.getVersionUrl(versionId);
-      window.open(url, '_blank', 'noopener,noreferrer');
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Erro ao abrir versão',
-        description: error instanceof Error ? error.message : 'Tente novamente.',
-      });
-    } finally {
-      setLoadingVersionId(null);
-    }
-  };
-
+export function VersionHistory({ versions, currentVersionId, isLoading }: VersionHistoryProps) {
   if (isLoading) {
     return (
       <Card>
@@ -79,12 +45,15 @@ export function VersionHistory({ versions, isLoading, onRestore }: VersionHistor
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground text-sm text-center py-4">
-            Nenhuma versão anterior disponível.
+            Nenhuma versão disponível.
           </p>
         </CardContent>
       </Card>
     );
   }
+
+  // Sort by version number descending
+  const sortedVersions = [...versions].sort((a, b) => b.versionNumber - a.versionNumber);
 
   return (
     <Card>
@@ -95,71 +64,47 @@ export function VersionHistory({ versions, isLoading, onRestore }: VersionHistor
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        {versions.map((version, index) => (
-          <div
-            key={version.versionId}
-            className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div>
-                <div className="flex items-center gap-2">
-                  <p className="font-medium text-sm">
-                    {version.name || `Versão ${versions.length - index}`}
-                  </p>
-                  {version.isLatest && (
-                    <Badge variant="secondary" className="text-xs">
-                      Atual
-                    </Badge>
-                  )}
+        {sortedVersions.map((version) => {
+          const isCurrent = version.id === currentVersionId;
+          
+          return (
+            <div
+              key={version.id}
+              className={`flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors ${
+                isCurrent ? 'border-primary bg-primary/5' : ''
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-muted rounded">
+                  <FileText className="h-4 w-4 text-muted-foreground" />
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {format(new Date(version.lastModified), "dd 'de' MMMM 'de' yyyy 'às' HH:mm", {
-                    locale: ptBR,
-                  })}
-                </p>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium text-sm">
+                      Versão {version.versionNumber}
+                    </p>
+                    {isCurrent && (
+                      <Badge variant="secondary" className="text-xs">
+                        Atual
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {version.originalFilename}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {format(new Date(version.createdAt), "dd 'de' MMMM 'de' yyyy 'às' HH:mm", {
+                      locale: ptBR,
+                    })}
+                  </p>
+                </div>
               </div>
+              <Badge variant="outline" className="text-xs">
+                {version.contentType.split('/')[1]?.toUpperCase() || 'FILE'}
+              </Badge>
             </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleViewVersion(version.versionId)}
-                disabled={loadingVersionId === version.versionId}
-              >
-                {loadingVersionId === version.versionId ? (
-                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                ) : (
-                  <Eye className="h-4 w-4 mr-1" />
-                )}
-                Ver
-              </Button>
-              {!version.isLatest && (
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <RotateCcw className="h-4 w-4 mr-1" />
-                      Restaurar
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Restaurar esta versão?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        A versão atual será salva no histórico e esta versão se tornará a atual.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => onRestore(version.versionId)}>
-                        Restaurar
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              )}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </CardContent>
     </Card>
   );

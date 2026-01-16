@@ -1,58 +1,41 @@
 import { apiClient } from './api';
-import type { Resume, ResumeVersion, PaginatedResponse } from '@/types';
+import type { ResumeSummary, ResumeVersion, ResumeWithVersions } from '@/types';
 
 export const resumeService = {
-  async getAllResumes(page: number = 1, limit: number = 10): Promise<PaginatedResponse<Resume>> {
-    return apiClient.get<PaginatedResponse<Resume>>(`/resumes/all?page=${page}&limit=${limit}`);
+  // List all resumes for the current user
+  async getAllResumes(): Promise<ResumeSummary[]> {
+    return apiClient.get<ResumeSummary[]>('/resumes');
   },
 
-  async getMyResume(): Promise<Resume | null> {
-    try {
-      const data = await apiClient.get<Resume>('/resumes/');
-      return data;
-    } catch (error) {
-      // If no resume found, return null instead of throwing
-      return null;
-    }
+  // Get a single resume with all its versions
+  async getResumeById(id: string): Promise<ResumeWithVersions> {
+    return apiClient.get<ResumeWithVersions>(`/resumes/${id}`);
   },
 
-  async getResumeById(id: string): Promise<Resume> {
-    return apiClient.get<Resume>(`/resumes/${id}`);
-  },
-
-  async uploadResume(file: File, description?: string): Promise<{ message: string; resume: Resume }> {
+  // Create a new resume with file upload
+  async createResume(file: File, title?: string): Promise<ResumeSummary> {
     const formData = new FormData();
-    formData.append('resume', file);
-    
-    // Determine format from file type
-    const fileExtension = file.name.split('.').pop()?.toLowerCase();
-    const format = fileExtension === 'pdf' ? 'pdf' : 
-                   ['jpg', 'jpeg', 'png'].includes(fileExtension || '') ? 'image' : 'pdf';
-    formData.append('format', format);
-    
-    if (description) {
-      formData.append('description', description);
+    formData.append('file', file);
+    if (title) {
+      formData.append('title', title);
     }
-    return apiClient.post('/resumes/upload', formData);
+    return apiClient.post<ResumeSummary>('/resumes', formData);
   },
 
-  async updateDescription(description: string): Promise<{ message: string; resume: Resume }> {
-    return apiClient.put('/resumes/update-description', { description });
+  // Add a new version to an existing resume
+  async addVersion(resumeId: string, file: File): Promise<ResumeVersion> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return apiClient.post<ResumeVersion>(`/resumes/${resumeId}/versions`, formData);
   },
 
-  async deleteResume(): Promise<{ message: string }> {
-    return apiClient.delete('/resumes');
+  // Delete a resume
+  async deleteResume(resumeId: string): Promise<void> {
+    return apiClient.delete(`/resumes/${resumeId}`);
   },
 
-  async getVersions(): Promise<ResumeVersion[]> {
-    return apiClient.get<ResumeVersion[]>('/resumes/versions');
-  },
-
-  async getVersionUrl(versionId: string): Promise<{ url: string }> {
-    return apiClient.get<{ url: string }>(`/resumes/versions/${versionId}/url`);
-  },
-
-  async restoreVersion(versionId: string): Promise<{ message: string; resume: Resume }> {
-    return apiClient.post(`/resumes/restore/${versionId}`);
+  // Ping endpoint for testing connectivity
+  async ping(): Promise<string> {
+    return apiClient.get<string>('/ping');
   },
 };
