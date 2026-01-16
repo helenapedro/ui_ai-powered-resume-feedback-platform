@@ -1,10 +1,10 @@
 export interface User {
   id: string;
-  username: string;
+  username?: string;
   email: string;
   isAdmin?: boolean;
   isActive?: boolean;
-  createdAt: string;
+  createdAt?: string;
   updatedAt?: string;
 }
 
