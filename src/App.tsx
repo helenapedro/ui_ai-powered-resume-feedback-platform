@@ -4,10 +4,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import MyResumes from "./pages/MyResumes";
 import Upload from "./pages/Upload";
 import ResumeDetails from "./pages/ResumeDetails";
+import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -21,10 +23,39 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/my-resumes" element={<MyResumes />} />
-            <Route path="/upload" element={<Upload />} />
-            <Route path="/resume/:id" element={<ResumeDetails />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-resumes"
+              element={
+                <ProtectedRoute>
+                  <MyResumes />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/upload"
+              element={
+                <ProtectedRoute>
+                  <Upload />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/resume/:id"
+              element={
+                <ProtectedRoute>
+                  <ResumeDetails />
+                </ProtectedRoute>
+              }
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

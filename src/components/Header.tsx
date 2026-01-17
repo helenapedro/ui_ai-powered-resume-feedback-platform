@@ -1,13 +1,19 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { FileText, Menu, User, Upload, Home } from 'lucide-react';
+import { FileText, Menu, User, Upload, Home, LogOut } from 'lucide-react';
 import { useState } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 export function Header() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/auth');
+  };
 
   const NavLinks = ({ mobile = false }: { mobile?: boolean }) => (
     <>
@@ -52,10 +58,16 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-4">
-          {/* User Info (no dropdown, just display) */}
-          <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
-            <User className="h-4 w-4" />
-            <span>{user.email}</span>
+          {/* User Info with Logout */}
+          <div className="hidden md:flex items-center gap-3">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <User className="h-4 w-4" />
+              <span>{user?.email}</span>
+            </div>
+            <Button variant="ghost" size="sm" onClick={handleLogout}>
+              <LogOut className="h-4 w-4 mr-2" />
+              Sair
+            </Button>
           </div>
 
           {/* Mobile Menu */}
@@ -71,8 +83,12 @@ export function Header() {
                 <hr className="my-2" />
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <User className="h-4 w-4" />
-                  <span>{user.email}</span>
+                  <span>{user?.email}</span>
                 </div>
+                <Button variant="ghost" size="sm" onClick={handleLogout} className="justify-start">
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sair
+                </Button>
               </nav>
             </SheetContent>
           </Sheet>
