@@ -1,32 +1,77 @@
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { authService } from '@/services/auth';
 import type { User } from '@/types';
 
-// Fixed user for development (no JWT yet)
-const FIXED_USER: User = {
-  id: '11111111-1111-1111-1111-111111111111',
-  email: 'fixed-owner@local.dev',
-  username: 'Dev User',
-};
-
 interface AuthContextType {
-  user: User;
-  isAuthenticated: true;
-  isLoading: false;
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string) => Promise<void>;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
-  user: FIXED_USER,
-  isAuthenticated: true,
-  isLoading: false,
+  user: null,
+  isAuthenticated: false,
+  isLoading: true,
+  login: async () => {},
+  register: async () => {},
+  logout: () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Check for existing token on mount
+    const existingUser = authService.getUser();
+    if (existingUser) {
+      setUser({
+        id: existingUser.id,
+        email: existingUser.email,
+      });
+    }
+    setIsLoading(false);
+  }, []);
+
+  const login = useCallback(async (email: string, password: string) => {
+    const response = await authService.login({ email, password });
+    const userData = authService.getUser();
+    if (userData) {
+      setUser({
+        id: userData.id,
+        email: userData.email,
+      });
+    }
+  }, []);
+
+  const register = useCallback(async (email: string, password: string) => {
+    const response = await authService.register({ email, password });
+    const userData = authService.getUser();
+    if (userData) {
+      setUser({
+        id: userData.id,
+        email: userData.email,
+      });
+    }
+  }, []);
+
+  const logout = useCallback(() => {
+    authService.logout();
+    setUser(null);
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
-        user: FIXED_USER,
-        isAuthenticated: true,
-        isLoading: false,
+        user,
+        isAuthenticated: !!user,
+        isLoading,
+        login,
+        register,
+        logout,
       }}
     >
       {children}
