@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { FileText, Menu, User, Upload, Home, LogOut } from 'lucide-react';
+import { FileText, Menu, User, Upload, LogOut } from 'lucide-react';
 import { useState } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
@@ -17,14 +17,6 @@ export function Header() {
 
   const NavLinks = ({ mobile = false }: { mobile?: boolean }) => (
     <>
-      <Link
-        to="/dashboard"
-        className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-        onClick={() => mobile && setMobileOpen(false)}
-      >
-        <Home className="h-4 w-4" />
-        Feed
-      </Link>
       <Link
         to="/my-resumes"
         className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
@@ -47,7 +39,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
-        <Link to="/dashboard" className="flex items-center gap-2">
+        <Link to="/my-resumes" className="flex items-center gap-2">
           <FileText className="h-6 w-6 text-primary" />
           <span className="text-xl font-bold text-primary">Resume Feedback</span>
         </Link>
