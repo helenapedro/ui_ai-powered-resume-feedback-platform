@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { VersionHistory } from '@/components/VersionHistory';
+import { ShareLinkModal } from '@/components/ShareLinkModal';
+import { SharedLinksList } from '@/components/SharedLinksList';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -18,8 +20,9 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { resumeService } from '@/services/resumes';
+import { sharingService } from '@/services/sharing';
 import { useToast } from '@/hooks/use-toast';
-import type { ResumeSummary, ResumeVersion } from '@/types';
+import type { ResumeSummary, ResumeVersion, SharedLink, SharePermission } from '@/types';
 import {
   ArrowLeft,
   Trash2,
@@ -28,6 +31,7 @@ import {
   Loader2,
   Upload,
   Hash,
+  Share2,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -39,12 +43,17 @@ export default function ResumeDetails() {
 
   const [resume, setResume] = useState<ResumeSummary | null>(null);
   const [versions, setVersions] = useState<ResumeVersion[]>([]);
+  const [sharedLinks, setSharedLinks] = useState<SharedLink[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isCreatingLink, setIsCreatingLink] = useState(false);
+  const [isLoadingLinks, setIsLoadingLinks] = useState(false);
 
   useEffect(() => {
     if (id) {
       fetchResume();
+      fetchSharedLinks();
     }
   }, [id]);
 
@@ -59,9 +68,64 @@ export default function ResumeDetails() {
         title: 'Erro ao carregar currículo',
         description: error instanceof Error ? error.message : 'Tente novamente.',
       });
-      navigate('/dashboard');
+      navigate('/my-resumes');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchSharedLinks = async () => {
+    setIsLoadingLinks(true);
+    try {
+      const links = await sharingService.getShareLinks(id!);
+      setSharedLinks(links);
+    } catch (error) {
+      // Silent fail - links are optional
+    } finally {
+      setIsLoadingLinks(false);
+    }
+  };
+
+  const handleCreateShareLink = async (permission: SharePermission, expiresAt?: string) => {
+    setIsCreatingLink(true);
+    try {
+      const newLink = await sharingService.createShareLink(id!, {
+        permission,
+        expiresAt: expiresAt ? new Date(expiresAt).toISOString() : undefined,
+      });
+      setSharedLinks((prev) => [...prev, newLink]);
+      
+      // Copy to clipboard
+      const url = `${window.location.origin}/share/${newLink.token}`;
+      await navigator.clipboard.writeText(url);
+      
+      toast({
+        title: 'Link criado e copiado!',
+        description: 'O link de partilha foi copiado para a área de transferência.',
+      });
+      setIsShareModalOpen(false);
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Erro ao criar link',
+        description: error instanceof Error ? error.message : 'Tente novamente.',
+      });
+    } finally {
+      setIsCreatingLink(false);
+    }
+  };
+
+  const handleRevokeLink = async (linkId: string) => {
+    try {
+      await sharingService.revokeShareLink(id!, linkId);
+      setSharedLinks((prev) => prev.filter((l) => l.id !== linkId));
+      toast({ title: 'Link revogado!' });
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Erro ao revogar link',
+        description: error instanceof Error ? error.message : 'Tente novamente.',
+      });
     }
   };
 
@@ -114,6 +178,10 @@ export default function ResumeDetails() {
           </Button>
           
           <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={() => setIsShareModalOpen(true)}>
+              <Share2 className="h-4 w-4 mr-2" />
+              Partilhar
+            </Button>
             <Button variant="outline" asChild>
               <Link to={`/upload?resumeId=${resume.id}`}>
                 <Upload className="h-4 w-4 mr-2" />
@@ -209,6 +277,24 @@ export default function ResumeDetails() {
             isLoading={false}
           />
         </div>
+
+        {/* Shared Links Section */}
+        <div className="mt-8">
+          <SharedLinksList
+            links={sharedLinks}
+            isLoading={isLoadingLinks}
+            onRevoke={handleRevokeLink}
+            baseUrl={window.location.origin}
+          />
+        </div>
+
+        {/* Share Link Modal */}
+        <ShareLinkModal
+          open={isShareModalOpen}
+          onOpenChange={setIsShareModalOpen}
+          onSubmit={handleCreateShareLink}
+          isLoading={isCreatingLink}
+        />
       </main>
     </div>
   );

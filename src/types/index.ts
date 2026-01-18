@@ -71,3 +71,15 @@ export interface ApiError {
   message: string;
   error?: string;
 }
+
+export type SharePermission = 'VIEW' | 'COMMENT';
+
+export interface SharedLink {
+  id: string;
+  resumeId: string;
+  token: string;
+  permission: SharePermission;
+  expiresAt: string;
+  createdAt: string;
+  revoked: boolean;
+}

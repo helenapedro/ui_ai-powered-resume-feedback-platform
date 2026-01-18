@@ -5,10 +5,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import Dashboard from "./pages/Dashboard";
 import MyResumes from "./pages/MyResumes";
 import Upload from "./pages/Upload";
 import ResumeDetails from "./pages/ResumeDetails";
+import SharedResume from "./pages/SharedResume";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -22,16 +22,9 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/" element={<Navigate to="/my-resumes" replace />} />
             <Route path="/auth" element={<Auth />} />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/share/:token" element={<SharedResume />} />
             <Route
               path="/my-resumes"
               element={
