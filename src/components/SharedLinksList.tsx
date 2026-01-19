@@ -117,11 +117,13 @@ export function SharedLinksList({
                         <Clock className="h-3 w-3" />
                         <span>
                           Criado{' '}
-                          {format(new Date(link.createdAt), "dd/MM/yyyy 'às' HH:mm", {
-                            locale: ptBR,
-                          })}
+                          {link.createdAt && !isNaN(new Date(link.createdAt).getTime())
+                            ? format(new Date(link.createdAt), "dd/MM/yyyy 'às' HH:mm", {
+                                locale: ptBR,
+                              })
+                            : 'Data desconhecida'}
                         </span>
-                        {link.expiresAt && (
+                        {link.expiresAt && !isNaN(new Date(link.expiresAt).getTime()) && (
                           <span className="text-muted-foreground">
                             · Expira{' '}
                             {format(new Date(link.expiresAt), 'dd/MM/yyyy', {
