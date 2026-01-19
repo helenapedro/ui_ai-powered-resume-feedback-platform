@@ -29,7 +29,7 @@ export default function Auth() {
         title: 'Login realizado!',
         description: 'Bem-vindo de volta.',
       });
-      navigate('/dashboard');
+      navigate('/my-resumes');
     } catch (error) {
       toast({
         title: 'Erro no login',
@@ -76,7 +76,7 @@ export default function Auth() {
         title: 'Conta criada!',
         description: 'Você foi autenticado automaticamente.',
       });
-      navigate('/dashboard');
+      navigate('/my-resumes');
     } catch (error) {
       toast({
         title: 'Erro no registro',
