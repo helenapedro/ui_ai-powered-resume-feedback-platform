@@ -30,13 +30,13 @@ export default function Landing() {
             
             <div className="flex items-center justify-center gap-4 pt-4">
               <Button asChild size="lg" className="gap-2">
-                <Link to="/register">
+                <Link to="/auth">
                   Começar Agora
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg">
-                <Link to="/login">Já tenho conta</Link>
+                <Link to="/auth">Já tenho conta</Link>
               </Button>
             </div>
           </div>
@@ -95,7 +95,7 @@ export default function Landing() {
             Junte-se a milhares de profissionais que já estão evoluindo suas carreiras.
           </p>
           <Button asChild size="lg" variant="secondary" className="gap-2">
-            <Link to="/register">
+            <Link to="/auth">
               Criar conta grátis
               <ArrowRight className="h-4 w-4" />
             </Link>
