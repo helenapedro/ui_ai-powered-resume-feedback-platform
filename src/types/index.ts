@@ -79,7 +79,7 @@ export interface SharedLink {
   resumeId: string;
   token: string;
   permission: SharePermission;
-  expiresAt: string;
+  expiresAt: string | null;
   createdAt: string;
   revoked: boolean;
 }
