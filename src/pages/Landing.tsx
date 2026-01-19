@@ -1,12 +1,22 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Header } from '@/components/Header';
 import { FileText, MessageSquare, History, Sparkles, ArrowRight } from 'lucide-react';
 
 export default function Landing() {
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      {/* Public Header */}
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-16 items-center justify-between">
+          <Link to="/" className="flex items-center gap-2">
+            <FileText className="h-6 w-6 text-primary" />
+            <span className="text-xl font-bold text-primary">Resume Feedback</span>
+          </Link>
+          <Button asChild>
+            <Link to="/auth">Entrar</Link>
+          </Button>
+        </div>
+      </header>
       
       {/* Hero Section */}
       <section className="flex-1 flex items-center justify-center py-20 px-4">
