@@ -23,7 +23,7 @@ export interface SharedResumeResponse {
 export const sharingService = {
   // Create a new share link for a resume
   async createShareLink(resumeId: string, request: CreateShareLinkRequest): Promise<SharedLink> {
-    return apiClient.post<SharedLink>(`/resumes/${resumeId}/share`, request);
+    return apiClient.post<SharedLink>(`/resumes/${resumeId}/share-links`, request);
   },
 
   // Get resume by share token (public endpoint)
@@ -33,11 +33,11 @@ export const sharingService = {
 
   // List all share links for a resume
   async getShareLinks(resumeId: string): Promise<SharedLink[]> {
-    return apiClient.get<SharedLink[]>(`/resumes/${resumeId}/shares`);
+    return apiClient.get<SharedLink[]>(`/resumes/${resumeId}/share-links`);
   },
 
-  // Revoke a share link
+  // Revoke a share link (POST instead of DELETE per backend spec)
   async revokeShareLink(resumeId: string, linkId: string): Promise<void> {
-    return apiClient.delete(`/resumes/${resumeId}/share/${linkId}`);
+    return apiClient.post(`/resumes/${resumeId}/share-links/${linkId}/revoke`);
   },
 };
