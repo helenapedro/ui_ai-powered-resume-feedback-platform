@@ -1,5 +1,5 @@
 import { apiClient } from './api';
-import type { SharedLink, SharePermission } from '@/types';
+import type { SharedLink, SharePermission, Comment } from '@/types';
 
 export interface CreateShareLinkRequest {
   permission: SharePermission;

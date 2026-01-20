@@ -1,16 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { sharingService, SharedResumeResponse } from '@/services/sharing';
+import { CommentList } from '@/components/CommentList';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { FileText, Calendar, AlertCircle, ExternalLink } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import type { Comment } from '@/types';
+import { FileText, AlertCircle, ExternalLink } from 'lucide-react';
 
 export default function SharedResume() {
   const { token } = useParams<{ token: string }>();
+  const { toast } = useToast();
   const [data, setData] = useState<SharedResumeResponse | null>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingComments, setIsLoadingComments] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -23,6 +29,10 @@ export default function SharedResume() {
     try {
       const response = await sharingService.getSharedResume(token!);
       setData(response);
+      // Fetch comments after getting resume data
+      if (response.permission === 'COMMENT') {
+        fetchComments();
+      }
     } catch (err) {
       setError(
         err instanceof Error
@@ -32,6 +42,37 @@ export default function SharedResume() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const fetchComments = async () => {
+    setIsLoadingComments(true);
+    try {
+      const commentsData = await sharingService.getSharedComments(token!);
+      setComments(commentsData);
+    } catch (err) {
+      // Silent fail for comments
+    } finally {
+      setIsLoadingComments(false);
+    }
+  };
+
+  const handleAddComment = useCallback(async (content: string) => {
+    try {
+      const newComment = await sharingService.postSharedComment(token!, content);
+      setComments((prev) => [...prev, newComment]);
+      toast({ title: 'Comentário adicionado!' });
+    } catch (err) {
+      toast({
+        variant: 'destructive',
+        title: 'Erro ao adicionar comentário',
+        description: err instanceof Error ? err.message : 'Tente novamente.',
+      });
+    }
+  }, [token, toast]);
+
+  const handleDownload = () => {
+    const downloadUrl = sharingService.getSharedResumeDownloadUrl(token!);
+    window.open(downloadUrl, '_blank');
   };
 
   if (isLoading) {
@@ -107,7 +148,7 @@ export default function SharedResume() {
               <p className="text-muted-foreground mb-4">
                 Pré-visualização do currículo
               </p>
-              <Button variant="outline">
+              <Button variant="outline" onClick={handleDownload}>
                 <ExternalLink className="h-4 w-4 mr-2" />
                 Abrir Ficheiro
               </Button>
@@ -116,9 +157,11 @@ export default function SharedResume() {
             {data.permission === 'COMMENT' && (
               <div className="border-t pt-6">
                 <h3 className="font-semibold mb-4">Comentários</h3>
-                <p className="text-sm text-muted-foreground">
-                  Funcionalidade de comentários disponível em breve.
-                </p>
+                <CommentList
+                  comments={comments}
+                  isLoading={isLoadingComments}
+                  onAddComment={handleAddComment}
+                />
               </div>
             )}
           </CardContent>
