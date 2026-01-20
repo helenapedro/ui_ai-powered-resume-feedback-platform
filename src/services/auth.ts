@@ -11,6 +11,8 @@ interface AuthCredentials {
 
 export const authService = {
   async register(credentials: AuthCredentials): Promise<AuthResponse> {
+    // Clear any existing token before registration to avoid 401 errors
+    localStorage.removeItem('token');
     const response = await apiClient.post<AuthResponse>('/auth/register', credentials);
     if (response.accessToken) {
       localStorage.setItem('token', response.accessToken);
@@ -19,6 +21,8 @@ export const authService = {
   },
 
   async login(credentials: AuthCredentials): Promise<AuthResponse> {
+    // Clear any existing token before login to avoid 401 errors
+    localStorage.removeItem('token');
     const response = await apiClient.post<AuthResponse>('/auth/login', credentials);
     if (response.accessToken) {
       localStorage.setItem('token', response.accessToken);
