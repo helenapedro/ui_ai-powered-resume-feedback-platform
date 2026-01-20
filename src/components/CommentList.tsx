@@ -24,8 +24,8 @@ interface CommentListProps {
   comments: Comment[];
   isLoading: boolean;
   onAddComment: (content: string) => Promise<void>;
-  onEditComment: (commentId: string, content: string) => Promise<void>;
-  onDeleteComment: (commentId: string) => Promise<void>;
+  onEditComment?: (commentId: string, content: string) => Promise<void>;
+  onDeleteComment?: (commentId: string) => Promise<void>;
 }
 
 export function CommentList({
@@ -53,7 +53,7 @@ export function CommentList({
   };
 
   const handleEdit = async (commentId: string) => {
-    if (!editText.trim()) return;
+    if (!editText.trim() || !onEditComment) return;
     setIsSubmitting(true);
     try {
       await onEditComment(commentId, editText);
@@ -65,6 +65,7 @@ export function CommentList({
   };
 
   const handleDelete = async (commentId: string) => {
+    if (!onDeleteComment) return;
     await onDeleteComment(commentId);
   };
 
@@ -142,47 +143,51 @@ export function CommentList({
                         })}
                       </span>
                     </div>
-                    {getUserId() === getCommenterId(comment) && (
+                    {getUserId() === getCommenterId(comment) && (onEditComment || onDeleteComment) && (
                       <div className="flex items-center gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => {
-                            setEditingId(commentId);
-                            setEditText(comment.content);
-                          }}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-destructive hover:text-destructive"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Deletar comentário?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Esta ação não pode ser desfeita.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => handleDelete(commentId)}
-                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        {onEditComment && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => {
+                              setEditingId(commentId);
+                              setEditText(comment.content);
+                            }}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        )}
+                        {onDeleteComment && (
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-destructive hover:text-destructive"
                               >
-                                Deletar
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Deletar comentário?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Esta ação não pode ser desfeita.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => handleDelete(commentId)}
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                >
+                                  Deletar
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        )}
                       </div>
                     )}
                   </div>
