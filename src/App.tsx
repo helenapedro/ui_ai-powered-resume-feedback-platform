@@ -1,3 +1,4 @@
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,47 +16,51 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/share/:token" element={<SharedResume />} />
-            <Route
-              path="/my-resumes"
-              element={
-                <ProtectedRoute>
-                  <MyResumes />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/upload"
-              element={
-                <ProtectedRoute>
-                  <Upload />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/resume/:id"
-              element={
-                <ProtectedRoute>
-                  <ResumeDetails />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <React.StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Landing />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/share/:token" element={<SharedResume />} />
+                <Route
+                  path="/my-resumes"
+                  element={
+                    <ProtectedRoute>
+                      <MyResumes />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/upload"
+                  element={
+                    <ProtectedRoute>
+                      <Upload />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/resume/:id"
+                  element={
+                    <ProtectedRoute>
+                      <ResumeDetails />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </React.StrictMode>
+  );
+}
 
 export default App;
