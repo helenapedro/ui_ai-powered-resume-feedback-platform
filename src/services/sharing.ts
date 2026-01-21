@@ -1,24 +1,13 @@
 import { apiClient } from './api';
-import type { SharedLink, SharePermission, Comment } from '@/types';
+import type { SharedLink, SharePermission, Comment, SharedResumeData } from '@/types';
 
 export interface CreateShareLinkRequest {
   permission: SharePermission;
   maxUses?: number;
 }
 
-export interface SharedResumeResponse {
-  resume: {
-    id: string;
-    title: string;
-  };
-  version: {
-    id: string;
-    versionNumber: number;
-    originalFilename: string;
-    contentType: string;
-  };
-  permission: SharePermission;
-}
+// Re-export for backward compatibility
+export type SharedResumeResponse = SharedResumeData;
 
 export const sharingService = {
   // Create a new share link for a resume (JWT)

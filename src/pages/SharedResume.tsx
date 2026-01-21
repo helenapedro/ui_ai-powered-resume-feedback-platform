@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { sharingService, SharedResumeResponse } from '@/services/sharing';
+import { sharingService } from '@/services/sharing';
+import type { SharedResumeData } from '@/types';
 import { CommentList } from '@/components/CommentList';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,7 +14,7 @@ import { FileText, AlertCircle, ExternalLink } from 'lucide-react';
 export default function SharedResume() {
   const { token } = useParams<{ token: string }>();
   const { toast } = useToast();
-  const [data, setData] = useState<SharedResumeResponse | null>(null);
+  const [data, setData] = useState<SharedResumeData | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingComments, setIsLoadingComments] = useState(false);
@@ -133,11 +134,10 @@ export default function SharedResume() {
               </div>
               <div className="flex-1">
                 <CardTitle className="text-2xl mb-2">
-                  {data.resume.title || 'Currículo'}
+                  Currículo Partilhado
                 </CardTitle>
                 <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                  <Badge>v{data.version.versionNumber}</Badge>
-                  <span>{data.version.originalFilename}</span>
+                  <Badge>ID: {data.resumeId.slice(0, 8)}...</Badge>
                 </div>
               </div>
             </div>
