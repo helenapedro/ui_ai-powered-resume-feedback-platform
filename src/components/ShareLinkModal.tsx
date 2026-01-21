@@ -14,10 +14,15 @@ import { Input } from '@/components/ui/input';
 import { Loader2, Link as LinkIcon } from 'lucide-react';
 import type { SharePermission } from '@/types';
 
+export interface ShareLinkFormData {
+  permission: SharePermission;
+  maxUses?: number;
+}
+
 interface ShareLinkModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (permission: SharePermission, expiresAt?: string) => Promise<void>;
+  onSubmit: (data: ShareLinkFormData) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -28,18 +33,16 @@ export function ShareLinkModal({
   isLoading,
 }: ShareLinkModalProps) {
   const [permission, setPermission] = useState<SharePermission>('VIEW');
-  const [expiresAt, setExpiresAt] = useState('');
+  const [maxUses, setMaxUses] = useState<string>('');
 
   const handleSubmit = async () => {
-    await onSubmit(permission, expiresAt || undefined);
+    await onSubmit({
+      permission,
+      maxUses: maxUses ? parseInt(maxUses, 10) : undefined,
+    });
     setPermission('VIEW');
-    setExpiresAt('');
+    setMaxUses('');
   };
-
-  // Get tomorrow's date as minimum
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const minDate = tomorrow.toISOString().split('T')[0];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -77,16 +80,17 @@ export function ShareLinkModal({
           </div>
 
           <div className="space-y-3">
-            <Label htmlFor="expires">Data de Expiração (opcional)</Label>
+            <Label htmlFor="maxUses">Número Máximo de Utilizações (opcional)</Label>
             <Input
-              id="expires"
-              type="date"
-              min={minDate}
-              value={expiresAt}
-              onChange={(e) => setExpiresAt(e.target.value)}
+              id="maxUses"
+              type="number"
+              min="1"
+              placeholder="Sem limite"
+              value={maxUses}
+              onChange={(e) => setMaxUses(e.target.value)}
             />
             <p className="text-xs text-muted-foreground">
-              Deixe em branco para link sem expiração.
+              Deixe em branco para utilizações ilimitadas.
             </p>
           </div>
         </div>

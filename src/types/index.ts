@@ -76,12 +76,10 @@ export type SharePermission = 'VIEW' | 'COMMENT';
 
 export interface SharedLink {
   id: string;
-  resumeId: string;
   token: string;
   permission: SharePermission;
   expiresAt: string | null;
   maxUses: number | null;
-  useCount: number;
-  createdAt: string;
-  revoked: boolean;
+  createdAt?: string;
+  revoked?: boolean;
 }
