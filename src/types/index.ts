@@ -80,6 +80,8 @@ export interface SharedLink {
   token: string;
   permission: SharePermission;
   expiresAt: string | null;
+  maxUses: number | null;
+  useCount: number;
   createdAt: string;
   revoked: boolean;
 }

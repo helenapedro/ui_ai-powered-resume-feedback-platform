@@ -8,7 +8,7 @@ export const commentService = {
   },
 
   async addComment(resumeId: string, versionId: string, content: string): Promise<Comment> {
-    return apiClient.post<Comment>(`/resumes/${resumeId}/versions/${versionId}/comments`, { content });
+    return apiClient.post<Comment>(`/resumes/${resumeId}/versions/${versionId}/comments`, { body: content });
   },
 
   async updateComment(commentId: string, content: string): Promise<{ message: string; comment: Comment }> {

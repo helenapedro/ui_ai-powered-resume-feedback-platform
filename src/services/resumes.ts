@@ -34,6 +34,12 @@ export const resumeService = {
     return apiClient.delete(`/resumes/${resumeId}`);
   },
 
+  // Download a specific version of a resume
+  getVersionDownloadUrl(resumeId: string, versionId: string): string {
+    const baseUrl = import.meta.env.VITE_API_URL || 'https://janett-achlamydate-springingly.ngrok-free.dev/api';
+    return `${baseUrl}/resumes/${resumeId}/versions/${versionId}/download`;
+  },
+
   // Ping endpoint for testing connectivity
   async ping(): Promise<string> {
     return apiClient.get<string>('/ping');
