@@ -18,14 +18,6 @@ export function Header() {
   const NavLinks = ({ mobile = false }: { mobile?: boolean }) => (
     <>
       <Link
-        to="/my-resumes"
-        className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-        onClick={() => mobile && setMobileOpen(false)}
-      >
-        <FileText className="h-4 w-4" />
-        Meus Currículos
-      </Link>
-      <Link
         to="/upload"
         className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
         onClick={() => mobile && setMobileOpen(false)}
