@@ -3,7 +3,6 @@ import type { SharedLink, SharePermission, Comment } from '@/types';
 
 export interface CreateShareLinkRequest {
   permission: SharePermission;
-  expiresAt?: string;
   maxUses?: number;
 }
 

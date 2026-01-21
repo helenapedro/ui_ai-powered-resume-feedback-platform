@@ -22,7 +22,8 @@ import {
 import { resumeService } from '@/services/resumes';
 import { sharingService } from '@/services/sharing';
 import { useToast } from '@/hooks/use-toast';
-import type { ResumeSummary, ResumeVersion, SharedLink, SharePermission } from '@/types';
+import type { ResumeSummary, ResumeVersion, SharedLink } from '@/types';
+import type { ShareLinkFormData } from '@/components/ShareLinkModal';
 import {
   ArrowLeft,
   Trash2,
@@ -86,12 +87,12 @@ export default function ResumeDetails() {
     }
   };
 
-  const handleCreateShareLink = async (permission: SharePermission, expiresAt?: string) => {
+  const handleCreateShareLink = async (data: ShareLinkFormData) => {
     setIsCreatingLink(true);
     try {
       const newLink = await sharingService.createShareLink(id!, {
-        permission,
-        expiresAt: expiresAt ? new Date(expiresAt).toISOString() : undefined,
+        permission: data.permission,
+        maxUses: data.maxUses,
       });
       setSharedLinks((prev) => [...prev, newLink]);
       
