@@ -26,6 +26,8 @@ export interface ResumeVersion {
   versionNumber: number;
   originalFilename: string;
   contentType: string;
+  fileSizeBytes?: number;
+  createdById?: string;
   createdAt: string;
 }
 
@@ -76,10 +78,20 @@ export type SharePermission = 'VIEW' | 'COMMENT';
 
 export interface SharedLink {
   id: string;
-  token: string;
+  token?: string;
   permission: SharePermission;
   expiresAt: string | null;
+  revokedAt?: string | null;
   maxUses: number | null;
+  useCount?: number;
   createdAt?: string;
-  revoked?: boolean;
+  createdBy?: string;
+}
+
+// Response from GET /api/share/{token}
+export interface SharedResumeData {
+  resumeId: string;
+  currentVersionId: string;
+  permission: SharePermission;
+  expiresAt: string | null;
 }

@@ -51,7 +51,7 @@ export function SharedLinksList({
     }
   };
 
-  const activeLinks = links.filter((l) => !l.revoked);
+  const activeLinks = links.filter((l) => !l.revokedAt);
 
   if (isLoading) {
     return (
