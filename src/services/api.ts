@@ -12,6 +12,7 @@ class ApiClient {
     const token = this.getToken();
     
     const headers: HeadersInit = {
+      'ngrok-skip-browser-warning': 'true',
       ...options.headers,
     };
 
