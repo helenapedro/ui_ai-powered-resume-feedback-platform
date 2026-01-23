@@ -54,12 +54,18 @@ export interface Resume {
 export interface Comment {
   id: string;
   _id?: string;
-  resumeId: string;
-  resumeVersionId?: string;
-  commenterId?: User;
-  content: string;
+  resumeVersionId: string;
+  authorUserId: string | null;
+  authorLabel: string;
+  body: string;
+  anchorRef?: string | null;
+  parentCommentId?: string | null;
   createdAt: string;
-  updatedAt?: string;
+  updatedAt?: string | null;
+  // Legacy fields for backward compatibility
+  resumeId?: string;
+  commenterId?: User;
+  content?: string;
 }
 
 export interface PaginatedResponse<T> {

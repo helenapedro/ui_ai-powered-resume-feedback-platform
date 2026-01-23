@@ -36,6 +36,7 @@ export function SharedLinksList({
   const [revokingId, setRevokingId] = useState<string | null>(null);
 
   const copyToClipboard = async (link: SharedLink) => {
+    if (!link.token) return;
     const url = `${baseUrl}/share/${link.token}`;
     await navigator.clipboard.writeText(url);
     setCopiedId(link.id);
@@ -136,18 +137,21 @@ export function SharedLinksList({
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => copyToClipboard(link)}
-                      disabled={isExpired}
-                    >
-                      {copiedId === link.id ? (
-                        <Check className="h-4 w-4 text-green-500" />
-                      ) : (
-                        <Copy className="h-4 w-4" />
-                      )}
-                    </Button>
+                    {link.token && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => copyToClipboard(link)}
+                        disabled={isExpired}
+                        title="Copiar link"
+                      >
+                        {copiedId === link.id ? (
+                          <Check className="h-4 w-4 text-success" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )}
+                      </Button>
+                    )}
 
                     <AlertDialog>
                       <AlertDialogTrigger asChild>

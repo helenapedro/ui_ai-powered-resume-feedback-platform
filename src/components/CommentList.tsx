@@ -71,7 +71,9 @@ export function CommentList({
 
   const getCommentId = (comment: Comment) => comment.id || comment._id || '';
   const getUserId = () => user?.id || (user as any)?._id || '';
-  const getCommenterId = (comment: Comment) => comment.commenterId?.id || (comment.commenterId as any)?._id || '';
+  const getCommentAuthorId = (comment: Comment) => comment.authorUserId || comment.commenterId?.id || '';
+  const getCommentContent = (comment: Comment) => comment.body || comment.content || '';
+  const getCommentAuthorLabel = (comment: Comment) => comment.authorLabel || comment.commenterId?.username || 'Visitante';
 
   if (isLoading) {
     return (
@@ -95,7 +97,7 @@ export function CommentList({
       <div className="flex gap-3">
         <Avatar>
           <AvatarFallback className="bg-primary text-primary-foreground">
-            {user?.username?.charAt(0).toUpperCase()}
+            {user?.username?.charAt(0).toUpperCase() || 'G'}
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 space-y-2">
@@ -129,13 +131,13 @@ export function CommentList({
               <div key={commentId} className="flex gap-3">
                 <Avatar>
                   <AvatarFallback className="bg-secondary text-secondary-foreground">
-                    {comment.commenterId?.username?.charAt(0).toUpperCase() || 'U'}
+                    {getCommentAuthorLabel(comment).charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-sm">{comment.commenterId?.username || 'Usuário'}</span>
+                      <span className="font-medium text-sm">{getCommentAuthorLabel(comment)}</span>
                       <span className="text-xs text-muted-foreground">
                         {formatDistanceToNow(new Date(comment.createdAt), {
                           addSuffix: true,
@@ -143,7 +145,7 @@ export function CommentList({
                         })}
                       </span>
                     </div>
-                    {getUserId() === getCommenterId(comment) && (onEditComment || onDeleteComment) && (
+                    {user && getUserId() === getCommentAuthorId(comment) && (onEditComment || onDeleteComment) && (
                       <div className="flex items-center gap-1">
                         {onEditComment && (
                           <Button
@@ -152,7 +154,7 @@ export function CommentList({
                             className="h-8 w-8"
                             onClick={() => {
                               setEditingId(commentId);
-                              setEditText(comment.content);
+                              setEditText(getCommentContent(comment));
                             }}
                           >
                             <Edit className="h-4 w-4" />
@@ -219,7 +221,7 @@ export function CommentList({
                       </div>
                     </div>
                   ) : (
-                    <p className="text-sm mt-1 text-muted-foreground">{comment.content}</p>
+                    <p className="text-sm mt-1 text-muted-foreground">{getCommentContent(comment)}</p>
                   )}
                 </div>
               </div>
