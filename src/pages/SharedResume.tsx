@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { sharingService } from '@/services/sharing';
 import type { SharedResumeData } from '@/types';
 import { CommentList } from '@/components/CommentList';
+import { PdfViewer } from '@/components/PdfViewer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -143,14 +144,17 @@ export default function SharedResume() {
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="bg-muted/50 rounded-lg p-8 text-center">
-              <FileText className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground mb-4">
-                Pré-visualização do currículo
-              </p>
+            {/* Inline PDF Viewer */}
+            <PdfViewer
+              fileUrl={sharingService.getSharedResumeDownloadUrl(token!)}
+              className="min-h-[600px]"
+            />
+            
+            {/* Download button as fallback */}
+            <div className="flex justify-center">
               <Button variant="outline" onClick={handleDownload}>
                 <ExternalLink className="h-4 w-4 mr-2" />
-                Abrir Ficheiro
+                Abrir em Nova Janela
               </Button>
             </div>
 
