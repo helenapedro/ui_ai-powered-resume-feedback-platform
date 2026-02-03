@@ -16,7 +16,8 @@ import type { SharePermission } from '@/types';
 
 export interface ShareLinkFormData {
   permission: SharePermission;
-  maxUses?: number;
+  expiresAt?: string | null;
+  maxUses?: number | null;
 }
 
 interface ShareLinkModalProps {
@@ -34,14 +35,17 @@ export function ShareLinkModal({
 }: ShareLinkModalProps) {
   const [permission, setPermission] = useState<SharePermission>('VIEW');
   const [maxUses, setMaxUses] = useState<string>('');
+  const [expiresAt, setExpiresAt] = useState<string>('');
 
   const handleSubmit = async () => {
     await onSubmit({
       permission,
-      maxUses: maxUses ? parseInt(maxUses, 10) : undefined,
+      expiresAt: expiresAt ? new Date(expiresAt).toISOString() : null,
+      maxUses: maxUses ? parseInt(maxUses, 10) : null,
     });
     setPermission('VIEW');
     setMaxUses('');
+    setExpiresAt('');
   };
 
   return (
@@ -77,6 +81,19 @@ export function ShareLinkModal({
                 </Label>
               </div>
             </RadioGroup>
+          </div>
+
+          <div className="space-y-3">
+            <Label htmlFor="expiresAt">Data de Expiração (opcional)</Label>
+            <Input
+              id="expiresAt"
+              type="datetime-local"
+              value={expiresAt}
+              onChange={(e) => setExpiresAt(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Deixe em branco para link sem expiração.
+            </p>
           </div>
 
           <div className="space-y-3">
