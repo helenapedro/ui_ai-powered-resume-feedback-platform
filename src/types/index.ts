@@ -101,3 +101,36 @@ export interface SharedResumeData {
   permission: SharePermission;
   expiresAt: string | null;
 }
+
+// AI Job Status
+export type AiJobStatus = 'PENDING' | 'PROCESSING' | 'DONE' | 'FAILED';
+
+// AI Job DTO
+export interface AiJobDTO {
+  id: string;
+  resumeVersionId: string;
+  status: AiJobStatus;
+  attemptCount: number;
+  createdAt: string;
+  updatedAt: string | null;
+  startedAt: string | null;
+  finishedAt: string | null;
+  errorCode: string | null;
+  errorDetail: string | null;
+  nextRetryAt: string | null;
+}
+
+// AI Feedback DTO
+export interface AiFeedbackDTO {
+  resumeId: string;
+  resumeVersionId: string;
+  jobId: string;
+  feedbackVersion: number;
+  mongoDocId: string;
+  model: string;
+  promptVersion: string;
+  createdAt: string;
+  summary: string;
+  strengths: string[];
+  improvements: string[];
+}

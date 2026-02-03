@@ -58,9 +58,12 @@ export default function SharedResume() {
     }
   };
 
-  const handleAddComment = useCallback(async (content: string) => {
+  const handleAddComment = useCallback(async (content: string, guestLabel?: string) => {
     try {
-      const newComment = await sharingService.postSharedComment(token!, content);
+      const newComment = await sharingService.postSharedComment(token!, {
+        body: content,
+        guestLabel: guestLabel || null,
+      });
       setComments((prev) => [...prev, newComment]);
       toast({ title: 'Comentário adicionado!' });
     } catch (err) {

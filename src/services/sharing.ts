@@ -3,7 +3,15 @@ import type { SharedLink, SharePermission, Comment, SharedResumeData } from '@/t
 
 export interface CreateShareLinkRequest {
   permission: SharePermission;
-  maxUses?: number;
+  expiresAt?: string | null;
+  maxUses?: number | null;
+}
+
+export interface CreatePublicCommentRequest {
+  body: string;
+  anchorRef?: string | null;
+  parentCommentId?: string | null;
+  guestLabel?: string | null;
 }
 
 // Re-export for backward compatibility
@@ -31,8 +39,8 @@ export const sharingService = {
   },
 
   // Post comment on shared resume (public, requires COMMENT permission)
-  async postSharedComment(token: string, content: string): Promise<Comment> {
-    return apiClient.post<Comment>(`/share/${token}/comments`, { body: content });
+  async postSharedComment(token: string, request: CreatePublicCommentRequest): Promise<Comment> {
+    return apiClient.post<Comment>(`/share/${token}/comments`, request);
   },
 
   // List all share links for a resume (JWT)

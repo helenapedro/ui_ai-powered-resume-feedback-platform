@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -23,7 +24,7 @@ import { useAuth } from '@/contexts/AuthContext';
 interface CommentListProps {
   comments: Comment[];
   isLoading: boolean;
-  onAddComment: (content: string) => Promise<void>;
+  onAddComment: (content: string, guestLabel?: string) => Promise<void>;
   onEditComment?: (commentId: string, content: string) => Promise<void>;
   onDeleteComment?: (commentId: string) => Promise<void>;
 }
@@ -37,6 +38,7 @@ export function CommentList({
 }: CommentListProps) {
   const { user } = useAuth();
   const [newComment, setNewComment] = useState('');
+  const [guestLabel, setGuestLabel] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,8 +47,9 @@ export function CommentList({
     if (!newComment.trim()) return;
     setIsSubmitting(true);
     try {
-      await onAddComment(newComment);
+      await onAddComment(newComment, user ? undefined : guestLabel || undefined);
       setNewComment('');
+      setGuestLabel('');
     } finally {
       setIsSubmitting(false);
     }
@@ -101,6 +104,14 @@ export function CommentList({
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 space-y-2">
+          {!user && (
+            <Input
+              placeholder="O seu nome (ex: Recruiter, HR Manager)"
+              value={guestLabel}
+              onChange={(e) => setGuestLabel(e.target.value)}
+              className="mb-2"
+            />
+          )}
           <Textarea
             placeholder="Adicionar um comentário..."
             value={newComment}
