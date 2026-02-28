@@ -1,18 +1,21 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { History, FileText } from 'lucide-react';
+import { History, FileText, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { ResumeVersion } from '@/types';
+import { resumeService } from '@/services/resumes';
 
 interface VersionHistoryProps {
+  resumeId: string;
   versions: ResumeVersion[];
   currentVersionId: string | null;
   isLoading: boolean;
 }
 
-export function VersionHistory({ versions, currentVersionId, isLoading }: VersionHistoryProps) {
+export function VersionHistory({ resumeId, versions, currentVersionId, isLoading }: VersionHistoryProps) {
   if (isLoading) {
     return (
       <Card>
@@ -99,9 +102,22 @@ export function VersionHistory({ versions, currentVersionId, isLoading }: Versio
                   </p>
                 </div>
               </div>
-              <Badge variant="outline" className="text-xs">
-                {version.contentType.split('/')[1]?.toUpperCase() || 'FILE'}
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const url = resumeService.getVersionPreviewUrl(resumeId, version.id);
+                    window.open(url, '_blank');
+                  }}
+                >
+                  <Eye className="h-3.5 w-3.5 mr-1" />
+                  Preview
+                </Button>
+                <Badge variant="outline" className="text-xs">
+                  {version.contentType.split('/')[1]?.toUpperCase() || 'FILE'}
+                </Badge>
+              </div>
             </div>
           );
         })}
