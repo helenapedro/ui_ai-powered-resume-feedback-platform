@@ -12,10 +12,12 @@ interface VersionHistoryProps {
   resumeId: string;
   versions: ResumeVersion[];
   currentVersionId: string | null;
+  selectedVersionId?: string | null;
+  onPreview?: (versionId: string) => void;
   isLoading: boolean;
 }
 
-export function VersionHistory({ resumeId, versions, currentVersionId, isLoading }: VersionHistoryProps) {
+export function VersionHistory({ resumeId, versions, currentVersionId, selectedVersionId, onPreview, isLoading }: VersionHistoryProps) {
   if (isLoading) {
     return (
       <Card>
@@ -104,12 +106,9 @@ export function VersionHistory({ resumeId, versions, currentVersionId, isLoading
               </div>
               <div className="flex items-center gap-2">
                 <Button
-                  variant="outline"
+                  variant={selectedVersionId === version.id ? "default" : "outline"}
                   size="sm"
-                  onClick={() => {
-                    const url = resumeService.getVersionPreviewUrl(resumeId, version.id);
-                    window.open(url, '_blank');
-                  }}
+                  onClick={() => onPreview?.(version.id)}
                 >
                   <Eye className="h-3.5 w-3.5 mr-1" />
                   Preview
