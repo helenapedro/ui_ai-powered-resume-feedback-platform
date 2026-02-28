@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Header } from '@/components/Header';
+import { PdfViewer } from '@/components/PdfViewer';
 import { VersionHistory } from '@/components/VersionHistory';
 import { ShareLinkModal } from '@/components/ShareLinkModal';
 import { SharedLinksList } from '@/components/SharedLinksList';
@@ -165,6 +166,10 @@ export default function ResumeDetails() {
   if (!resume) return null;
 
   const currentVersion = versions.find(v => v.id === resume.currentVersionId);
+  const previewUrl = currentVersion
+    ? resumeService.getVersionPreviewUrl(resume.id, currentVersion.id)
+    : null;
+  const token = localStorage.getItem('token');
 
   return (
     <div className="min-h-screen flex flex-col bg-muted/30">
@@ -279,6 +284,27 @@ export default function ResumeDetails() {
             isLoading={false}
           />
         </div>
+
+        {/* PDF Preview */}
+        {previewUrl && token && (
+          <div className="mt-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  Pré-visualização
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <PdfViewer
+                  fileUrl={previewUrl}
+                  httpHeaders={{ Authorization: `Bearer ${token}` }}
+                  className="min-h-[600px]"
+                />
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Shared Links Section */}
         <div className="mt-8">
