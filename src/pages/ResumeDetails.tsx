@@ -273,6 +273,7 @@ export default function ResumeDetails() {
 
           {/* Version History */}
           <VersionHistory
+            resumeId={resume.id}
             versions={versions}
             currentVersionId={resume.currentVersionId}
             isLoading={false}

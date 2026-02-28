@@ -36,8 +36,14 @@ export const resumeService = {
 
   // Download a specific version of a resume
   getVersionDownloadUrl(resumeId: string, versionId: string): string {
-    const baseUrl = import.meta.env.VITE_API_URL || 'https://janett-achlamydate-springingly.ngrok-free.dev/api';
+    const baseUrl = import.meta.env.VITE_API_URL || 'https://resumefeedback-api.hmpedro.com/api';
     return `${baseUrl}/resumes/${resumeId}/versions/${versionId}/download`;
+  },
+
+  // Preview a specific version inline
+  getVersionPreviewUrl(resumeId: string, versionId: string): string {
+    const baseUrl = import.meta.env.VITE_API_URL || 'https://resumefeedback-api.hmpedro.com/api';
+    return `${baseUrl}/resumes/${resumeId}/versions/${versionId}/preview`;
   },
 
   // Ping endpoint for testing connectivity
