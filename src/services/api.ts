@@ -83,7 +83,18 @@ class ApiClient {
         traceId: '',
       }));
 
-      // Handle specific HTTP status codes
+      // Log traceId for support/debug
+      if (errorData.traceId) {
+        console.error(`[API Error] traceId: ${errorData.traceId} | ${errorData.code} | ${endpoint}`);
+      }
+
+      // 401/403: redirect to login
+      if (response.status === 401 || response.status === 403) {
+        localStorage.removeItem('token');
+        window.location.href = '/auth';
+        throw new ApiError(errorData.code, errorData.message, response.status, errorData.details);
+      }
+
       if (response.status === 410) {
         throw new ShareLinkGoneError(errorData.message);
       }
