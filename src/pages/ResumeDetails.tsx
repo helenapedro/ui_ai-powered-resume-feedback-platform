@@ -51,6 +51,7 @@ export default function ResumeDetails() {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isCreatingLink, setIsCreatingLink] = useState(false);
   const [isLoadingLinks, setIsLoadingLinks] = useState(false);
+  const [previewVersionId, setPreviewVersionId] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -166,8 +167,9 @@ export default function ResumeDetails() {
   if (!resume) return null;
 
   const currentVersion = versions.find(v => v.id === resume.currentVersionId);
-  const previewUrl = currentVersion
-    ? resumeService.getVersionPreviewUrl(resume.id, currentVersion.id)
+  const activePreviewId = previewVersionId || currentVersion?.id || null;
+  const previewUrl = activePreviewId
+    ? resumeService.getVersionPreviewUrl(resume.id, activePreviewId)
     : null;
   const token = localStorage.getItem('token');
 
@@ -281,6 +283,8 @@ export default function ResumeDetails() {
             resumeId={resume.id}
             versions={versions}
             currentVersionId={resume.currentVersionId}
+            selectedVersionId={activePreviewId}
+            onPreview={(versionId) => setPreviewVersionId(versionId)}
             isLoading={false}
           />
         </div>
