@@ -11,10 +11,11 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 
 interface PdfViewerProps {
   fileUrl: string;
+  httpHeaders?: Record<string, string>;
   className?: string;
 }
 
-export function PdfViewer({ fileUrl, className = '' }: PdfViewerProps) {
+export function PdfViewer({ fileUrl, httpHeaders, className = '' }: PdfViewerProps) {
   const [numPages, setNumPages] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [scale, setScale] = useState<number>(1.0);
@@ -111,6 +112,7 @@ export function PdfViewer({ fileUrl, className = '' }: PdfViewerProps) {
           onLoadSuccess={onDocumentLoadSuccess}
           onLoadError={onDocumentLoadError}
           loading={null}
+          options={httpHeaders ? { httpHeaders, withCredentials: false } : undefined}
           className={isLoading ? 'hidden' : ''}
         >
           <Page
