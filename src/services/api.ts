@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://janett-achlamydate-springingly.ngrok-free.dev/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://resumefeedback-api.hmpedro.com/api';
 
 // API Error Response interface
 export interface ApiErrorResponse {
@@ -57,7 +57,6 @@ class ApiClient {
     const token = this.getToken();
     
     const headers: HeadersInit = {
-      'ngrok-skip-browser-warning': 'true',
       ...options.headers,
     };
 
