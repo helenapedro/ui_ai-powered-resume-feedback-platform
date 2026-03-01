@@ -6,6 +6,7 @@ import { VersionHistory } from '@/components/VersionHistory';
 import { ShareLinkModal } from '@/components/ShareLinkModal';
 import { SharedLinksList } from '@/components/SharedLinksList';
 import { CommentList } from '@/components/CommentList';
+import { AiFeedback } from '@/components/AiFeedback';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -348,6 +349,13 @@ export default function ResumeDetails() {
                 />
               </CardContent>
             </Card>
+          </div>
+        )}
+
+        {/* AI Feedback Section */}
+        {activePreviewId && (
+          <div className="mt-8">
+            <AiFeedback resumeId={resume.id} versionId={activePreviewId} />
           </div>
         )}
 

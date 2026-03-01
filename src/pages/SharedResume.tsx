@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { sharingService } from '@/services/sharing';
+import { useAuth } from '@/contexts/AuthContext';
 import type { SharedResumeData } from '@/types';
 import { CommentList } from '@/components/CommentList';
 import { PdfViewer } from '@/components/PdfViewer';
@@ -10,11 +11,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import type { Comment } from '@/types';
-import { FileText, AlertCircle, ExternalLink } from 'lucide-react';
+import { FileText, AlertCircle, ExternalLink, LogIn } from 'lucide-react';
 
 export default function SharedResume() {
   const { token } = useParams<{ token: string }>();
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
   const [data, setData] = useState<SharedResumeData | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -163,11 +165,25 @@ export default function SharedResume() {
             {data.permission === 'COMMENT' && (
               <div className="border-t pt-6">
                 <h3 className="font-semibold mb-4">Comentários</h3>
-                <CommentList
-                  comments={comments}
-                  isLoading={isLoadingComments}
-                  onAddComment={handleAddComment}
-                />
+                {isAuthenticated ? (
+                  <CommentList
+                    comments={comments}
+                    isLoading={isLoadingComments}
+                    onAddComment={handleAddComment}
+                  />
+                ) : (
+                  <div className="text-center py-6">
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Faça login para visualizar e adicionar comentários.
+                    </p>
+                    <Button asChild size="sm">
+                      <Link to={`/auth?redirect=/share/${token}`}>
+                        <LogIn className="h-4 w-4 mr-2" />
+                        Fazer Login
+                      </Link>
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
           </CardContent>
