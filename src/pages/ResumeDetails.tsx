@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { PdfViewer } from '@/components/PdfViewer';
 import { VersionHistory } from '@/components/VersionHistory';
 import { ShareLinkModal } from '@/components/ShareLinkModal';
 import { SharedLinksList } from '@/components/SharedLinksList';
+import { CommentList } from '@/components/CommentList';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -22,8 +23,9 @@ import {
 } from '@/components/ui/alert-dialog';
 import { resumeService } from '@/services/resumes';
 import { sharingService } from '@/services/sharing';
+import { commentService } from '@/services/comments';
 import { useToast } from '@/hooks/use-toast';
-import type { ResumeSummary, ResumeVersion, SharedLink } from '@/types';
+import type { ResumeSummary, ResumeVersion, SharedLink, Comment } from '@/types';
 import type { ShareLinkFormData } from '@/components/ShareLinkModal';
 import {
   ArrowLeft,
@@ -34,6 +36,7 @@ import {
   Upload,
   Hash,
   Share2,
+  MessageSquare,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -46,11 +49,13 @@ export default function ResumeDetails() {
   const [resume, setResume] = useState<ResumeSummary | null>(null);
   const [versions, setVersions] = useState<ResumeVersion[]>([]);
   const [sharedLinks, setSharedLinks] = useState<SharedLink[]>([]);
+  const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isCreatingLink, setIsCreatingLink] = useState(false);
   const [isLoadingLinks, setIsLoadingLinks] = useState(false);
+  const [isLoadingComments, setIsLoadingComments] = useState(false);
   const [previewVersionId, setPreviewVersionId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -59,6 +64,16 @@ export default function ResumeDetails() {
       fetchSharedLinks();
     }
   }, [id]);
+
+  // Fetch comments when active version changes
+  useEffect(() => {
+    if (id && resume) {
+      const versionId = previewVersionId || resume.currentVersionId;
+      if (versionId) {
+        fetchComments(versionId);
+      }
+    }
+  }, [id, resume, previewVersionId]);
 
   const fetchResume = async () => {
     try {
@@ -88,6 +103,32 @@ export default function ResumeDetails() {
       setIsLoadingLinks(false);
     }
   };
+
+  const fetchComments = async (versionId: string) => {
+    setIsLoadingComments(true);
+    try {
+      const data = await commentService.getComments(id!, versionId);
+      setComments(data);
+    } catch {
+      // Silent fail
+    } finally {
+      setIsLoadingComments(false);
+    }
+  };
+
+  const handleAddComment = useCallback(async (content: string) => {
+    const versionId = previewVersionId || resume?.currentVersionId;
+    if (!versionId) return;
+    const newComment = await commentService.addComment(id!, versionId, { body: content });
+    setComments((prev) => [...prev, newComment]);
+  }, [id, resume, previewVersionId]);
+
+  const handleDeleteComment = useCallback(async (commentId: string) => {
+    const versionId = previewVersionId || resume?.currentVersionId;
+    if (!versionId) return;
+    await commentService.deleteComment(id!, versionId, commentId);
+    setComments((prev) => prev.filter((c) => (c.id || c._id) !== commentId));
+  }, [id, resume, previewVersionId]);
 
   const handleCreateShareLink = async (data: ShareLinkFormData) => {
     setIsCreatingLink(true);
@@ -309,6 +350,26 @@ export default function ResumeDetails() {
             </Card>
           </div>
         )}
+
+        {/* Comments Section */}
+        <div className="mt-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageSquare className="h-5 w-5" />
+                Comentários
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CommentList
+                comments={comments}
+                isLoading={isLoadingComments}
+                onAddComment={handleAddComment}
+                onDeleteComment={handleDeleteComment}
+              />
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Shared Links Section */}
         <div className="mt-8">
