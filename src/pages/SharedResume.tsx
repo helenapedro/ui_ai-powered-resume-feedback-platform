@@ -58,11 +58,10 @@ export default function SharedResume() {
     }
   };
 
-  const handleAddComment = useCallback(async (content: string, guestLabel?: string) => {
+  const handleAddComment = useCallback(async (content: string) => {
     try {
       const newComment = await sharingService.postSharedComment(token!, {
         body: content,
-        guestLabel: guestLabel || null,
       });
       setComments((prev) => [...prev, newComment]);
       toast({ title: 'Comentário adicionado!' });
@@ -149,7 +148,7 @@ export default function SharedResume() {
           <CardContent className="space-y-6">
             {/* Inline PDF Viewer */}
             <PdfViewer
-              fileUrl={sharingService.getSharedResumeDownloadUrl(token!)}
+              fileUrl={sharingService.getSharedResumePreviewUrl(token!)}
               className="min-h-[600px]"
             />
             

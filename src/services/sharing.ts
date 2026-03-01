@@ -1,17 +1,23 @@
 import { apiClient } from './api';
 import type { SharedLink, SharePermission, Comment, SharedResumeData } from '@/types';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://resumefeedback-api.hmpedro.com/api';
+
 export interface CreateShareLinkRequest {
   permission: SharePermission;
   expiresAt?: string | null;
   maxUses?: number | null;
 }
 
-export interface CreatePublicCommentRequest {
+export interface CreateSharedCommentRequest {
   body: string;
   anchorRef?: string | null;
   parentCommentId?: string | null;
-  guestLabel?: string | null;
+}
+
+export interface UpdateSharedCommentRequest {
+  body: string;
+  anchorRef?: string | null;
 }
 
 // Re-export for backward compatibility
@@ -30,17 +36,32 @@ export const sharingService = {
 
   // Download current version via share token (public)
   getSharedResumeDownloadUrl(token: string): string {
-    return `${import.meta.env.VITE_API_URL || 'https://janett-achlamydate-springingly.ngrok-free.dev/api'}/share/${token}/download`;
+    return `${API_BASE_URL}/share/${token}/download`;
   },
 
-  // Get comments for shared resume (public)
+  // Preview current version inline via share token (public)
+  getSharedResumePreviewUrl(token: string): string {
+    return `${API_BASE_URL}/share/${token}/preview`;
+  },
+
+  // Get comments for shared resume (token + JWT required)
   async getSharedComments(token: string): Promise<Comment[]> {
     return apiClient.get<Comment[]>(`/share/${token}/comments`);
   },
 
-  // Post comment on shared resume (public, requires COMMENT permission)
-  async postSharedComment(token: string, request: CreatePublicCommentRequest): Promise<Comment> {
+  // Post comment on shared resume (token + JWT required, COMMENT permission)
+  async postSharedComment(token: string, request: CreateSharedCommentRequest): Promise<Comment> {
     return apiClient.post<Comment>(`/share/${token}/comments`, request);
+  },
+
+  // Update comment on shared resume (token + JWT required)
+  async updateSharedComment(token: string, commentId: string, request: UpdateSharedCommentRequest): Promise<Comment> {
+    return apiClient.put<Comment>(`/share/${token}/comments/${commentId}`, request);
+  },
+
+  // Delete comment on shared resume (token + JWT required)
+  async deleteSharedComment(token: string, commentId: string): Promise<void> {
+    return apiClient.delete(`/share/${token}/comments/${commentId}`);
   },
 
   // List all share links for a resume (JWT)
