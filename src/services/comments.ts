@@ -5,24 +5,21 @@ export interface CreateCommentRequest {
   body: string;
   anchorRef?: string | null;
   parentCommentId?: string | null;
-  guestLabel?: string | null;
 }
 
 export const commentService = {
-  // Owner endpoints (JWT authenticated)
+  // Owner: list comments for a version (JWT)
   async getComments(resumeId: string, versionId: string): Promise<Comment[]> {
     return apiClient.get<Comment[]>(`/resumes/${resumeId}/versions/${versionId}/comments`);
   },
 
+  // Owner: add comment to a version (JWT)
   async addComment(resumeId: string, versionId: string, request: CreateCommentRequest): Promise<Comment> {
     return apiClient.post<Comment>(`/resumes/${resumeId}/versions/${versionId}/comments`, request);
   },
 
-  async updateComment(commentId: string, content: string): Promise<{ message: string; comment: Comment }> {
-    return apiClient.put(`/comments/${commentId}`, { content });
-  },
-
-  async deleteComment(commentId: string): Promise<{ message: string }> {
-    return apiClient.delete(`/comments/${commentId}`);
+  // Owner: delete/moderate comment on a version (JWT)
+  async deleteComment(resumeId: string, versionId: string, commentId: string): Promise<void> {
+    return apiClient.delete(`/resumes/${resumeId}/versions/${versionId}/comments/${commentId}`);
   },
 };
