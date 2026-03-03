@@ -44,10 +44,13 @@ export function Header() {
         <div className="flex items-center gap-4">
           {/* User Info with Logout */}
           <div className="hidden md:flex items-center gap-3">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Link
+              to="/profile"
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
               <User className="h-4 w-4" />
               <span>{user?.email}</span>
-            </div>
+            </Link>
             <Button variant="ghost" size="sm" onClick={handleLogout}>
               <LogOut className="h-4 w-4 mr-2" />
               Sair
