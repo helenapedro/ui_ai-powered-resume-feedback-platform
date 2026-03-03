@@ -136,6 +136,7 @@ export default function ResumeDetails() {
     try {
       const newLink = await sharingService.createShareLink(id!, {
         permission: data.permission,
+        expiresAt: data.expiresAt,
         maxUses: data.maxUses,
       });
       setSharedLinks((prev) => [...prev, newLink]);

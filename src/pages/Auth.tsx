@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +13,8 @@ export default function Auth() {
   const [isLoading, setIsLoading] = useState(false);
   const { login, register } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get('redirect') || '/my-resumes';
   const { toast } = useToast();
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -29,7 +31,7 @@ export default function Auth() {
         title: 'Login realizado!',
         description: 'Bem-vindo de volta.',
       });
-      navigate('/my-resumes');
+      navigate(redirectTo);
     } catch (error) {
       toast({
         title: 'Erro no login',
@@ -76,7 +78,7 @@ export default function Auth() {
         title: 'Conta criada!',
         description: 'Você foi autenticado automaticamente.',
       });
-      navigate('/my-resumes');
+      navigate(redirectTo);
     } catch (error) {
       toast({
         title: 'Erro no registro',

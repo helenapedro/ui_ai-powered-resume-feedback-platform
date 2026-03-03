@@ -56,7 +56,7 @@ export const sharingService = {
 
   // Update comment on shared resume (token + JWT required)
   async updateSharedComment(token: string, commentId: string, request: UpdateSharedCommentRequest): Promise<Comment> {
-    return apiClient.put<Comment>(`/share/${token}/comments/${commentId}`, request);
+    return apiClient.patch<Comment>(`/share/${token}/comments/${commentId}`, request);
   },
 
   // Delete comment on shared resume (token + JWT required)
