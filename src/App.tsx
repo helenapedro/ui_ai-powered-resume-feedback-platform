@@ -12,6 +12,7 @@ import Upload from "./pages/Upload";
 import ResumeDetails from "./pages/ResumeDetails";
 import SharedResume from "./pages/SharedResume";
 import Auth from "./pages/Auth";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,14 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <ResumeDetails />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <Profile />
                     </ProtectedRoute>
                   }
                 />
