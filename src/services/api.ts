@@ -112,7 +112,12 @@ class ApiClient {
       );
     }
 
-    return response.json();
+    // Handle 204 No Content or empty responses
+    const text = await response.text();
+    if (!text) {
+      return undefined as T;
+    }
+    return JSON.parse(text);
   }
 
   async get<T>(endpoint: string): Promise<T> {
