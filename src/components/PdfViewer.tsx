@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Loader2 } from 'lucide-react';
 
-// Configure worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+// Use a local bundled worker in Vite to avoid remote worker/network issues.
+pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
 
 interface PdfViewerProps {
   fileUrl: string;
@@ -22,15 +22,28 @@ export function PdfViewer({ fileUrl, httpHeaders, className = '' }: PdfViewerPro
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const documentOptions = useMemo(
+    () => (httpHeaders ? { httpHeaders, withCredentials: false } : undefined),
+    [httpHeaders],
+  );
+
+  useEffect(() => {
+    setNumPages(0);
+    setPageNumber(1);
+    setIsLoading(true);
+    setError(null);
+  }, [fileUrl]);
+
   const onDocumentLoadSuccess = useCallback(({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
+    setPageNumber((prev) => Math.min(Math.max(prev, 1), numPages));
     setIsLoading(false);
     setError(null);
   }, []);
 
   const onDocumentLoadError = useCallback((error: Error) => {
     console.error('PDF load error:', error);
-    setError('Não foi possível carregar o PDF.');
+    setError('Nao foi possivel carregar o PDF.');
     setIsLoading(false);
   }, []);
 
@@ -49,7 +62,6 @@ export function PdfViewer({ fileUrl, httpHeaders, className = '' }: PdfViewerPro
 
   return (
     <div className={`flex flex-col ${className}`}>
-      {/* Controls */}
       <div className="flex items-center justify-between gap-2 p-3 bg-muted/50 rounded-t-lg border-b">
         <div className="flex items-center gap-1">
           <Button
@@ -57,7 +69,7 @@ export function PdfViewer({ fileUrl, httpHeaders, className = '' }: PdfViewerPro
             size="icon"
             onClick={goToPrevPage}
             disabled={pageNumber <= 1 || isLoading}
-            aria-label="Página anterior"
+            aria-label="Pagina anterior"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -69,7 +81,7 @@ export function PdfViewer({ fileUrl, httpHeaders, className = '' }: PdfViewerPro
             size="icon"
             onClick={goToNextPage}
             disabled={pageNumber >= numPages || isLoading}
-            aria-label="Próxima página"
+            aria-label="Proxima pagina"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -99,7 +111,6 @@ export function PdfViewer({ fileUrl, httpHeaders, className = '' }: PdfViewerPro
         </div>
       </div>
 
-      {/* PDF Viewer */}
       <div className="flex-1 overflow-auto bg-muted/30 rounded-b-lg p-4 flex justify-center">
         {isLoading && (
           <div className="flex flex-col items-center justify-center gap-3 py-16">
@@ -107,24 +118,26 @@ export function PdfViewer({ fileUrl, httpHeaders, className = '' }: PdfViewerPro
             <p className="text-sm text-muted-foreground">A carregar PDF...</p>
           </div>
         )}
+
         <Document
+          key={fileUrl}
           file={fileUrl}
           onLoadSuccess={onDocumentLoadSuccess}
           onLoadError={onDocumentLoadError}
           loading={null}
-          options={httpHeaders ? { httpHeaders, withCredentials: false } : undefined}
+          options={documentOptions}
           className={isLoading ? 'hidden' : ''}
         >
-          <Page
-            pageNumber={pageNumber}
-            scale={scale}
-            renderTextLayer={true}
-            renderAnnotationLayer={true}
-            loading={
-              <Skeleton className="w-[595px] h-[842px]" />
-            }
-            className="shadow-lg"
-          />
+          {!isLoading && numPages > 0 && (
+            <Page
+              pageNumber={pageNumber}
+              scale={scale}
+              renderTextLayer={true}
+              renderAnnotationLayer={true}
+              loading={<Skeleton className="w-[595px] h-[842px]" />}
+              className="shadow-lg"
+            />
+          )}
         </Document>
       </div>
     </div>
