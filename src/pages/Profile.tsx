@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,10 +6,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/contexts/AuthContext';
 import { userService, type UserProfile, type UpdateProfileRequest } from '@/services/users';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Save, User } from 'lucide-react';
+import { Loader2, Save, Mail, Phone, User, FileText, Camera } from 'lucide-react';
 
 export default function Profile() {
   const { user } = useAuth();
@@ -81,6 +81,16 @@ export default function Profile() {
     ? fullName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
     : (user?.email?.[0] || 'U').toUpperCase();
 
+  const hasChanges = () => {
+    if (!profile) return false;
+    return (
+      fullName !== (profile.fullName || '') ||
+      phone !== (profile.phone || '') ||
+      bio !== (profile.bio || '') ||
+      avatarUrl !== (profile.avatarUrl || '')
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -95,89 +105,179 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container max-w-2xl py-10">
-        <h1 className="text-3xl font-bold text-foreground mb-8">Meu Perfil</h1>
+      <main className="container max-w-3xl py-10 px-4">
+        {/* Page title */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-foreground">Meu Perfil</h1>
+          <p className="text-muted-foreground mt-1">
+            Gerencie suas informações pessoais e preferências.
+          </p>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16">
-                <AvatarImage src={avatarUrl || undefined} alt={fullName || 'Avatar'} />
-                <AvatarFallback className="text-lg bg-primary text-primary-foreground">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <CardTitle>{fullName || user?.email}</CardTitle>
-                <CardDescription>{user?.email}</CardDescription>
+        <form onSubmit={handleSave} className="space-y-6">
+          {/* Avatar & Identity Card */}
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex flex-col sm:flex-row items-center gap-6">
+                {/* Avatar */}
+                <div className="relative group">
+                  <Avatar className="h-24 w-24 ring-4 ring-primary/10">
+                    <AvatarImage src={avatarUrl || undefined} alt={fullName || 'Avatar'} />
+                    <AvatarFallback className="text-2xl font-bold bg-primary text-primary-foreground">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="absolute inset-0 rounded-full bg-foreground/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+                    <Camera className="h-6 w-6 text-primary-foreground" />
+                  </div>
+                </div>
+
+                {/* Name + Email summary */}
+                <div className="flex-1 text-center sm:text-left space-y-1">
+                  <h2 className="text-xl font-semibold text-foreground">
+                    {fullName || 'Sem nome definido'}
+                  </h2>
+                  <div className="flex items-center justify-center sm:justify-start gap-2 text-muted-foreground">
+                    <Mail className="h-4 w-4" />
+                    <span className="text-sm">{user?.email}</span>
+                  </div>
+                  {phone && (
+                    <div className="flex items-center justify-center sm:justify-start gap-2 text-muted-foreground">
+                      <Phone className="h-4 w-4" />
+                      <span className="text-sm">{phone}</span>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSave} className="space-y-5">
+            </CardContent>
+          </Card>
+
+          {/* Personal Info */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <User className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg">Informações Pessoais</CardTitle>
+              </div>
+              <CardDescription>
+                Atualize seu nome e telefone de contato.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Nome completo</Label>
+                  <Input
+                    id="fullName"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Seu nome completo"
+                    maxLength={100}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Telefone</Label>
+                  <Input
+                    id="phone"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+55 11 99999-9999"
+                    maxLength={20}
+                  />
+                </div>
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" value={user?.email || ''} disabled className="bg-muted" />
-                <p className="text-xs text-muted-foreground">O email não pode ser alterado.</p>
+                <Input id="email" value={user?.email || ''} disabled className="bg-muted/50" />
+                <p className="text-xs text-muted-foreground">
+                  O email é vinculado à sua conta e não pode ser alterado.
+                </p>
               </div>
+            </CardContent>
+          </Card>
 
-              <div className="space-y-2">
-                <Label htmlFor="fullName">Nome completo</Label>
-                <Input
-                  id="fullName"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Seu nome completo"
-                  maxLength={100}
-                />
+          {/* Bio */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg">Sobre você</CardTitle>
               </div>
-
+              <CardDescription>
+                Escreva uma breve descrição sobre sua experiência e objetivos.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="phone">Telefone</Label>
-                <Input
-                  id="phone"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+55 11 99999-9999"
-                  maxLength={20}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="bio">Bio</Label>
                 <Textarea
                   id="bio"
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
-                  placeholder="Conte um pouco sobre você..."
+                  placeholder="Ex: Desenvolvedor full-stack com 5 anos de experiência, buscando oportunidades em startups..."
                   maxLength={500}
-                  rows={3}
+                  rows={4}
+                  className="resize-none"
                 />
-                <p className="text-xs text-muted-foreground text-right">{bio.length}/500</p>
+                <div className="flex justify-between items-center">
+                  <p className="text-xs text-muted-foreground">
+                    Essa informação pode ser visível em links compartilhados.
+                  </p>
+                  <span className="text-xs text-muted-foreground tabular-nums">
+                    {bio.length}/500
+                  </span>
+                </div>
               </div>
+            </CardContent>
+          </Card>
 
-              <div className="space-y-2">
-                <Label htmlFor="avatarUrl">URL do Avatar</Label>
-                <Input
-                  id="avatarUrl"
-                  value={avatarUrl}
-                  onChange={(e) => setAvatarUrl(e.target.value)}
-                  placeholder="https://exemplo.com/foto.jpg"
-                  type="url"
-                />
+          {/* Avatar URL */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Camera className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg">Foto de perfil</CardTitle>
               </div>
-
-              <Button type="submit" disabled={isSaving} className="w-full">
-                {isSaving ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                ) : (
-                  <Save className="h-4 w-4 mr-2" />
+              <CardDescription>
+                Insira a URL de uma imagem para usar como avatar.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-4 items-end">
+                <div className="flex-1 space-y-2">
+                  <Label htmlFor="avatarUrl">URL da imagem</Label>
+                  <Input
+                    id="avatarUrl"
+                    value={avatarUrl}
+                    onChange={(e) => setAvatarUrl(e.target.value)}
+                    placeholder="https://exemplo.com/minha-foto.jpg"
+                    type="url"
+                  />
+                </div>
+                {avatarUrl && (
+                  <Avatar className="h-10 w-10 shrink-0">
+                    <AvatarImage src={avatarUrl} alt="Preview" />
+                    <AvatarFallback className="text-xs bg-muted">?</AvatarFallback>
+                  </Avatar>
                 )}
-                Salvar Alterações
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Save */}
+          <div className="flex items-center justify-between pt-2">
+            <p className="text-sm text-muted-foreground">
+              {hasChanges() ? 'Você tem alterações não salvas.' : 'Tudo salvo.'}
+            </p>
+            <Button type="submit" disabled={isSaving || !hasChanges()} className="min-w-[160px]">
+              {isSaving ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <Save className="h-4 w-4 mr-2" />
+              )}
+              Salvar Alterações
+            </Button>
+          </div>
+        </form>
       </main>
     </div>
   );
