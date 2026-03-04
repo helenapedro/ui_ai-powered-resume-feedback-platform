@@ -77,15 +77,20 @@ export default function About() {
             <FileText className="h-6 w-6 text-primary" />
             <span className="text-xl font-bold text-primary">Resume Feedback</span>
           </Link>
-          <Button asChild>
-            <Link to="/auth">Entrar</Link>
-          </Button>
+          <div className="flex items-center gap-4">
+            <Link to="/about" className="text-sm font-medium text-foreground transition-colors">
+              Sobre
+            </Link>
+            <Button asChild>
+              <Link to="/auth">Entrar</Link>
+            </Button>
+          </div>
         </div>
       </header>
 
       {/* Hero */}
       <section className="py-20 px-4">
-        <div className="container max-w-3xl text-center space-y-4">
+        <div className="container max-w-3xl text-center space-y-4 animate-fade-in">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground leading-tight">
             Como funciona o <span className="text-primary">Resume Feedback</span>?
           </h1>
@@ -101,9 +106,13 @@ export default function About() {
         <div className="container max-w-4xl">
           <div className="space-y-6">
             {steps.map((step, i) => (
-              <div key={step.title} className="flex gap-6 items-start">
+              <div
+                key={step.title}
+                className="flex gap-6 items-start animate-fade-in"
+                style={{ animationDelay: `${i * 150}ms`, animationFillMode: 'both' }}
+              >
                 <div className="flex flex-col items-center">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0 hover-scale">
                     <step.icon className="h-5 w-5 text-primary" />
                   </div>
                   {i < steps.length - 1 && (
@@ -129,8 +138,12 @@ export default function About() {
             Por que escolher o Resume Feedback?
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
-            {highlights.map((h) => (
-              <Card key={h.title} className="border bg-background">
+            {highlights.map((h, i) => (
+              <Card
+                key={h.title}
+                className="border bg-background hover-scale animate-fade-in"
+                style={{ animationDelay: `${i * 100 + 600}ms`, animationFillMode: 'both' }}
+              >
                 <CardContent className="p-6 space-y-3">
                   <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                     <h.icon className="h-5 w-5 text-primary" />

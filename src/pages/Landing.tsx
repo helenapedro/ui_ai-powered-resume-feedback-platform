@@ -12,9 +12,14 @@ export default function Landing() {
             <FileText className="h-6 w-6 text-primary" />
             <span className="text-xl font-bold text-primary">Resume Feedback</span>
           </Link>
-          <Button asChild>
-            <Link to="/auth">Entrar</Link>
-          </Button>
+          <div className="flex items-center gap-4">
+            <Link to="/about" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              Sobre
+            </Link>
+            <Button asChild>
+              <Link to="/auth">Entrar</Link>
+            </Button>
+          </div>
         </div>
       </header>
       
