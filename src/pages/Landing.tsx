@@ -46,7 +46,7 @@ export default function Landing() {
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg">
-                <Link to="/auth">Já tenho conta</Link>
+                <Link to="/about">Saiba mais</Link>
               </Button>
             </div>
           </div>
