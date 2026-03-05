@@ -8,6 +8,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: (idToken: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthContextType>({
   isLoading: true,
   login: async () => {},
   register: async () => {},
+  loginWithGoogle: async () => {},
   logout: () => {},
 });
 
@@ -37,7 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    const response = await authService.login({ email, password });
+    await authService.login({ email, password });
     const userData = authService.getUser();
     if (userData) {
       setUser({
@@ -48,7 +50,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const register = useCallback(async (email: string, password: string) => {
-    const response = await authService.register({ email, password });
+    await authService.register({ email, password });
+    const userData = authService.getUser();
+    if (userData) {
+      setUser({
+        id: userData.id,
+        email: userData.email,
+      });
+    }
+  }, []);
+
+  const loginWithGoogle = useCallback(async (idToken: string) => {
+    await authService.loginWithGoogle(idToken);
     const userData = authService.getUser();
     if (userData) {
       setUser({
@@ -71,6 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading,
         login,
         register,
+        loginWithGoogle,
         logout,
       }}
     >

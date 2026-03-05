@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { PdfViewer } from '@/components/PdfViewer';
@@ -58,6 +58,11 @@ export default function ResumeDetails() {
   const [isLoadingLinks, setIsLoadingLinks] = useState(false);
   const [isLoadingComments, setIsLoadingComments] = useState(false);
   const [previewVersionId, setPreviewVersionId] = useState<string | null>(null);
+  const token = localStorage.getItem('token');
+  const authHeaders = useMemo(
+    () => (token ? { Authorization: `Bearer ${token}` } : undefined),
+    [token],
+  );
 
   useEffect(() => {
     if (id) {
@@ -214,7 +219,6 @@ export default function ResumeDetails() {
   const previewUrl = activePreviewId
     ? resumeService.getVersionPreviewUrl(resume.id, activePreviewId)
     : null;
-  const token = localStorage.getItem('token');
 
   return (
     <div className="min-h-screen flex flex-col bg-muted/30">
@@ -345,7 +349,7 @@ export default function ResumeDetails() {
               <CardContent>
                 <PdfViewer
                   fileUrl={previewUrl}
-                  httpHeaders={{ Authorization: `Bearer ${token}` }}
+                  httpHeaders={authHeaders}
                   className="min-h-[600px]"
                 />
               </CardContent>

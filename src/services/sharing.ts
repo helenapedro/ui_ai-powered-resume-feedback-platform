@@ -1,7 +1,6 @@
 import { apiClient } from './api';
+import { API_BASE_URL, API_PREFIX } from './api';
 import type { SharedLink, SharePermission, Comment, SharedResumeData } from '@/types';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://resumefeedback-api.hmpedro.com/api';
 
 export interface CreateShareLinkRequest {
   permission: SharePermission;
@@ -36,12 +35,12 @@ export const sharingService = {
 
   // Download current version via share token (public)
   getSharedResumeDownloadUrl(token: string): string {
-    return `${API_BASE_URL}/share/${token}/download`;
+    return `${API_BASE_URL}${API_PREFIX}/share/${token}/download`;
   },
 
   // Preview current version inline via share token (public)
   getSharedResumePreviewUrl(token: string): string {
-    return `${API_BASE_URL}/share/${token}/preview`;
+    return `${API_BASE_URL}${API_PREFIX}/share/${token}/preview`;
   },
 
   // Get comments for shared resume (token + JWT required)

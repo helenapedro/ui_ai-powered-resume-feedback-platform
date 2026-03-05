@@ -11,8 +11,8 @@ interface AuthCredentials {
 
 export const authService = {
   async register(credentials: AuthCredentials): Promise<AuthResponse> {
-    // Clear any existing token before registration to avoid 401 errors
     localStorage.removeItem('token');
+
     const response = await apiClient.post<AuthResponse>('/auth/register', credentials);
     if (response.accessToken) {
       localStorage.setItem('token', response.accessToken);
@@ -21,9 +21,18 @@ export const authService = {
   },
 
   async login(credentials: AuthCredentials): Promise<AuthResponse> {
-    // Clear any existing token before login to avoid 401 errors
     localStorage.removeItem('token');
     const response = await apiClient.post<AuthResponse>('/auth/login', credentials);
+    
+    if (response.accessToken) {
+      localStorage.setItem('token', response.accessToken);
+    }
+    return response;
+  },
+
+  async loginWithGoogle(idToken: string): Promise<AuthResponse> {
+    localStorage.removeItem('token');
+    const response = await apiClient.post<AuthResponse>('/auth/google', { idToken });
     if (response.accessToken) {
       localStorage.setItem('token', response.accessToken);
     }
@@ -45,6 +54,7 @@ export const authService = {
   // Decode JWT to get user info (without verification)
   getUser(): { id: string; email: string; role: string } | null {
     const token = this.getToken();
+
     if (!token) return null;
 
     try {

@@ -42,6 +42,36 @@ Frontend should still send standard headers only (`Authorization`, `Content-Type
 { "accessToken": "<jwt>" }
 ```
 
+### Google Login/Register
+- `POST /api/auth/google`
+- Body:
+```json
+{ "idToken": "<google_id_token_from_frontend_oauth_flow>" }
+```
+- Behavior:
+  - If user email exists, logs in.
+  - If user email does not exist, creates account and logs in.
+- Response:
+```json
+{ "accessToken": "<jwt>" }
+```
+
+### Google Frontend Setup
+- Frontend env var:
+  - `VITE_GOOGLE_CLIENT_ID=<google_oauth_web_client_id>`
+- Authorized JavaScript origins in Google Cloud OAuth client must include:
+  - `https://resumefeedback.hmpedro.com`
+  - local dev origin (example: `http://localhost:5173`)
+- ID token acquisition:
+  - Use Google Identity Services in frontend and request an ID token.
+  - Send received ID token to backend `/api/auth/google`.
+
+Minimal client-side flow:
+1. User clicks "Continue with Google".
+2. Frontend gets `idToken` from Google.
+3. Frontend `POST /api/auth/google` with `{ idToken }`.
+4. Store returned JWT (`accessToken`) and use `Authorization: Bearer <jwt>`.
+
 Store token and send:
 `Authorization: Bearer <jwt>`
 
@@ -224,6 +254,10 @@ Frontend handling:
 ## Known Integration Notes
 
 - `GET /api/auth/login` is invalid. Login is `POST`.
+- Google auth backend requires env var:
+  - `GOOGLE_OAUTH_CLIENT_ID` (or `GOOGLE_OAUTH_CLIENT_IDS` as comma-separated list)
+- If Google login fails with audience mismatch, confirm frontend `VITE_GOOGLE_CLIENT_ID`
+  and backend `GOOGLE_OAUTH_CLIENT_ID` belong to the same OAuth client.
 - Download endpoints may return `302`.
 - Preview endpoints may also return `302`.
 - AI processing is asynchronous; UI must poll job status.

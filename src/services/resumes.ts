@@ -1,4 +1,5 @@
 import { apiClient } from './api';
+import { API_BASE_URL, API_PREFIX } from './api';
 import type { ResumeSummary, ResumeVersion, ResumeWithVersions } from '@/types';
 
 export const resumeService = {
@@ -36,14 +37,12 @@ export const resumeService = {
 
   // Download a specific version of a resume
   getVersionDownloadUrl(resumeId: string, versionId: string): string {
-    const baseUrl = import.meta.env.VITE_API_URL || 'https://resumefeedback-api.hmpedro.com/api';
-    return `${baseUrl}/resumes/${resumeId}/versions/${versionId}/download`;
+    return `${API_BASE_URL}${API_PREFIX}/resumes/${resumeId}/versions/${versionId}/download`;
   },
 
   // Preview a specific version inline
   getVersionPreviewUrl(resumeId: string, versionId: string): string {
-    const baseUrl = import.meta.env.VITE_API_URL || 'https://resumefeedback-api.hmpedro.com/api';
-    return `${baseUrl}/resumes/${resumeId}/versions/${versionId}/preview`;
+    return `${API_BASE_URL}${API_PREFIX}/resumes/${resumeId}/versions/${versionId}/preview`;
   },
 
   // Ping endpoint for testing connectivity
