@@ -67,7 +67,6 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
         setError(latestJob.errorDetail || 'A análise falhou.');
       }
     } catch {
-      // No job exists yet — not an error, just nothing to show
       stopPolling();
       setIsLoading(false);
     }
@@ -77,13 +76,10 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
     stopPolling();
     setError(null);
 
-    // Poll immediately
     pollJob();
 
-    // Then every POLL_INTERVAL
     pollingRef.current = setInterval(pollJob, POLL_INTERVAL);
 
-    // Timeout after POLL_TIMEOUT
     timeoutRef.current = setTimeout(() => {
       stopPolling();
       setError('Tempo limite atingido. Tente regenerar o feedback.');
@@ -106,11 +102,9 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
         } else if (latestJob.status === 'FAILED') {
           setError(latestJob.errorDetail || 'A análise falhou.');
         } else {
-          // PENDING or PROCESSING — start polling
           startPolling();
         }
       } catch {
-        // No job exists
         setJob(null);
       } finally {
         setIsLoading(false);
@@ -162,7 +156,6 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
     );
   }
 
-  // No job exists at all
   if (!job) {
     return (
       <Card>
@@ -223,7 +216,6 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
         </div>
       </CardHeader>
       <CardContent>
-        {/* Processing / Pending state */}
         {(job.status === 'PENDING' || job.status === 'PROCESSING') && (
           <div className="flex flex-col items-center py-8 text-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
@@ -233,7 +225,6 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
           </div>
         )}
 
-        {/* Error state */}
         {error && job.status === 'FAILED' && (
           <div className="flex flex-col items-center py-6 text-center">
             <AlertTriangle className="h-8 w-8 text-destructive mb-3" />
@@ -241,7 +232,6 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
           </div>
         )}
 
-        {/* Timeout error */}
         {error && job.status !== 'FAILED' && (
           <div className="flex flex-col items-center py-6 text-center">
             <AlertTriangle className="h-8 w-8 text-muted-foreground mb-3" />
@@ -257,10 +247,8 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
           </div>
         )}
 
-        {/* Feedback display */}
         {feedback && job.status === 'DONE' && (
           <div className="space-y-6">
-            {/* Summary */}
             <div>
               <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
                 <Lightbulb className="h-4 w-4 text-primary" />
@@ -271,7 +259,6 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
               </p>
             </div>
 
-            {/* Strengths */}
             {feedback.strengths.length > 0 && (
               <div>
                 <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
@@ -289,7 +276,6 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
               </div>
             )}
 
-            {/* Improvements */}
             {feedback.improvements.length > 0 && (
               <div>
                 <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">

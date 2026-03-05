@@ -27,7 +27,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing token on mount
     const existingUser = authService.getUser();
     if (existingUser) {
       setUser({

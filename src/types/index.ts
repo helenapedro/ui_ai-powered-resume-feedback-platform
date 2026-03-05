@@ -13,7 +13,6 @@ export interface AuthResponse {
   user: User;
 }
 
-// Spring Boot Resume DTOs
 export interface ResumeSummary {
   id: string;
   title: string;
@@ -36,7 +35,6 @@ export interface ResumeWithVersions {
   versions: ResumeVersion[];
 }
 
-// Legacy Resume interface for backward compatibility
 export interface Resume {
   _id?: string;
   id: string;
@@ -62,7 +60,6 @@ export interface Comment {
   parentCommentId?: string | null;
   createdAt: string;
   updatedAt?: string | null;
-  // Legacy fields for backward compatibility
   resumeId?: string;
   commenterId?: User;
   content?: string;
@@ -94,7 +91,6 @@ export interface SharedLink {
   createdBy?: string;
 }
 
-// Response from GET /api/share/{token}
 export interface SharedResumeData {
   resumeId: string;
   currentVersionId: string;
@@ -102,10 +98,8 @@ export interface SharedResumeData {
   expiresAt: string | null;
 }
 
-// AI Job Status
 export type AiJobStatus = 'PENDING' | 'PROCESSING' | 'DONE' | 'FAILED';
 
-// AI Job DTO
 export interface AiJobDTO {
   id: string;
   resumeVersionId: string;
@@ -120,7 +114,6 @@ export interface AiJobDTO {
   nextRetryAt: string | null;
 }
 
-// AI Feedback DTO
 export interface AiFeedbackDTO {
   resumeId: string;
   resumeVersionId: string;

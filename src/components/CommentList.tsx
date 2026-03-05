@@ -96,7 +96,6 @@ export function CommentList({
 
   return (
     <div className="space-y-6">
-      {/* Add Comment Form */}
       <div className="flex gap-3">
         <Avatar>
           <AvatarFallback className="bg-primary text-primary-foreground">
@@ -129,7 +128,6 @@ export function CommentList({
         </div>
       </div>
 
-      {/* Comments List */}
       {comments.length === 0 ? (
         <p className="text-center text-muted-foreground py-8">
           Nenhum comentário ainda. Seja o primeiro a comentar!

@@ -70,7 +70,6 @@ export default function About() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
@@ -88,7 +87,6 @@ export default function About() {
         </div>
       </header>
 
-      {/* Hero */}
       <section className="py-20 px-4">
         <div className="container max-w-3xl text-center space-y-4 animate-fade-in">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground leading-tight">
@@ -101,7 +99,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* Steps */}
       <section className="pb-20 px-4">
         <div className="container max-w-4xl">
           <div className="space-y-6">
@@ -131,7 +128,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* Highlights */}
       <section className="py-20 bg-muted/50 px-4">
         <div className="container max-w-5xl">
           <h2 className="text-3xl font-bold text-center mb-12 text-foreground">
@@ -157,7 +153,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="py-20 bg-primary text-primary-foreground px-4">
         <div className="container max-w-3xl text-center space-y-6">
           <h2 className="text-3xl font-bold">Pronto para começar?</h2>
@@ -173,7 +168,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="py-8 border-t">
         <div className="container text-center text-sm text-muted-foreground">
           <p>© 2024 Resume Feedback. Todos os direitos reservados.</p>

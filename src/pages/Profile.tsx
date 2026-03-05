@@ -106,7 +106,6 @@ export default function Profile() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container max-w-3xl py-10 px-4">
-        {/* Page title */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">Meu Perfil</h1>
           <p className="text-muted-foreground mt-1">
@@ -115,11 +114,9 @@ export default function Profile() {
         </div>
 
         <form onSubmit={handleSave} className="space-y-6">
-          {/* Avatar & Identity Card */}
           <Card>
             <CardContent className="p-6">
               <div className="flex flex-col sm:flex-row items-center gap-6">
-                {/* Avatar */}
                 <div className="relative group">
                   <Avatar className="h-24 w-24 ring-4 ring-primary/10">
                     <AvatarImage src={avatarUrl || undefined} alt={fullName || 'Avatar'} />
@@ -132,7 +129,6 @@ export default function Profile() {
                   </div>
                 </div>
 
-                {/* Name + Email summary */}
                 <div className="flex-1 text-center sm:text-left space-y-1">
                   <h2 className="text-xl font-semibold text-foreground">
                     {fullName || 'Sem nome definido'}
@@ -152,7 +148,6 @@ export default function Profile() {
             </CardContent>
           </Card>
 
-          {/* Personal Info */}
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
@@ -196,7 +191,6 @@ export default function Profile() {
             </CardContent>
           </Card>
 
-          {/* Bio */}
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
@@ -230,7 +224,6 @@ export default function Profile() {
             </CardContent>
           </Card>
 
-          {/* Avatar URL */}
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
@@ -263,7 +256,6 @@ export default function Profile() {
             </CardContent>
           </Card>
 
-          {/* Save */}
           <div className="flex items-center justify-between pt-2">
             <p className="text-sm text-muted-foreground">
               {hasChanges() ? 'Você tem alterações não salvas.' : 'Tudo salvo.'}

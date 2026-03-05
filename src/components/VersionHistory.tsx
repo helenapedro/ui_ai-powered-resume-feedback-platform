@@ -57,7 +57,6 @@ export function VersionHistory({ resumeId, versions, currentVersionId, selectedV
     );
   }
 
-  // Sort by version number descending
   const sortedVersions = [...versions].sort((a, b) => b.versionNumber - a.versionNumber);
 
   return (

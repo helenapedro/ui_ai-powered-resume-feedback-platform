@@ -33,7 +33,6 @@ export default function SharedResume() {
     try {
       const response = await sharingService.getSharedResume(token!);
       setData(response);
-      // Fetch comments after getting resume data
       if (response.permission === 'COMMENT') {
         fetchComments();
       }
@@ -54,7 +53,6 @@ export default function SharedResume() {
       const commentsData = await sharingService.getSharedComments(token!);
       setComments(commentsData);
     } catch (err) {
-      // Silent fail for comments
     } finally {
       setIsLoadingComments(false);
     }
@@ -148,13 +146,11 @@ export default function SharedResume() {
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Inline PDF Viewer */}
             <PdfViewer
               fileUrl={sharingService.getSharedResumePreviewUrl(token!)}
               className="min-h-[600px]"
             />
             
-            {/* Download button as fallback */}
             <div className="flex justify-center">
               <Button variant="outline" onClick={handleDownload}>
                 <ExternalLink className="h-4 w-4 mr-2" />

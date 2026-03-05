@@ -71,7 +71,6 @@ export default function ResumeDetails() {
     }
   }, [id]);
 
-  // Fetch comments when active version changes
   useEffect(() => {
     if (id && resume) {
       const versionId = previewVersionId || resume.currentVersionId;
@@ -104,7 +103,6 @@ export default function ResumeDetails() {
       const links = await sharingService.getShareLinks(id!);
       setSharedLinks(links);
     } catch (error) {
-      // Silent fail - links are optional
     } finally {
       setIsLoadingLinks(false);
     }
@@ -116,7 +114,6 @@ export default function ResumeDetails() {
       const data = await commentService.getComments(id!, versionId);
       setComments(data);
     } catch {
-      // Silent fail
     } finally {
       setIsLoadingComments(false);
     }
@@ -146,7 +143,6 @@ export default function ResumeDetails() {
       });
       setSharedLinks((prev) => [...prev, newLink]);
       
-      // Copy to clipboard
       const url = `${window.location.origin}/share/${newLink.token}`;
       await navigator.clipboard.writeText(url);
       
@@ -225,7 +221,6 @@ export default function ResumeDetails() {
       <Header />
       
       <main className="flex-1 container py-8 px-4">
-        {/* Back Button & Actions */}
         <div className="flex items-center justify-between mb-6">
           <Button variant="ghost" onClick={() => navigate(-1)}>
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -276,7 +271,6 @@ export default function ResumeDetails() {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
-          {/* Resume Info */}
           <Card>
             <CardHeader>
               <div className="flex items-start gap-4">
@@ -325,7 +319,6 @@ export default function ResumeDetails() {
             </CardContent>
           </Card>
 
-          {/* Version History */}
           <VersionHistory
             resumeId={resume.id}
             versions={versions}
@@ -336,7 +329,6 @@ export default function ResumeDetails() {
           />
         </div>
 
-        {/* PDF Preview */}
         {previewUrl && token && (
           <div className="mt-8">
             <Card>
@@ -357,14 +349,12 @@ export default function ResumeDetails() {
           </div>
         )}
 
-        {/* AI Feedback Section */}
         {activePreviewId && (
           <div className="mt-8">
             <AiFeedback resumeId={resume.id} versionId={activePreviewId} />
           </div>
         )}
 
-        {/* Comments Section */}
         <div className="mt-8">
           <Card>
             <CardHeader>
@@ -384,7 +374,6 @@ export default function ResumeDetails() {
           </Card>
         </div>
 
-        {/* Shared Links Section */}
         <div className="mt-8">
           <SharedLinksList
             links={sharedLinks}
@@ -394,7 +383,6 @@ export default function ResumeDetails() {
           />
         </div>
 
-        {/* Share Link Modal */}
         <ShareLinkModal
           open={isShareModalOpen}
           onOpenChange={setIsShareModalOpen}

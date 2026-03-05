@@ -51,7 +51,6 @@ export const authService = {
     return !!this.getToken();
   },
 
-  // Decode JWT to get user info (without verification)
   getUser(): { id: string; email: string; role: string } | null {
     const token = this.getToken();
 

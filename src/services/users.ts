@@ -17,12 +17,10 @@ export interface UpdateProfileRequest {
 }
 
 export const userService = {
-  // Get current user profile (JWT)
   async getMe(): Promise<UserProfile> {
     return apiClient.get<UserProfile>('/users/me');
   },
 
-  // Update current user profile (JWT)
   async updateMe(data: UpdateProfileRequest): Promise<UserProfile> {
     return apiClient.patch<UserProfile>('/users/me', data);
   },

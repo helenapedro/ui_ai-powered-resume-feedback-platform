@@ -5,7 +5,6 @@ import { FileText, MessageSquare, History, Sparkles, ArrowRight } from 'lucide-r
 export default function Landing() {
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Public Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
@@ -23,7 +22,6 @@ export default function Landing() {
         </div>
       </header>
       
-      {/* Hero Section */}
       <section className="flex-1 flex items-center justify-center py-20 px-4">
         <div className="container max-w-6xl">
           <div className="text-center space-y-8">
@@ -58,7 +56,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Features Section */}
       <section className="py-20 bg-muted/50">
         <div className="container max-w-6xl px-4">
           <h2 className="text-3xl font-bold text-center mb-12">
@@ -99,7 +96,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="py-20 bg-primary text-primary-foreground">
         <div className="container max-w-4xl px-4 text-center">
           <FileText className="h-12 w-12 mx-auto mb-6 opacity-90" />
@@ -118,7 +114,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="py-8 border-t">
         <div className="container text-center text-sm text-muted-foreground">
           <p>© 2024 Resume Feedback. Todos os direitos reservados.</p>

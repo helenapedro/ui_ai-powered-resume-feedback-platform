@@ -82,7 +82,6 @@ export default function Upload() {
     setIsUploading(true);
     setProgress(0);
 
-    // Simulate progress
     const progressInterval = setInterval(() => {
       setProgress((prev) => Math.min(prev + 10, 90));
     }, 200);
@@ -136,7 +135,6 @@ export default function Upload() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Title (only for new resumes) */}
               {!isAddingVersion && (
                 <div className="space-y-2">
                   <Label htmlFor="title">Título (opcional)</Label>
@@ -150,7 +148,6 @@ export default function Upload() {
                 </div>
               )}
 
-              {/* File Upload Area */}
               <div
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
@@ -208,7 +205,6 @@ export default function Upload() {
                 )}
               </div>
 
-              {/* Progress */}
               {isUploading && (
                 <div className="space-y-2">
                   <Progress value={progress} />
@@ -218,7 +214,6 @@ export default function Upload() {
                 </div>
               )}
 
-              {/* Submit Button */}
               <Button
                 type="submit"
                 className="w-full"

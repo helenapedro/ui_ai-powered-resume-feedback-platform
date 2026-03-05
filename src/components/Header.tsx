@@ -36,13 +36,11 @@ export function Header() {
           <span className="text-xl font-bold text-primary">Resume Feedback</span>
         </Link>
 
-        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6">
           <NavLinks />
         </nav>
 
         <div className="flex items-center gap-4">
-          {/* User Info with Logout */}
           <div className="hidden md:flex items-center gap-3">
             <Link
               to="/profile"
@@ -57,7 +55,6 @@ export function Header() {
             </Button>
           </div>
 
-          {/* Mobile Menu */}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
