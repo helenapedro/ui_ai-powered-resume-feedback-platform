@@ -116,7 +116,7 @@ export default function Landing() {
 
       <footer className="py-8 border-t">
         <div className="container text-center text-sm text-muted-foreground">
-          <p>© 2024 Resume Feedback. Todos os direitos reservados.</p>
+          <p>© 2025 Resume Feedback. Todos os direitos reservados.</p>
         </div>
       </footer>
     </div>
