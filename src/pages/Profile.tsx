@@ -373,77 +373,6 @@ export default function Profile() {
             </CardContent>
           </Card>
 
-          <Card className="border-destructive/30">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <UserX className="h-5 w-5 text-destructive" />
-                <CardTitle className="text-lg">Conta</CardTitle>
-              </div>
-              <CardDescription>
-                Gerencie o estado da sua conta. Essas acoes afetam seu acesso imediatamente.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex flex-wrap items-center gap-2">
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button type="button" variant="outline" className="border-amber-500 text-amber-700 hover:bg-amber-50">
-                      <UserX className="h-4 w-4 mr-2" />
-                      Desativar Conta
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Desativar conta?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Sua conta ficara inativa, mas seus dados serao mantidos. Voce podera reativar depois com email e senha.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleDeactivateAccount} disabled={isDeactivatingAccount}>
-                        {isDeactivatingAccount ? (
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        ) : null}
-                        Confirmar desativacao
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button type="button" variant="destructive">
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Excluir Conta
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Excluir conta permanentemente?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Esta acao nao pode ser desfeita. Sua conta sera removida de forma definitiva.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={handleDeleteAccount}
-                        disabled={isDeletingAccount}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                      >
-                        {isDeletingAccount ? (
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        ) : null}
-                        Confirmar exclusao
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
-            </CardContent>
-          </Card>
-
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
@@ -544,6 +473,77 @@ export default function Profile() {
                   )}
                   {isUploadingAvatar ? 'Enviando...' : 'Selecionar imagem'}
                 </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-destructive/30">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <UserX className="h-5 w-5 text-destructive" />
+                <CardTitle className="text-lg">Conta</CardTitle>
+              </div>
+              <CardDescription>
+                Gerencie o estado da sua conta. Essas acoes afetam seu acesso imediatamente.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button type="button" variant="outline" className="border-amber-500 text-amber-700 hover:bg-amber-50">
+                      <UserX className="h-4 w-4 mr-2" />
+                      Desativar Conta
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Desativar conta?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Sua conta ficara inativa, mas seus dados serao mantidos. Voce podera reativar depois com email e senha.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleDeactivateAccount} disabled={isDeactivatingAccount}>
+                        {isDeactivatingAccount ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : null}
+                        Confirmar desativacao
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button type="button" variant="destructive">
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Excluir Conta
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Excluir conta permanentemente?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Esta acao nao pode ser desfeita. Sua conta sera removida de forma definitiva.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleDeleteAccount}
+                        disabled={isDeletingAccount}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        {isDeletingAccount ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : null}
+                        Confirmar exclusao
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </CardContent>
           </Card>
