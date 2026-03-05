@@ -148,7 +148,7 @@ export function useAuthPageActions({ redirectTo }: UseAuthPageActionsParams) {
       const email = getFormValue(formData, 'email');
       const password = getFormValue(formData, 'password');
 
-      await runAuthTask(() => authService.reactivate({ email, password }), {
+      await runAuthTask(async () => { await authService.reactivate({ email, password }); }, {
         successTitle: 'Conta reativada!',
         successDescription: 'Sua conta foi reativada com sucesso.',
         errorTitle: 'Erro ao reativar conta',

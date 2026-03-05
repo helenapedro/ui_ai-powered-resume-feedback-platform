@@ -8,6 +8,7 @@ declare global {
             callback: (response: { credential?: string }) => void;
           }) => void;
           renderButton: (element: HTMLElement, options: Record<string, unknown>) => void;
+          prompt: () => void;
         };
       };
     };
