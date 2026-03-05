@@ -39,6 +39,15 @@ export const authService = {
     return response;
   },
 
+  async reactivate(credentials: AuthCredentials): Promise<AuthResponse> {
+    localStorage.removeItem('token');
+    const response = await apiClient.post<AuthResponse>('/auth/reactivate', credentials);
+    if (response.accessToken) {
+      localStorage.setItem('token', response.accessToken);
+    }
+    return response;
+  },
+
   logout(): void {
     localStorage.removeItem('token');
   },

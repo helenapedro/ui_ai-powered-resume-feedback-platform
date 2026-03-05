@@ -7,10 +7,35 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { useAuth } from '@/contexts/AuthContext';
 import { userService, type UserProfile, type UpdateProfileRequest } from '@/services/users';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Save, Mail, Phone, User, FileText, Camera, Upload, ArrowLeft, RefreshCw, X } from 'lucide-react';
+import {
+  Loader2,
+  Save,
+  Mail,
+  Phone,
+  User,
+  FileText,
+  Camera,
+  Upload,
+  ArrowLeft,
+  RefreshCw,
+  X,
+  UserX,
+  Trash2,
+} from 'lucide-react';
 
 const MAX_AVATAR_SIZE_BYTES = 2 * 1024 * 1024;
 const ALLOWED_AVATAR_TYPES = new Set([
@@ -82,7 +107,7 @@ async function optimizeAvatarFile(file: File): Promise<File> {
 }
 
 export default function Profile() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -90,6 +115,8 @@ export default function Profile() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [isDeactivatingAccount, setIsDeactivatingAccount] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
@@ -232,6 +259,48 @@ export default function Profile() {
     toast({ title: 'Perfil atualizado', description: 'Dados recarregados do servidor.' });
   };
 
+  const handleDeactivateAccount = async () => {
+    setIsDeactivatingAccount(true);
+    try {
+      await userService.deactivateMe();
+      logout();
+      toast({
+        title: 'Conta desativada',
+        description: 'Sua conta foi desativada. Voce pode reativar depois na tela de login.',
+      });
+      navigate('/auth');
+    } catch (error) {
+      toast({
+        title: 'Erro ao desativar conta',
+        description: error instanceof Error ? error.message : 'Nao foi possivel desativar sua conta.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsDeactivatingAccount(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setIsDeletingAccount(true);
+    try {
+      await userService.deleteMe();
+      logout();
+      toast({
+        title: 'Conta removida',
+        description: 'Sua conta foi excluida permanentemente.',
+      });
+      navigate('/auth');
+    } catch (error) {
+      toast({
+        title: 'Erro ao excluir conta',
+        description: error instanceof Error ? error.message : 'Nao foi possivel excluir sua conta.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsDeletingAccount(false);
+    }
+  };
+
   const displayName = fullName || user?.email?.split('@')[0] || 'usuario';
 
   if (isLoading) {
@@ -300,6 +369,77 @@ export default function Profile() {
                     </div>
                   )}
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-destructive/30">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <UserX className="h-5 w-5 text-destructive" />
+                <CardTitle className="text-lg">Conta</CardTitle>
+              </div>
+              <CardDescription>
+                Gerencie o estado da sua conta. Essas acoes afetam seu acesso imediatamente.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button type="button" variant="outline" className="border-amber-500 text-amber-700 hover:bg-amber-50">
+                      <UserX className="h-4 w-4 mr-2" />
+                      Desativar Conta
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Desativar conta?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Sua conta ficara inativa, mas seus dados serao mantidos. Voce podera reativar depois com email e senha.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleDeactivateAccount} disabled={isDeactivatingAccount}>
+                        {isDeactivatingAccount ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : null}
+                        Confirmar desativacao
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button type="button" variant="destructive">
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Excluir Conta
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Excluir conta permanentemente?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Esta acao nao pode ser desfeita. Sua conta sera removida de forma definitiva.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleDeleteAccount}
+                        disabled={isDeletingAccount}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        {isDeletingAccount ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : null}
+                        Confirmar exclusao
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </CardContent>
           </Card>

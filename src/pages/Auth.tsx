@@ -18,6 +18,7 @@ export default function Auth() {
     isGoogleLoading,
     handleLogin,
     handleRegister,
+    handleReactivate,
     handleGoogleCredential,
     showMissingGoogleCredentialError,
   } = useAuthPageActions({ redirectTo });
@@ -46,6 +47,7 @@ export default function Auth() {
             isLoading={isLoading}
             onLogin={handleLogin}
             onRegister={handleRegister}
+            onReactivate={handleReactivate}
           />
           <GoogleAuthSection
             clientId={googleClientId}

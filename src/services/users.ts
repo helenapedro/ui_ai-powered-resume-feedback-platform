@@ -30,4 +30,12 @@ export const userService = {
     formData.append('file', file);
     return apiClient.post<UserProfile>('/users/me/avatar', formData);
   },
+
+  async deactivateMe(): Promise<void> {
+    return apiClient.post('/users/me/deactivate');
+  },
+
+  async deleteMe(): Promise<void> {
+    return apiClient.delete('/users/me');
+  },
 };

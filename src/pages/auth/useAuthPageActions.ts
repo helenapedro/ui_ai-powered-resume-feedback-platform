@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { userService } from '@/services/users';
+import { authService } from '@/services/auth';
 import type { AuthTaskMessages } from './constants';
 import { getFormValue, getRegisterValidationError } from './utils';
 
@@ -140,11 +141,29 @@ export function useAuthPageActions({ redirectTo }: UseAuthPageActionsParams) {
     [register, runAuthTask, toast]
   );
 
+  const handleReactivate = useCallback(
+    async (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      const formData = new FormData(event.currentTarget);
+      const email = getFormValue(formData, 'email');
+      const password = getFormValue(formData, 'password');
+
+      await runAuthTask(() => authService.reactivate({ email, password }), {
+        successTitle: 'Conta reativada!',
+        successDescription: 'Sua conta foi reativada com sucesso.',
+        errorTitle: 'Erro ao reativar conta',
+        fallbackError: 'Nao foi possivel reativar a conta',
+      });
+    },
+    [runAuthTask]
+  );
+
   return {
     isLoading,
     isGoogleLoading,
     handleLogin,
     handleRegister,
+    handleReactivate,
     handleGoogleCredential,
     showMissingGoogleCredentialError: () =>
       showErrorToast(
