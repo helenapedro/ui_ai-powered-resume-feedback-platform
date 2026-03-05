@@ -24,4 +24,10 @@ export const userService = {
   async updateMe(data: UpdateProfileRequest): Promise<UserProfile> {
     return apiClient.patch<UserProfile>('/users/me', data);
   },
+
+  async uploadAvatar(file: File): Promise<UserProfile> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return apiClient.post<UserProfile>('/users/me/avatar', formData);
+  },
 };
