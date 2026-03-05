@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 export function Header() {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -48,8 +48,7 @@ export function Header() {
               title="Abrir perfil"
             >
               <User className="h-4 w-4" />
-              <span className="hidden lg:inline">Meu perfil</span>
-              <span className="max-w-[180px] truncate">{user?.email}</span>
+              <span>Perfil</span>
               <ChevronRight className="h-3.5 w-3.5 opacity-70" />
             </Link>
             <Button variant="ghost" size="sm" onClick={handleLogout}>
@@ -74,8 +73,7 @@ export function Header() {
                   onClick={() => setMobileOpen(false)}
                 >
                   <User className="h-4 w-4" />
-                  <span>Meu perfil</span>
-                  <span className="truncate">{user?.email}</span>
+                  <span>Perfil</span>
                 </Link>
                 <Button variant="ghost" size="sm" onClick={handleLogout} className="justify-start">
                   <LogOut className="h-4 w-4 mr-2" />

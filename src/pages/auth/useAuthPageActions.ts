@@ -2,6 +2,7 @@ import { useCallback, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { userService } from '@/services/users';
 import type { AuthTaskMessages } from './constants';
 import { getFormValue, getRegisterValidationError } from './utils';
 
@@ -46,11 +47,40 @@ export function useAuthPageActions({ redirectTo }: UseAuthPageActionsParams) {
     [navigate, redirectTo, showErrorToast, toast]
   );
 
+  const decodeGoogleName = useCallback((idToken: string): string | null => {
+    try {
+      const payloadPart = idToken.split('.')[1];
+      if (!payloadPart) return null;
+      const normalized = payloadPart.replace(/-/g, '+').replace(/_/g, '/');
+      const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=');
+      const payload = JSON.parse(atob(padded)) as { name?: string; given_name?: string };
+      const name = payload.name?.trim() || payload.given_name?.trim() || '';
+      return name || null;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const trySetGoogleFullName = useCallback(async (idToken: string) => {
+    const googleName = decodeGoogleName(idToken);
+    if (!googleName) return;
+
+    try {
+      const me = await userService.getMe();
+      if (!me.fullName || !me.fullName.trim()) {
+        await userService.updateMe({ fullName: googleName });
+      }
+    } catch {
+      return;
+    }
+  }, [decodeGoogleName]);
+
   const handleGoogleCredential = useCallback(
     async (idToken: string) => {
       setIsGoogleLoading(true);
       try {
         await loginWithGoogle(idToken);
+        await trySetGoogleFullName(idToken);
         toast({
           title: 'Login com Google realizado!',
           description: 'Bem-vindo de volta.',
@@ -62,7 +92,7 @@ export function useAuthPageActions({ redirectTo }: UseAuthPageActionsParams) {
         setIsGoogleLoading(false);
       }
     },
-    [loginWithGoogle, navigate, redirectTo, showErrorToast, toast]
+    [loginWithGoogle, navigate, redirectTo, showErrorToast, toast, trySetGoogleFullName]
   );
 
   const handleLogin = useCallback(
