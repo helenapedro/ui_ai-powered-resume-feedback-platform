@@ -1,10 +1,8 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { aiService } from '@/services/ai';
-import type { AiJobDTO, AiFeedbackDTO } from '@/types';
+import { useAiFeedback } from '@/features/ai/useAiFeedback';
 import {
   Brain,
   Loader2,
@@ -22,120 +20,33 @@ interface AiFeedbackProps {
   versionId: string;
 }
 
-const POLL_INTERVAL = 3000;
-const POLL_TIMEOUT = 120000;
-
 export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
-  const [job, setJob] = useState<AiJobDTO | null>(null);
-  const [feedback, setFeedback] = useState<AiFeedbackDTO | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isRegenerating, setIsRegenerating] = useState(false);
-  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const stopPolling = useCallback(() => {
-    if (pollingRef.current) {
-      clearInterval(pollingRef.current);
-      pollingRef.current = null;
-    }
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-  }, []);
-
-  const fetchFeedback = useCallback(async () => {
-    try {
-      const data = await aiService.getFeedback(resumeId, versionId);
-      setFeedback(data);
-    } catch {
-      setError('Não foi possível carregar o feedback.');
-    }
-  }, [resumeId, versionId]);
-
-  const pollJob = useCallback(async () => {
-    try {
-      const latestJob = await aiService.getLatestJob(resumeId, versionId);
-      setJob(latestJob);
-
-      if (latestJob.status === 'DONE') {
-        stopPolling();
-        await fetchFeedback();
-      } else if (latestJob.status === 'FAILED') {
-        stopPolling();
-        setError(latestJob.errorDetail || 'A análise falhou.');
-      }
-    } catch {
-      stopPolling();
-      setIsLoading(false);
-    }
-  }, [resumeId, versionId, stopPolling, fetchFeedback]);
-
-  const startPolling = useCallback(() => {
-    stopPolling();
-    setError(null);
-
-    pollJob();
-
-    pollingRef.current = setInterval(pollJob, POLL_INTERVAL);
-
-    timeoutRef.current = setTimeout(() => {
-      stopPolling();
-      setError('Tempo limite atingido. Tente regenerar o feedback.');
-    }, POLL_TIMEOUT);
-  }, [pollJob, stopPolling]);
-
-  useEffect(() => {
-    setIsLoading(true);
-    setFeedback(null);
-    setJob(null);
-    setError(null);
-
-    const init = async () => {
-      try {
-        const latestJob = await aiService.getLatestJob(resumeId, versionId);
-        setJob(latestJob);
-
-        if (latestJob.status === 'DONE') {
-          await fetchFeedback();
-        } else if (latestJob.status === 'FAILED') {
-          setError(latestJob.errorDetail || 'A análise falhou.');
-        } else {
-          startPolling();
-        }
-      } catch {
-        setJob(null);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    init();
-
-    return stopPolling;
-  }, [resumeId, versionId]);
-
-  const handleRegenerate = async () => {
-    setIsRegenerating(true);
-    setError(null);
-    setFeedback(null);
-    try {
-      const newJob = await aiService.regenerate(resumeId, versionId);
-      setJob(newJob);
-      startPolling();
-    } catch {
-      setError('Não foi possível regenerar o feedback.');
-    } finally {
-      setIsRegenerating(false);
-    }
-  };
+  const { job, feedback, isLoading, error, isRegenerating, handleRegenerate } = useAiFeedback(
+    resumeId,
+    versionId
+  );
 
   const statusConfig: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
-    PENDING: { icon: <Clock className="h-4 w-4" />, label: 'Aguardando', color: 'bg-muted text-muted-foreground' },
-    PROCESSING: { icon: <Loader2 className="h-4 w-4 animate-spin" />, label: 'Analisando...', color: 'bg-primary/10 text-primary' },
-    DONE: { icon: <CheckCircle2 className="h-4 w-4" />, label: 'Concluído', color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' },
-    FAILED: { icon: <XCircle className="h-4 w-4" />, label: 'Falhou', color: 'bg-destructive/10 text-destructive' },
+    PENDING: {
+      icon: <Clock className="h-4 w-4" />,
+      label: 'Aguardando',
+      color: 'bg-muted text-muted-foreground',
+    },
+    PROCESSING: {
+      icon: <Loader2 className="h-4 w-4 animate-spin" />,
+      label: 'Analisando...',
+      color: 'bg-primary/10 text-primary',
+    },
+    DONE: {
+      icon: <CheckCircle2 className="h-4 w-4" />,
+      label: 'Concluido',
+      color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+    },
+    FAILED: {
+      icon: <XCircle className="h-4 w-4" />,
+      label: 'Falhou',
+      color: 'bg-destructive/10 text-destructive',
+    },
   };
 
   if (isLoading) {
@@ -166,9 +77,7 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground mb-4">
-            Nenhuma análise disponível para esta versão.
-          </p>
+          <p className="text-sm text-muted-foreground mb-4">Nenhuma analise disponivel para esta versao.</p>
           <Button onClick={handleRegenerate} disabled={isRegenerating} size="sm">
             {isRegenerating ? (
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -198,12 +107,7 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
               <span className="ml-1">{status.label}</span>
             </Badge>
             {(job.status === 'DONE' || job.status === 'FAILED') && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleRegenerate}
-                disabled={isRegenerating}
-              >
+              <Button variant="outline" size="sm" onClick={handleRegenerate} disabled={isRegenerating}>
                 {isRegenerating ? (
                   <Loader2 className="h-4 w-4 mr-1 animate-spin" />
                 ) : (
@@ -220,7 +124,7 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
           <div className="flex flex-col items-center py-8 text-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
             <p className="text-sm text-muted-foreground">
-              A IA está a analisar o seu currículo. Isto pode demorar alguns segundos...
+              A IA esta a analisar o seu curriculo. Isto pode demorar alguns segundos...
             </p>
           </div>
         )}
@@ -254,9 +158,7 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
                 <Lightbulb className="h-4 w-4 text-primary" />
                 Resumo
               </h4>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {feedback.summary}
-              </p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{feedback.summary}</p>
             </div>
 
             {feedback.strengths.length > 0 && (
@@ -266,8 +168,8 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
                   Pontos Fortes
                 </h4>
                 <ul className="space-y-2">
-                  {feedback.strengths.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                  {feedback.strengths.map((item, index) => (
+                    <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
                       <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 shrink-0" />
                       <span>{item}</span>
                     </li>
@@ -283,10 +185,10 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
                   Melhorias Sugeridas
                 </h4>
                 <ul className="space-y-2">
-                  {feedback.improvements.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                  {feedback.improvements.map((item, index) => (
+                    <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
                       <span className="h-4 w-4 flex items-center justify-center text-amber-600 dark:text-amber-400 mt-0.5 shrink-0 font-bold text-xs">
-                        {i + 1}.
+                        {index + 1}.
                       </span>
                       <span>{item}</span>
                     </li>

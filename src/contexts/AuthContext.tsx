@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { authService } from '@/services/auth';
+import React, { useEffect, useMemo } from 'react';
+import { initializeAuth, login, loginWithGoogle, logout, register } from '@/store/slices/authSlice';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import type { User } from '@/types';
 
 interface AuthContextType {
@@ -12,86 +13,42 @@ interface AuthContextType {
   logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  isAuthenticated: false,
-  isLoading: true,
-  login: async () => {},
-  register: async () => {},
-  loginWithGoogle: async () => {},
-  logout: () => {},
-});
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const isInitialized = useAppSelector((state) => state.auth.isInitialized);
 
   useEffect(() => {
-    const existingUser = authService.getUser();
-    if (existingUser) {
-      setUser({
-        id: existingUser.id,
-        email: existingUser.email,
-      });
+    if (!isInitialized) {
+      void dispatch(initializeAuth());
     }
-    setIsLoading(false);
-  }, []);
+  }, [dispatch, isInitialized]);
 
-  const login = useCallback(async (email: string, password: string) => {
-    await authService.login({ email, password });
-    const userData = authService.getUser();
-    if (userData) {
-      setUser({
-        id: userData.id,
-        email: userData.email,
-      });
-    }
-  }, []);
-
-  const register = useCallback(async (email: string, password: string) => {
-    await authService.register({ email, password });
-    const userData = authService.getUser();
-    if (userData) {
-      setUser({
-        id: userData.id,
-        email: userData.email,
-      });
-    }
-  }, []);
-
-  const loginWithGoogle = useCallback(async (idToken: string) => {
-    await authService.loginWithGoogle(idToken);
-    const userData = authService.getUser();
-    if (userData) {
-      setUser({
-        id: userData.id,
-        email: userData.email,
-      });
-    }
-  }, []);
-
-  const logout = useCallback(() => {
-    authService.logout();
-    setUser(null);
-  }, []);
-
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isAuthenticated: !!user,
-        isLoading,
-        login,
-        register,
-        loginWithGoogle,
-        logout,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+  return <>{children}</>;
 }
 
 export function useAuth() {
-  return useContext(AuthContext);
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.auth.user);
+  const isLoading = useAppSelector((state) => state.auth.isLoading);
+
+  return useMemo<AuthContextType>(
+    () => ({
+      user: user as User | null,
+      isAuthenticated: !!user,
+      isLoading,
+      login: async (email: string, password: string) => {
+        await dispatch(login({ email, password })).unwrap();
+      },
+      register: async (email: string, password: string) => {
+        await dispatch(register({ email, password })).unwrap();
+      },
+      loginWithGoogle: async (idToken: string) => {
+        await dispatch(loginWithGoogle(idToken)).unwrap();
+      },
+      logout: () => {
+        dispatch(logout());
+      },
+    }),
+    [dispatch, isLoading, user]
+  );
 }

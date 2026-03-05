@@ -1,148 +1,57 @@
-import { useState, useCallback } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { resumeService } from '@/services/resumes';
-import { useToast } from '@/hooks/use-toast';
 import { Upload as UploadIcon, FileText, X, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useUploadPage } from '@/features/upload/useUploadPage';
 
 export default function Upload() {
-  const [file, setFile] = useState<File | null>(null);
-  const [title, setTitle] = useState('');
-  const [isUploading, setIsUploading] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const resumeId = searchParams.get('resumeId');
-  const isAddingVersion = !!resumeId;
-  const { toast } = useToast();
-
-  const acceptedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
-  const maxSize = 10 * 1024 * 1024; // 10MB
-
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-
-    const droppedFile = e.dataTransfer.files[0];
-    if (droppedFile) {
-      validateAndSetFile(droppedFile);
-    }
-  }, []);
-
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  }, []);
-
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-  }, []);
-
-  const validateAndSetFile = (file: File) => {
-    if (!acceptedTypes.includes(file.type)) {
-      toast({
-        variant: 'destructive',
-        title: 'Tipo de arquivo inválido',
-        description: 'Apenas PDF, JPEG e PNG são aceitos.',
-      });
-      return;
-    }
-
-    if (file.size > maxSize) {
-      toast({
-        variant: 'destructive',
-        title: 'Arquivo muito grande',
-        description: 'O tamanho máximo é 10MB.',
-      });
-      return;
-    }
-
-    setFile(file);
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      validateAndSetFile(selectedFile);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!file) return;
-
-    setIsUploading(true);
-    setProgress(0);
-
-    const progressInterval = setInterval(() => {
-      setProgress((prev) => Math.min(prev + 10, 90));
-    }, 200);
-
-    try {
-      if (isAddingVersion) {
-        await resumeService.addVersion(resumeId, file);
-        toast({
-          title: 'Nova versão adicionada!',
-          description: 'A versão foi adicionada com sucesso.',
-        });
-        navigate(`/resume/${resumeId}`);
-      } else {
-        const resume = await resumeService.createResume(file, title || undefined);
-        toast({
-          title: 'Currículo criado!',
-          description: 'Seu currículo foi enviado com sucesso.',
-        });
-        navigate(`/resume/${resume.id}`);
-      }
-      clearInterval(progressInterval);
-      setProgress(100);
-    } catch (error) {
-      clearInterval(progressInterval);
-      toast({
-        variant: 'destructive',
-        title: 'Erro ao enviar currículo',
-        description: error instanceof Error ? error.message : 'Tente novamente.',
-      });
-    } finally {
-      setIsUploading(false);
-    }
-  };
+  const {
+    file,
+    title,
+    isUploading,
+    progress,
+    isDragging,
+    isAddingVersion,
+    setTitle,
+    clearFile,
+    handleDrop,
+    handleDragOver,
+    handleDragLeave,
+    handleFileChange,
+    handleSubmit,
+  } = useUploadPage();
 
   return (
     <div className="min-h-screen flex flex-col bg-muted/30">
       <Header />
-      
+
       <main className="flex-1 container py-8 px-4 max-w-2xl">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <UploadIcon className="h-6 w-6 text-primary" />
-              {isAddingVersion ? 'Adicionar Nova Versão' : 'Enviar Currículo'}
+              {isAddingVersion ? 'Adicionar Nova Versao' : 'Enviar Curriculo'}
             </CardTitle>
             <CardDescription>
-              {isAddingVersion 
-                ? 'Adicione uma nova versão ao currículo existente'
-                : 'Faça upload do seu currículo e receba feedback de IA em minutos'}
+              {isAddingVersion
+                ? 'Adicione uma nova versao ao curriculo existente'
+                : 'Faca upload do seu curriculo e receba feedback de IA em minutos'}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               {!isAddingVersion && (
                 <div className="space-y-2">
-                  <Label htmlFor="title">Título (opcional)</Label>
+                  <Label htmlFor="title">Titulo (opcional)</Label>
                   <Input
                     id="title"
-                    placeholder="Ex: Currículo Backend Developer"
+                    placeholder="Ex: Curriculo Backend Developer"
                     value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    onChange={(event) => setTitle(event.target.value)}
                     disabled={isUploading}
                   />
                 </div>
@@ -167,25 +76,15 @@ export default function Upload() {
                         {(file.size / 1024 / 1024).toFixed(2)} MB
                       </p>
                     </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setFile(null)}
-                      className="ml-2"
-                    >
+                    <Button type="button" variant="ghost" size="icon" onClick={clearFile} className="ml-2">
                       <X className="h-4 w-4" />
                     </Button>
                   </div>
                 ) : (
                   <>
                     <UploadIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-lg font-medium mb-2">
-                      Arraste e solte seu currículo aqui
-                    </p>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      ou clique para selecionar
-                    </p>
+                    <p className="text-lg font-medium mb-2">Arraste e solte seu curriculo aqui</p>
+                    <p className="text-sm text-muted-foreground mb-4">ou clique para selecionar</p>
                     <input
                       type="file"
                       accept=".pdf,.jpg,.jpeg,.png"
@@ -198,9 +97,7 @@ export default function Upload() {
                         Selecionar Arquivo
                       </label>
                     </Button>
-                    <p className="text-xs text-muted-foreground mt-4">
-                      PDF, JPEG ou PNG • Máximo 10MB
-                    </p>
+                    <p className="text-xs text-muted-foreground mt-4">PDF, JPEG ou PNG | Maximo 10MB</p>
                   </>
                 )}
               </div>
@@ -208,18 +105,11 @@ export default function Upload() {
               {isUploading && (
                 <div className="space-y-2">
                   <Progress value={progress} />
-                  <p className="text-sm text-muted-foreground text-center">
-                    Enviando currículo...
-                  </p>
+                  <p className="text-sm text-muted-foreground text-center">Enviando curriculo...</p>
                 </div>
               )}
 
-              <Button
-                type="submit"
-                className="w-full"
-                size="lg"
-                disabled={!file || isUploading}
-              >
+              <Button type="submit" className="w-full" size="lg" disabled={!file || isUploading}>
                 {isUploading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -228,7 +118,7 @@ export default function Upload() {
                 ) : (
                   <>
                     <UploadIcon className="mr-2 h-4 w-4" />
-                    {isAddingVersion ? 'Adicionar Versão' : 'Enviar Currículo'}
+                    {isAddingVersion ? 'Adicionar Versao' : 'Enviar Curriculo'}
                   </>
                 )}
               </Button>

@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { PdfViewer } from '@/components/PdfViewer';
 import { VersionHistory } from '@/components/VersionHistory';
-import { ShareLinkModal } from '@/components/ShareLinkModal';
+import { ShareLinkModal, type ShareLinkFormData } from '@/components/ShareLinkModal';
 import { SharedLinksList } from '@/components/SharedLinksList';
 import { CommentList } from '@/components/CommentList';
 import { AiFeedback } from '@/components/AiFeedback';
@@ -22,12 +22,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { resumeService } from '@/services/resumes';
-import { sharingService } from '@/services/sharing';
-import { commentService } from '@/services/comments';
-import { useToast } from '@/hooks/use-toast';
-import type { ResumeSummary, ResumeVersion, SharedLink, Comment } from '@/types';
-import type { ShareLinkFormData } from '@/components/ShareLinkModal';
+import { useResumeDetailsPage } from '@/features/resume-details/useResumeDetailsPage';
 import {
   ArrowLeft,
   Trash2,
@@ -43,155 +38,29 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 export default function ResumeDetails() {
-  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { toast } = useToast();
-
-  const [resume, setResume] = useState<ResumeSummary | null>(null);
-  const [versions, setVersions] = useState<ResumeVersion[]>([]);
-  const [sharedLinks, setSharedLinks] = useState<SharedLink[]>([]);
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const [isCreatingLink, setIsCreatingLink] = useState(false);
-  const [isLoadingLinks, setIsLoadingLinks] = useState(false);
-  const [isLoadingComments, setIsLoadingComments] = useState(false);
-  const [previewVersionId, setPreviewVersionId] = useState<string | null>(null);
-  const token = localStorage.getItem('token');
-  const authHeaders = useMemo(
-    () => (token ? { Authorization: `Bearer ${token}` } : undefined),
-    [token],
-  );
-
-  useEffect(() => {
-    if (id) {
-      fetchResume();
-      fetchSharedLinks();
-    }
-  }, [id]);
-
-  useEffect(() => {
-    if (id && resume) {
-      const versionId = previewVersionId || resume.currentVersionId;
-      if (versionId) {
-        fetchComments(versionId);
-      }
-    }
-  }, [id, resume, previewVersionId]);
-
-  const fetchResume = async () => {
-    try {
-      const data = await resumeService.getResumeById(id!);
-      setResume(data.resume);
-      setVersions(data.versions);
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Erro ao carregar currículo',
-        description: error instanceof Error ? error.message : 'Tente novamente.',
-      });
-      navigate('/my-resumes');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const fetchSharedLinks = async () => {
-    setIsLoadingLinks(true);
-    try {
-      const links = await sharingService.getShareLinks(id!);
-      setSharedLinks(links);
-    } catch (error) {
-    } finally {
-      setIsLoadingLinks(false);
-    }
-  };
-
-  const fetchComments = async (versionId: string) => {
-    setIsLoadingComments(true);
-    try {
-      const data = await commentService.getComments(id!, versionId);
-      setComments(data);
-    } catch {
-    } finally {
-      setIsLoadingComments(false);
-    }
-  };
-
-  const handleAddComment = useCallback(async (content: string) => {
-    const versionId = previewVersionId || resume?.currentVersionId;
-    if (!versionId) return;
-    const newComment = await commentService.addComment(id!, versionId, { body: content });
-    setComments((prev) => [...prev, newComment]);
-  }, [id, resume, previewVersionId]);
-
-  const handleDeleteComment = useCallback(async (commentId: string) => {
-    const versionId = previewVersionId || resume?.currentVersionId;
-    if (!versionId) return;
-    await commentService.deleteComment(id!, versionId, commentId);
-    setComments((prev) => prev.filter((c) => (c.id || c._id) !== commentId));
-  }, [id, resume, previewVersionId]);
-
-  const handleCreateShareLink = async (data: ShareLinkFormData) => {
-    setIsCreatingLink(true);
-    try {
-      const newLink = await sharingService.createShareLink(id!, {
-        permission: data.permission,
-        expiresAt: data.expiresAt,
-        maxUses: data.maxUses,
-      });
-      setSharedLinks((prev) => [...prev, newLink]);
-      
-      const url = `${window.location.origin}/share/${newLink.token}`;
-      await navigator.clipboard.writeText(url);
-      
-      toast({
-        title: 'Link criado e copiado!',
-        description: 'O link de partilha foi copiado para a área de transferência.',
-      });
-      setIsShareModalOpen(false);
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Erro ao criar link',
-        description: error instanceof Error ? error.message : 'Tente novamente.',
-      });
-    } finally {
-      setIsCreatingLink(false);
-    }
-  };
-
-  const handleRevokeLink = async (linkId: string) => {
-    try {
-      await sharingService.revokeShareLink(id!, linkId);
-      setSharedLinks((prev) => prev.filter((l) => l.id !== linkId));
-      toast({ title: 'Link revogado!' });
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Erro ao revogar link',
-        description: error instanceof Error ? error.message : 'Tente novamente.',
-      });
-    }
-  };
-
-  const handleDelete = async () => {
-    setIsDeleting(true);
-    try {
-      await resumeService.deleteResume(id!);
-      toast({ title: 'Currículo removido!' });
-      navigate('/my-resumes');
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Erro ao remover currículo',
-        description: error instanceof Error ? error.message : 'Tente novamente.',
-      });
-    } finally {
-      setIsDeleting(false);
-    }
-  };
+  const {
+    resume,
+    versions,
+    sharedLinks,
+    comments,
+    isLoading,
+    isDeleting,
+    isLoadingLinks,
+    isLoadingComments,
+    isCreatingLink,
+    currentVersion,
+    activePreviewId,
+    previewUrl,
+    authHeaders,
+    setPreviewVersion,
+    handleAddComment,
+    handleDeleteComment,
+    handleCreateShareLink,
+    handleRevokeLink,
+    handleDeleteResume,
+  } = useResumeDetailsPage();
 
   if (isLoading) {
     return (
@@ -208,25 +77,21 @@ export default function ResumeDetails() {
     );
   }
 
-  if (!resume) return null;
-
-  const currentVersion = versions.find(v => v.id === resume.currentVersionId);
-  const activePreviewId = previewVersionId || currentVersion?.id || null;
-  const previewUrl = activePreviewId
-    ? resumeService.getVersionPreviewUrl(resume.id, activePreviewId)
-    : null;
+  if (!resume) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-muted/30">
       <Header />
-      
+
       <main className="flex-1 container py-8 px-4">
         <div className="flex items-center justify-between mb-6">
           <Button variant="ghost" onClick={() => navigate(-1)}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Voltar
           </Button>
-          
+
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={() => setIsShareModalOpen(true)}>
               <Share2 className="h-4 w-4 mr-2" />
@@ -235,7 +100,7 @@ export default function ResumeDetails() {
             <Button variant="outline" asChild>
               <Link to={`/upload?resumeId=${resume.id}`}>
                 <Upload className="h-4 w-4 mr-2" />
-                Adicionar Versão
+                Adicionar Versao
               </Link>
             </Button>
             <AlertDialog>
@@ -251,15 +116,15 @@ export default function ResumeDetails() {
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Deletar currículo?</AlertDialogTitle>
+                  <AlertDialogTitle>Deletar curriculo?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Esta ação não pode ser desfeita. Todas as versões serão removidas.
+                    Esta acao nao pode ser desfeita. Todas as versoes serao removidas.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancelar</AlertDialogCancel>
                   <AlertDialogAction
-                    onClick={handleDelete}
+                    onClick={handleDeleteResume}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   >
                     Deletar
@@ -278,9 +143,7 @@ export default function ResumeDetails() {
                   <FileText className="h-8 w-8 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <CardTitle className="text-2xl mb-2">
-                    {resume.title || 'Currículo sem título'}
-                  </CardTitle>
+                  <CardTitle className="text-2xl mb-2">{resume.title || 'Curriculo sem titulo'}</CardTitle>
                   <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
@@ -292,7 +155,7 @@ export default function ResumeDetails() {
                     </div>
                     <div className="flex items-center gap-1">
                       <Hash className="h-4 w-4" />
-                      <span>{versions.length} versões</span>
+                      <span>{versions.length} versoes</span>
                     </div>
                   </div>
                 </div>
@@ -300,19 +163,15 @@ export default function ResumeDetails() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <h4 className="text-sm font-medium mb-2">ID do Currículo</h4>
-                <code className="text-xs bg-muted px-2 py-1 rounded">
-                  {resume.id}
-                </code>
+                <h4 className="text-sm font-medium mb-2">ID do Curriculo</h4>
+                <code className="text-xs bg-muted px-2 py-1 rounded">{resume.id}</code>
               </div>
               {currentVersion && (
                 <div>
-                  <h4 className="text-sm font-medium mb-2">Versão Atual</h4>
+                  <h4 className="text-sm font-medium mb-2">Versao Atual</h4>
                   <div className="flex items-center gap-2">
                     <Badge>v{currentVersion.versionNumber}</Badge>
-                    <span className="text-sm text-muted-foreground">
-                      {currentVersion.originalFilename}
-                    </span>
+                    <span className="text-sm text-muted-foreground">{currentVersion.originalFilename}</span>
                   </div>
                 </div>
               )}
@@ -324,26 +183,22 @@ export default function ResumeDetails() {
             versions={versions}
             currentVersionId={resume.currentVersionId}
             selectedVersionId={activePreviewId}
-            onPreview={(versionId) => setPreviewVersionId(versionId)}
+            onPreview={setPreviewVersion}
             isLoading={false}
           />
         </div>
 
-        {previewUrl && token && (
+        {previewUrl && authHeaders && (
           <div className="mt-8">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <FileText className="h-5 w-5" />
-                  Pré-visualização
+                  Pre-visualizacao
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <PdfViewer
-                  fileUrl={previewUrl}
-                  httpHeaders={authHeaders}
-                  className="min-h-[600px]"
-                />
+                <PdfViewer fileUrl={previewUrl} httpHeaders={authHeaders} className="min-h-[600px]" />
               </CardContent>
             </Card>
           </div>
@@ -360,7 +215,7 @@ export default function ResumeDetails() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <MessageSquare className="h-5 w-5" />
-                Comentários
+                Comentarios
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -386,7 +241,10 @@ export default function ResumeDetails() {
         <ShareLinkModal
           open={isShareModalOpen}
           onOpenChange={setIsShareModalOpen}
-          onSubmit={handleCreateShareLink}
+          onSubmit={async (data: ShareLinkFormData) => {
+            await handleCreateShareLink(data);
+            setIsShareModalOpen(false);
+          }}
           isLoading={isCreatingLink}
         />
       </main>
