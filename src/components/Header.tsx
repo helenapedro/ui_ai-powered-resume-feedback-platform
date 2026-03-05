@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { FileText, Menu, User, Upload, LogOut } from 'lucide-react';
+import { FileText, Menu, User, Upload, LogOut, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
@@ -44,10 +44,13 @@ export function Header() {
           <div className="hidden md:flex items-center gap-3">
             <Link
               to="/profile"
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              title="Abrir perfil"
             >
               <User className="h-4 w-4" />
-              <span>{user?.email}</span>
+              <span className="hidden lg:inline">Meu perfil</span>
+              <span className="max-w-[180px] truncate">{user?.email}</span>
+              <ChevronRight className="h-3.5 w-3.5 opacity-70" />
             </Link>
             <Button variant="ghost" size="sm" onClick={handleLogout}>
               <LogOut className="h-4 w-4 mr-2" />
@@ -65,10 +68,15 @@ export function Header() {
               <nav className="flex flex-col gap-4 mt-8">
                 <NavLinks mobile />
                 <hr className="my-2" />
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Link
+                  to="/profile"
+                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={() => setMobileOpen(false)}
+                >
                   <User className="h-4 w-4" />
-                  <span>{user?.email}</span>
-                </div>
+                  <span>Meu perfil</span>
+                  <span className="truncate">{user?.email}</span>
+                </Link>
                 <Button variant="ghost" size="sm" onClick={handleLogout} className="justify-start">
                   <LogOut className="h-4 w-4 mr-2" />
                   Sair

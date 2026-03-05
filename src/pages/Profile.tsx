@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, type ChangeEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { userService, type UserProfile, type UpdateProfileRequest } from '@/services/users';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Save, Mail, Phone, User, FileText, Camera, Upload } from 'lucide-react';
+import { Loader2, Save, Mail, Phone, User, FileText, Camera, Upload, ArrowLeft, RefreshCw, X } from 'lucide-react';
 
 const MAX_AVATAR_SIZE_BYTES = 2 * 1024 * 1024;
 const ALLOWED_AVATAR_TYPES = new Set([
@@ -82,6 +83,7 @@ async function optimizeAvatarFile(file: File): Promise<File> {
 
 export default function Profile() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -93,6 +95,12 @@ export default function Profile() {
   const [phone, setPhone] = useState('');
   const [bio, setBio] = useState('');
 
+  const applyProfileToForm = (data: UserProfile) => {
+    setFullName(data.fullName || '');
+    setPhone(data.phone || '');
+    setBio(data.bio || '');
+  };
+
   useEffect(() => {
     loadProfile();
   }, []);
@@ -101,9 +109,7 @@ export default function Profile() {
     try {
       const data = await userService.getMe();
       setProfile(data);
-      setFullName(data.fullName || '');
-      setPhone(data.phone || '');
-      setBio(data.bio || '');
+      applyProfileToForm(data);
     } catch {
       toast({
         title: 'Erro ao carregar perfil',
@@ -132,9 +138,7 @@ export default function Profile() {
 
       const updated = await userService.updateMe(payload);
       setProfile(updated);
-      setFullName(updated.fullName || '');
-      setPhone(updated.phone || '');
-      setBio(updated.bio || '');
+      applyProfileToForm(updated);
       toast({ title: 'Perfil atualizado!', description: 'Suas informacoes foram salvas.' });
     } catch (error) {
       toast({
@@ -181,9 +185,7 @@ export default function Profile() {
 
       const updated = await userService.uploadAvatar(fileToUpload);
       setProfile(updated);
-      setFullName(updated.fullName || '');
-      setPhone(updated.phone || '');
-      setBio(updated.bio || '');
+      applyProfileToForm(updated);
       toast({
         title: 'Avatar atualizado!',
         description: 'Sua foto de perfil foi enviada com sucesso.',
@@ -218,6 +220,20 @@ export default function Profile() {
     );
   };
 
+  const handleCancelChanges = () => {
+    if (!profile) return;
+    applyProfileToForm(profile);
+    toast({ title: 'Alteracoes descartadas', description: 'Os campos voltaram ao ultimo estado salvo.' });
+  };
+
+  const handleRefreshProfile = async () => {
+    setIsLoading(true);
+    await loadProfile();
+    toast({ title: 'Perfil atualizado', description: 'Dados recarregados do servidor.' });
+  };
+
+  const displayName = fullName || user?.email?.split('@')[0] || 'usuario';
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -233,9 +249,19 @@ export default function Profile() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container max-w-3xl py-10 px-4">
-        <div className="mb-8">
+        <div className="mb-8 space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button type="button" variant="ghost" size="sm" onClick={() => navigate(-1)}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Voltar
+            </Button>
+            <Button type="button" variant="outline" size="sm" onClick={handleRefreshProfile}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Atualizar
+            </Button>
+          </div>
           <h1 className="text-3xl font-bold text-foreground">Meu Perfil</h1>
-          <p className="text-muted-foreground mt-1">Gerencie suas informacoes pessoais e preferencias.</p>
+          <p className="text-muted-foreground mt-1">Bem-vindo, {displayName}. Atualize suas informacoes pessoais e preferencias.</p>
         </div>
 
         <form onSubmit={handleSave} className="space-y-6">
@@ -386,14 +412,25 @@ export default function Profile() {
             <p className="text-sm text-muted-foreground">
               {hasChanges() ? 'Voce tem alteracoes nao salvas.' : 'Tudo salvo.'}
             </p>
-            <Button type="submit" disabled={isSaving || !hasChanges()} className="min-w-[160px]">
-              {isSaving ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              ) : (
-                <Save className="h-4 w-4 mr-2" />
-              )}
-              Salvar Alteracoes
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={!hasChanges() || isSaving}
+                onClick={handleCancelChanges}
+              >
+                <X className="h-4 w-4 mr-2" />
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={isSaving || !hasChanges()} className="min-w-[160px]">
+                {isSaving ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : (
+                  <Save className="h-4 w-4 mr-2" />
+                )}
+                Salvar Alteracoes
+              </Button>
+            </div>
           </div>
         </form>
       </main>
