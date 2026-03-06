@@ -23,19 +23,8 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useResumeDetailsPage } from '@/features/resume-details/useResumeDetailsPage';
-import {
-  ArrowLeft,
-  Trash2,
-  FileText,
-  Calendar,
-  Loader2,
-  Upload,
-  Hash,
-  Share2,
-  MessageSquare,
-} from 'lucide-react';
+import { ArrowLeft, Trash2, FileText, Calendar, Loader2, Upload, Hash, Share2, MessageSquare } from 'lucide-react';
 import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 
 export default function ResumeDetails() {
   const navigate = useNavigate();
@@ -89,18 +78,18 @@ export default function ResumeDetails() {
         <div className="flex items-center justify-between mb-6">
           <Button variant="ghost" onClick={() => navigate(-1)}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar
+            Back
           </Button>
 
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={() => setIsShareModalOpen(true)}>
               <Share2 className="h-4 w-4 mr-2" />
-              Partilhar
+              Share
             </Button>
             <Button variant="outline" asChild>
               <Link to={`/upload?resumeId=${resume.id}`}>
                 <Upload className="h-4 w-4 mr-2" />
-                Adicionar Versao
+                Add Version
               </Link>
             </Button>
             <AlertDialog>
@@ -111,23 +100,23 @@ export default function ResumeDetails() {
                   ) : (
                     <Trash2 className="h-4 w-4 mr-2" />
                   )}
-                  Deletar
+                  Delete
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Deletar curriculo?</AlertDialogTitle>
+                  <AlertDialogTitle>Delete resume?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Esta acao nao pode ser desfeita. Todas as versoes serao removidas.
+                    This action cannot be undone. All versions will be removed.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleDeleteResume}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   >
-                    Deletar
+                    Delete
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -143,19 +132,15 @@ export default function ResumeDetails() {
                   <FileText className="h-8 w-8 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <CardTitle className="text-2xl mb-2">{resume.title || 'Curriculo sem titulo'}</CardTitle>
+                  <CardTitle className="text-2xl mb-2">{resume.title || 'Untitled resume'}</CardTitle>
                   <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
-                      <span>
-                        {format(new Date(resume.createdAt), "dd 'de' MMMM 'de' yyyy", {
-                          locale: ptBR,
-                        })}
-                      </span>
+                      <span>{format(new Date(resume.createdAt), 'MMMM dd, yyyy')}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <Hash className="h-4 w-4" />
-                      <span>{versions.length} versoes</span>
+                      <span>{versions.length} versions</span>
                     </div>
                   </div>
                 </div>
@@ -164,7 +149,7 @@ export default function ResumeDetails() {
             <CardContent className="space-y-4">
               {currentVersion && (
                 <div>
-                  <h4 className="text-sm font-medium mb-2">Versao Atual</h4>
+                  <h4 className="text-sm font-medium mb-2">Current Version</h4>
                   <div className="flex items-center gap-2">
                     <Badge>v{currentVersion.versionNumber}</Badge>
                     <span className="text-sm text-muted-foreground">{currentVersion.originalFilename}</span>
@@ -190,7 +175,7 @@ export default function ResumeDetails() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <FileText className="h-5 w-5" />
-                  Pre-visualizacao
+                  Preview
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -211,7 +196,7 @@ export default function ResumeDetails() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <MessageSquare className="h-5 w-5" />
-                Comentarios
+                Comments
               </CardTitle>
             </CardHeader>
             <CardContent>

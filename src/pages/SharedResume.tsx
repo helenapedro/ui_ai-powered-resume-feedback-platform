@@ -25,7 +25,7 @@ export default function SharedResume() {
 
   useEffect(() => {
     if (token) {
-      fetchSharedResume();
+      void fetchSharedResume();
     }
   }, [token]);
 
@@ -34,14 +34,10 @@ export default function SharedResume() {
       const response = await sharingService.getSharedResume(token!);
       setData(response);
       if (response.permission === 'COMMENT') {
-        fetchComments();
+        void fetchComments();
       }
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Link inválido, expirado ou revogado.'
-      );
+      setError(err instanceof Error ? err.message : 'Invalid, expired, or revoked link.');
     } finally {
       setIsLoading(false);
     }
@@ -52,27 +48,27 @@ export default function SharedResume() {
     try {
       const commentsData = await sharingService.getSharedComments(token!);
       setComments(commentsData);
-    } catch (err) {
     } finally {
       setIsLoadingComments(false);
     }
   };
 
-  const handleAddComment = useCallback(async (content: string) => {
-    try {
-      const newComment = await sharingService.postSharedComment(token!, {
-        body: content,
-      });
-      setComments((prev) => [...prev, newComment]);
-      toast({ title: 'Comentário adicionado!' });
-    } catch (err) {
-      toast({
-        variant: 'destructive',
-        title: 'Erro ao adicionar comentário',
-        description: err instanceof Error ? err.message : 'Tente novamente.',
-      });
-    }
-  }, [token, toast]);
+  const handleAddComment = useCallback(
+    async (content: string) => {
+      try {
+        const newComment = await sharingService.postSharedComment(token!, { body: content });
+        setComments((prev) => [...prev, newComment]);
+        toast({ title: 'Comment added!' });
+      } catch (err) {
+        toast({
+          variant: 'destructive',
+          title: 'Unable to add comment',
+          description: err instanceof Error ? err.message : 'Please try again.',
+        });
+      }
+    },
+    [token, toast]
+  );
 
   const handleDownload = () => {
     const downloadUrl = sharingService.getSharedResumeDownloadUrl(token!);
@@ -101,12 +97,10 @@ export default function SharedResume() {
         <Card className="w-full max-w-md text-center">
           <CardContent className="pt-8 pb-8">
             <AlertCircle className="h-16 w-16 text-destructive mx-auto mb-4" />
-            <h1 className="text-xl font-semibold mb-2">Link Indisponível</h1>
-            <p className="text-muted-foreground mb-6">
-              {error || 'Este link de partilha não é válido.'}
-            </p>
+            <h1 className="text-xl font-semibold mb-2">Link unavailable</h1>
+            <p className="text-muted-foreground mb-6">{error || 'This share link is not valid.'}</p>
             <Button asChild>
-              <Link to="/auth">Fazer Login</Link>
+              <Link to="/auth">Sign in</Link>
             </Button>
           </CardContent>
         </Card>
@@ -123,7 +117,7 @@ export default function SharedResume() {
             <span className="text-xl font-bold text-primary">Resume Feedback</span>
           </div>
           <Badge variant="secondary">
-            {data.permission === 'VIEW' ? 'Apenas Visualização' : 'Visualização + Comentários'}
+            {data.permission === 'VIEW' ? 'View only' : 'View + comments'}
           </Badge>
         </div>
       </header>
@@ -136,9 +130,7 @@ export default function SharedResume() {
                 <FileText className="h-8 w-8 text-primary" />
               </div>
               <div className="flex-1">
-                <CardTitle className="text-2xl mb-2">
-                  Currículo Partilhado
-                </CardTitle>
+                <CardTitle className="text-2xl mb-2">Shared Resume</CardTitle>
                 <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                   <Badge>ID: {data.resumeId.slice(0, 8)}...</Badge>
                 </div>
@@ -146,36 +138,29 @@ export default function SharedResume() {
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
-            <PdfViewer
-              fileUrl={sharingService.getSharedResumePreviewUrl(token!)}
-              className="min-h-[600px]"
-            />
-            
+            <PdfViewer fileUrl={sharingService.getSharedResumePreviewUrl(token!)} className="min-h-[600px]" />
+
             <div className="flex justify-center">
               <Button variant="outline" onClick={handleDownload}>
                 <ExternalLink className="h-4 w-4 mr-2" />
-                Abrir em Nova Janela
+                Open in New Tab
               </Button>
             </div>
 
             {data.permission === 'COMMENT' && (
               <div className="border-t pt-6">
-                <h3 className="font-semibold mb-4">Comentários</h3>
+                <h3 className="font-semibold mb-4">Comments</h3>
                 {isAuthenticated ? (
-                  <CommentList
-                    comments={comments}
-                    isLoading={isLoadingComments}
-                    onAddComment={handleAddComment}
-                  />
+                  <CommentList comments={comments} isLoading={isLoadingComments} onAddComment={handleAddComment} />
                 ) : (
                   <div className="text-center py-6">
                     <p className="text-sm text-muted-foreground mb-4">
-                      Faça login para visualizar e adicionar comentários.
+                      Sign in to view and add comments.
                     </p>
                     <Button asChild size="sm">
                       <Link to={`/auth?redirect=/share/${token}`}>
                         <LogIn className="h-4 w-4 mr-2" />
-                        Fazer Login
+                        Sign in
                       </Link>
                     </Button>
                   </div>

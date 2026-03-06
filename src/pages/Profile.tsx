@@ -38,12 +38,7 @@ import {
 } from 'lucide-react';
 
 const MAX_AVATAR_SIZE_BYTES = 2 * 1024 * 1024;
-const ALLOWED_AVATAR_TYPES = new Set([
-  'image/png',
-  'image/jpeg',
-  'image/jpg',
-  'image/webp',
-]);
+const ALLOWED_AVATAR_TYPES = new Set(['image/png', 'image/jpeg', 'image/jpg', 'image/webp']);
 const MAX_AVATAR_DIMENSION = 1024;
 const AVATAR_OUTPUT_QUALITY = 0.82;
 
@@ -57,7 +52,7 @@ function loadImageFromFile(file: File): Promise<HTMLImageElement> {
     };
     image.onerror = () => {
       URL.revokeObjectURL(objectUrl);
-      reject(new Error('Nao foi possivel carregar a imagem.'));
+      reject(new Error('Unable to load the image.'));
     };
     image.src = objectUrl;
   });
@@ -129,7 +124,7 @@ export default function Profile() {
   };
 
   useEffect(() => {
-    loadProfile();
+    void loadProfile();
   }, []);
 
   const loadProfile = async () => {
@@ -139,8 +134,8 @@ export default function Profile() {
       applyProfileToForm(data);
     } catch {
       toast({
-        title: 'Erro ao carregar perfil',
-        description: 'Nao foi possivel carregar seus dados.',
+        title: 'Unable to load profile',
+        description: 'We could not load your profile data.',
         variant: 'destructive',
       });
     } finally {
@@ -148,8 +143,8 @@ export default function Profile() {
     }
   };
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSave = async (event: React.FormEvent) => {
+    event.preventDefault();
     setIsSaving(true);
     try {
       const payload: UpdateProfileRequest = {};
@@ -158,7 +153,7 @@ export default function Profile() {
       if (bio !== (profile?.bio || '')) payload.bio = bio;
 
       if (Object.keys(payload).length === 0) {
-        toast({ title: 'Nenhuma alteracao', description: 'Nenhum campo foi modificado.' });
+        toast({ title: 'No changes', description: 'No fields were modified.' });
         setIsSaving(false);
         return;
       }
@@ -166,11 +161,11 @@ export default function Profile() {
       const updated = await userService.updateMe(payload);
       setProfile(updated);
       applyProfileToForm(updated);
-      toast({ title: 'Perfil atualizado!', description: 'Suas informacoes foram salvas.' });
+      toast({ title: 'Profile updated', description: 'Your information has been saved.' });
     } catch (error) {
       toast({
-        title: 'Erro ao salvar',
-        description: error instanceof Error ? error.message : 'Nao foi possivel atualizar o perfil.',
+        title: 'Unable to save profile',
+        description: error instanceof Error ? error.message : 'We could not update your profile.',
         variant: 'destructive',
       });
     } finally {
@@ -184,8 +179,8 @@ export default function Profile() {
 
     if (!ALLOWED_AVATAR_TYPES.has(file.type)) {
       toast({
-        title: 'Formato invalido',
-        description: 'Use PNG, JPG, JPEG ou WEBP.',
+        title: 'Invalid file format',
+        description: 'Use PNG, JPG, JPEG, or WEBP.',
         variant: 'destructive',
       });
       event.target.value = '';
@@ -203,8 +198,8 @@ export default function Profile() {
 
       if (fileToUpload.size > MAX_AVATAR_SIZE_BYTES) {
         toast({
-          title: 'Arquivo muito grande',
-          description: 'O tamanho maximo permitido e 2MB.',
+          title: 'File too large',
+          description: 'The maximum allowed size is 2MB.',
           variant: 'destructive',
         });
         return;
@@ -214,13 +209,13 @@ export default function Profile() {
       setProfile(updated);
       applyProfileToForm(updated);
       toast({
-        title: 'Avatar atualizado!',
-        description: 'Sua foto de perfil foi enviada com sucesso.',
+        title: 'Avatar updated',
+        description: 'Your profile image was uploaded successfully.',
       });
     } catch (error) {
       toast({
-        title: 'Erro no upload',
-        description: error instanceof Error ? error.message : 'Nao foi possivel enviar a imagem.',
+        title: 'Upload failed',
+        description: error instanceof Error ? error.message : 'We could not upload the image.',
         variant: 'destructive',
       });
     } finally {
@@ -250,13 +245,13 @@ export default function Profile() {
   const handleCancelChanges = () => {
     if (!profile) return;
     applyProfileToForm(profile);
-    toast({ title: 'Alteracoes descartadas', description: 'Os campos voltaram ao ultimo estado salvo.' });
+    toast({ title: 'Changes discarded', description: 'Fields were reset to the last saved state.' });
   };
 
   const handleRefreshProfile = async () => {
     setIsLoading(true);
     await loadProfile();
-    toast({ title: 'Perfil atualizado', description: 'Dados recarregados do servidor.' });
+    toast({ title: 'Profile refreshed', description: 'Data reloaded from the server.' });
   };
 
   const handleDeactivateAccount = async () => {
@@ -265,14 +260,14 @@ export default function Profile() {
       await userService.deactivateMe();
       logout();
       toast({
-        title: 'Conta desativada',
-        description: 'Sua conta foi desativada. Voce pode reativar depois na tela de login.',
+        title: 'Account deactivated',
+        description: 'Your account was deactivated. You can reactivate it later from the login page.',
       });
       navigate('/auth');
     } catch (error) {
       toast({
-        title: 'Erro ao desativar conta',
-        description: error instanceof Error ? error.message : 'Nao foi possivel desativar sua conta.',
+        title: 'Unable to deactivate account',
+        description: error instanceof Error ? error.message : 'We could not deactivate your account.',
         variant: 'destructive',
       });
     } finally {
@@ -286,14 +281,14 @@ export default function Profile() {
       await userService.deleteMe();
       logout();
       toast({
-        title: 'Conta removida',
-        description: 'Sua conta foi excluida permanentemente.',
+        title: 'Account deleted',
+        description: 'Your account was permanently deleted.',
       });
       navigate('/auth');
     } catch (error) {
       toast({
-        title: 'Erro ao excluir conta',
-        description: error instanceof Error ? error.message : 'Nao foi possivel excluir sua conta.',
+        title: 'Unable to delete account',
+        description: error instanceof Error ? error.message : 'We could not delete your account.',
         variant: 'destructive',
       });
     } finally {
@@ -301,7 +296,7 @@ export default function Profile() {
     }
   };
 
-  const displayName = fullName || user?.email?.split('@')[0] || 'usuario';
+  const displayName = fullName || user?.email?.split('@')[0] || 'user';
 
   if (isLoading) {
     return (
@@ -322,15 +317,17 @@ export default function Profile() {
           <div className="flex flex-wrap items-center gap-2">
             <Button type="button" variant="ghost" size="sm" onClick={() => navigate(-1)}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Voltar
+              Back
             </Button>
             <Button type="button" variant="outline" size="sm" onClick={handleRefreshProfile}>
               <RefreshCw className="h-4 w-4 mr-2" />
-              Atualizar
+              Refresh
             </Button>
           </div>
-          <h1 className="text-3xl font-bold text-foreground">Meu Perfil</h1>
-          <p className="text-muted-foreground mt-1">Bem-vindo, {displayName}. Atualize suas informacoes pessoais e preferencias.</p>
+          <h1 className="text-3xl font-bold text-foreground">My Profile</h1>
+          <p className="text-muted-foreground mt-1">
+            Welcome, {displayName}. Update your personal information and preferences.
+          </p>
         </div>
 
         <form onSubmit={handleSave} className="space-y-6">
@@ -357,7 +354,7 @@ export default function Profile() {
                 </div>
 
                 <div className="flex-1 text-center sm:text-left space-y-1">
-                  <h2 className="text-xl font-semibold text-foreground">{fullName || 'Sem nome definido'}</h2>
+                  <h2 className="text-xl font-semibold text-foreground">{fullName || 'No name set'}</h2>
                   <div className="flex items-center justify-center sm:justify-start gap-2 text-muted-foreground">
                     <Mail className="h-4 w-4" />
                     <span className="text-sm">{user?.email}</span>
@@ -377,29 +374,29 @@ export default function Profile() {
             <CardHeader>
               <div className="flex items-center gap-2">
                 <User className="h-5 w-5 text-primary" />
-                <CardTitle className="text-lg">Informacoes Pessoais</CardTitle>
+                <CardTitle className="text-lg">Personal Information</CardTitle>
               </div>
-              <CardDescription>Atualize seu nome e telefone de contato.</CardDescription>
+              <CardDescription>Update your name and contact phone number.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="fullName">Nome completo</Label>
+                  <Label htmlFor="fullName">Full name</Label>
                   <Input
                     id="fullName"
                     value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Seu nome completo"
+                    onChange={(event) => setFullName(event.target.value)}
+                    placeholder="Your full name"
                     maxLength={100}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Telefone</Label>
+                  <Label htmlFor="phone">Phone</Label>
                   <Input
                     id="phone"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+55 11 99999-9999"
+                    onChange={(event) => setPhone(event.target.value)}
+                    placeholder="+1 555 123 4567"
                     maxLength={20}
                   />
                 </div>
@@ -407,7 +404,7 @@ export default function Profile() {
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input id="email" value={user?.email || ''} disabled className="bg-muted/50" />
-                <p className="text-xs text-muted-foreground">O email e vinculado a sua conta e nao pode ser alterado.</p>
+                <p className="text-xs text-muted-foreground">Your email is tied to your account and cannot be changed.</p>
               </div>
             </CardContent>
           </Card>
@@ -416,23 +413,23 @@ export default function Profile() {
             <CardHeader>
               <div className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-primary" />
-                <CardTitle className="text-lg">Sobre voce</CardTitle>
+                <CardTitle className="text-lg">About You</CardTitle>
               </div>
-              <CardDescription>Escreva uma breve descricao sobre sua experiencia e objetivos.</CardDescription>
+              <CardDescription>Write a short description about your background and goals.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Textarea
                   id="bio"
                   value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                  placeholder="Ex: Desenvolvedor full-stack com 5 anos de experiencia, buscando oportunidades em startups..."
+                  onChange={(event) => setBio(event.target.value)}
+                  placeholder="Example: Full-stack developer with 5 years of experience looking for startup opportunities..."
                   maxLength={500}
                   rows={4}
                   className="resize-none"
                 />
                 <div className="flex justify-between items-center">
-                  <p className="text-xs text-muted-foreground">Essa informacao pode ser visivel em links compartilhados.</p>
+                  <p className="text-xs text-muted-foreground">This information may be visible in shared links.</p>
                   <span className="text-xs text-muted-foreground tabular-nums">{bio.length}/500</span>
                 </div>
               </div>
@@ -443,9 +440,9 @@ export default function Profile() {
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Camera className="h-5 w-5 text-primary" />
-                <CardTitle className="text-lg">Foto de perfil</CardTitle>
+                <CardTitle className="text-lg">Profile Photo</CardTitle>
               </div>
-              <CardDescription>Envie uma imagem PNG, JPG, JPEG ou WEBP com ate 2MB.</CardDescription>
+              <CardDescription>Upload a PNG, JPG, JPEG, or WEBP image up to 2MB.</CardDescription>
             </CardHeader>
             <CardContent>
               <input
@@ -471,7 +468,7 @@ export default function Profile() {
                   ) : (
                     <Upload className="h-4 w-4 mr-2" />
                   )}
-                  {isUploadingAvatar ? 'Enviando...' : 'Selecionar imagem'}
+                  {isUploadingAvatar ? 'Uploading...' : 'Select image'}
                 </Button>
               </div>
             </CardContent>
@@ -481,11 +478,9 @@ export default function Profile() {
             <CardHeader>
               <div className="flex items-center gap-2">
                 <UserX className="h-5 w-5 text-destructive" />
-                <CardTitle className="text-lg">Conta</CardTitle>
+                <CardTitle className="text-lg">Account</CardTitle>
               </div>
-              <CardDescription>
-                Gerencie o estado da sua conta. Essas acoes afetam seu acesso imediatamente.
-              </CardDescription>
+              <CardDescription>Manage your account state. These actions affect your access immediately.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex flex-wrap items-center gap-2">
@@ -493,23 +488,21 @@ export default function Profile() {
                   <AlertDialogTrigger asChild>
                     <Button type="button" variant="outline" className="border-amber-500 text-amber-700 hover:bg-amber-50">
                       <UserX className="h-4 w-4 mr-2" />
-                      Desativar Conta
+                      Deactivate Account
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Desativar conta?</AlertDialogTitle>
+                      <AlertDialogTitle>Deactivate account?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Sua conta ficara inativa, mas seus dados serao mantidos. Voce podera reativar depois com email e senha.
+                        Your account will become inactive, but your data will be kept. You can reactivate it later using your email and password.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction onClick={handleDeactivateAccount} disabled={isDeactivatingAccount}>
-                        {isDeactivatingAccount ? (
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        ) : null}
-                        Confirmar desativacao
+                        {isDeactivatingAccount ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                        Confirm deactivation
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -519,27 +512,25 @@ export default function Profile() {
                   <AlertDialogTrigger asChild>
                     <Button type="button" variant="destructive">
                       <Trash2 className="h-4 w-4 mr-2" />
-                      Excluir Conta
+                      Delete Account
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Excluir conta permanentemente?</AlertDialogTitle>
+                      <AlertDialogTitle>Delete account permanently?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Esta acao nao pode ser desfeita. Sua conta sera removida de forma definitiva.
+                        This action cannot be undone. Your account will be removed permanently.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={handleDeleteAccount}
                         disabled={isDeletingAccount}
                         className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       >
-                        {isDeletingAccount ? (
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        ) : null}
-                        Confirmar exclusao
+                        {isDeletingAccount ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                        Confirm deletion
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -549,18 +540,11 @@ export default function Profile() {
           </Card>
 
           <div className="flex items-center justify-between pt-2">
-            <p className="text-sm text-muted-foreground">
-              {hasChanges() ? 'Voce tem alteracoes nao salvas.' : 'Tudo salvo.'}
-            </p>
+            <p className="text-sm text-muted-foreground">{hasChanges() ? 'You have unsaved changes.' : 'Everything is saved.'}</p>
             <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                disabled={!hasChanges() || isSaving}
-                onClick={handleCancelChanges}
-              >
+              <Button type="button" variant="outline" disabled={!hasChanges() || isSaving} onClick={handleCancelChanges}>
                 <X className="h-4 w-4 mr-2" />
-                Cancelar
+                Cancel
               </Button>
               <Button type="submit" disabled={isSaving || !hasChanges()} className="min-w-[160px]">
                 {isSaving ? (
@@ -568,7 +552,7 @@ export default function Profile() {
                 ) : (
                   <Save className="h-4 w-4 mr-2" />
                 )}
-                Salvar Alteracoes
+                Save Changes
               </Button>
             </div>
           </div>

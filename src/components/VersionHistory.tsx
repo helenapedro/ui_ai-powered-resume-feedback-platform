@@ -4,9 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { History, FileText, Eye } from 'lucide-react';
 import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import type { ResumeVersion } from '@/types';
-import { resumeService } from '@/services/resumes';
 
 interface VersionHistoryProps {
   resumeId: string;
@@ -17,19 +15,26 @@ interface VersionHistoryProps {
   isLoading: boolean;
 }
 
-export function VersionHistory({ resumeId, versions, currentVersionId, selectedVersionId, onPreview, isLoading }: VersionHistoryProps) {
+export function VersionHistory({
+  resumeId,
+  versions,
+  currentVersionId,
+  selectedVersionId,
+  onPreview,
+  isLoading,
+}: VersionHistoryProps) {
   if (isLoading) {
     return (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <History className="h-5 w-5" />
-            Histórico de Versões
+            Version History
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="flex items-center justify-between p-3 border rounded-lg">
+          {[1, 2, 3].map((index) => (
+            <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
               <Skeleton className="h-4 w-32" />
               <Skeleton className="h-8 w-24" />
             </div>
@@ -45,13 +50,11 @@ export function VersionHistory({ resumeId, versions, currentVersionId, selectedV
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <History className="h-5 w-5" />
-            Histórico de Versões
+            Version History
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground text-sm text-center py-4">
-            Nenhuma versão disponível.
-          </p>
+          <p className="text-muted-foreground text-sm text-center py-4">No versions available.</p>
         </CardContent>
       </Card>
     );
@@ -64,13 +67,13 @@ export function VersionHistory({ resumeId, versions, currentVersionId, selectedV
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <History className="h-5 w-5" />
-          Histórico de Versões ({versions.length})
+          Version History ({versions.length})
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         {sortedVersions.map((version) => {
           const isCurrent = version.id === currentVersionId;
-          
+
           return (
             <div
               key={version.id}
@@ -84,28 +87,22 @@ export function VersionHistory({ resumeId, versions, currentVersionId, selectedV
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className="font-medium text-sm">
-                      Versão {version.versionNumber}
-                    </p>
+                    <p className="font-medium text-sm">Version {version.versionNumber}</p>
                     {isCurrent && (
                       <Badge variant="secondary" className="text-xs">
-                        Atual
+                        Current
                       </Badge>
                     )}
                   </div>
+                  <p className="text-xs text-muted-foreground">{version.originalFilename}</p>
                   <p className="text-xs text-muted-foreground">
-                    {version.originalFilename}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {format(new Date(version.createdAt), "dd 'de' MMMM 'de' yyyy 'às' HH:mm", {
-                      locale: ptBR,
-                    })}
+                    {format(new Date(version.createdAt), 'MMM dd, yyyy HH:mm')}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <Button
-                  variant={selectedVersionId === version.id ? "default" : "outline"}
+                  variant={selectedVersionId === version.id ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => onPreview?.(version.id)}
                 >

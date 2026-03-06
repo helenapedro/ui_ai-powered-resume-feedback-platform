@@ -47,8 +47,8 @@ export function useUploadPage() {
       if (!ACCEPTED_TYPES.includes(nextFile.type)) {
         toast({
           variant: 'destructive',
-          title: 'Tipo de arquivo invalido',
-          description: 'Apenas PDF, JPEG e PNG sao aceitos.',
+          title: 'Invalid file type',
+          description: 'Only PDF, JPEG, and PNG files are supported.',
         });
         return;
       }
@@ -56,8 +56,8 @@ export function useUploadPage() {
       if (nextFile.size > MAX_FILE_SIZE) {
         toast({
           variant: 'destructive',
-          title: 'Arquivo muito grande',
-          description: 'O tamanho maximo e 10MB.',
+          title: 'File too large',
+          description: 'The maximum file size is 10MB.',
         });
         return;
       }
@@ -127,15 +127,15 @@ export function useUploadPage() {
         if (isAddingVersion && resumeId) {
           await resumeService.addVersion(resumeId, file);
           toast({
-            title: 'Nova versao adicionada!',
-            description: 'A versao foi adicionada com sucesso.',
+            title: 'New version added',
+            description: 'The new version was added successfully.',
           });
           navigate(`/resume/${resumeId}`);
         } else {
           const resume = await resumeService.createResume(file, title || undefined);
           toast({
-            title: 'Curriculo criado!',
-            description: 'Seu curriculo foi enviado com sucesso.',
+            title: 'Resume created',
+            description: 'Your resume was uploaded successfully.',
           });
           navigate(`/resume/${resume.id}`);
         }
@@ -147,8 +147,8 @@ export function useUploadPage() {
         clearProgressInterval();
         toast({
           variant: 'destructive',
-          title: 'Erro ao enviar curriculo',
-          description: error instanceof Error ? error.message : 'Tente novamente.',
+          title: 'Unable to upload resume',
+          description: error instanceof Error ? error.message : 'Please try again.',
         });
       } finally {
         dispatch(setIsUploading(false));

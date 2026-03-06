@@ -35,8 +35,8 @@ export function useResumeDetailsPage() {
       .catch((error) => {
         toast({
           variant: 'destructive',
-          title: 'Erro ao carregar curriculo',
-          description: error instanceof Error ? error.message : 'Tente novamente.',
+          title: 'Unable to load resume',
+          description: error instanceof Error ? error.message : 'Please try again.',
         });
         navigate('/my-resumes');
       });
@@ -114,8 +114,8 @@ export function useResumeDetailsPage() {
       const url = `${window.location.origin}/share/${newLink.token}`;
       await navigator.clipboard.writeText(url);
       toast({
-        title: 'Link criado e copiado!',
-        description: 'O link de partilha foi copiado para a area de transferencia.',
+        title: 'Link created and copied',
+        description: 'The share link was copied to your clipboard.',
       });
     },
     [dispatch, id, toast]
@@ -128,7 +128,7 @@ export function useResumeDetailsPage() {
       }
 
       await dispatch(revokeShareLink({ resumeId: id, linkId })).unwrap();
-      toast({ title: 'Link revogado!' });
+      toast({ title: 'Link revoked' });
     },
     [dispatch, id, toast]
   );
@@ -139,7 +139,7 @@ export function useResumeDetailsPage() {
     }
 
     await dispatch(deleteResume(id)).unwrap();
-    toast({ title: 'Curriculo removido!' });
+    toast({ title: 'Resume deleted' });
     navigate('/my-resumes');
   }, [dispatch, id, navigate, toast]);
 

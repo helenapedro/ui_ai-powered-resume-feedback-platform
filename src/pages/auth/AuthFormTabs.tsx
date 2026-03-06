@@ -17,42 +17,28 @@ export function AuthFormTabs({ isLoading, onLogin, onRegister, onReactivate }: A
     <Tabs defaultValue="login" className="w-full">
       <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="login">Login</TabsTrigger>
-        <TabsTrigger value="register">Registrar</TabsTrigger>
-        <TabsTrigger value="reactivate">Reativar</TabsTrigger>
+        <TabsTrigger value="register">Register</TabsTrigger>
+        <TabsTrigger value="reactivate">Reactivate</TabsTrigger>
       </TabsList>
 
       <TabsContent value="login">
         <form onSubmit={onLogin} className="space-y-4 mt-4">
           <div className="space-y-2">
             <Label htmlFor="login-email">Email</Label>
-            <Input
-              id="login-email"
-              name="email"
-              type="email"
-              placeholder="seu@email.com"
-              required
-              disabled={isLoading}
-            />
+            <Input id="login-email" name="email" type="email" placeholder="you@email.com" required disabled={isLoading} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="login-password">Senha</Label>
-            <Input
-              id="login-password"
-              name="password"
-              type="password"
-              placeholder="******"
-              required
-              disabled={isLoading}
-            />
+            <Label htmlFor="login-password">Password</Label>
+            <Input id="login-password" name="password" type="password" placeholder="******" required disabled={isLoading} />
           </div>
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Entrando...
+                Signing in...
               </>
             ) : (
-              'Entrar'
+              'Sign In'
             )}
           </Button>
         </form>
@@ -62,45 +48,24 @@ export function AuthFormTabs({ isLoading, onLogin, onRegister, onReactivate }: A
         <form onSubmit={onRegister} className="space-y-4 mt-4">
           <div className="space-y-2">
             <Label htmlFor="register-email">Email</Label>
-            <Input
-              id="register-email"
-              name="email"
-              type="email"
-              placeholder="seu@email.com"
-              required
-              disabled={isLoading}
-            />
+            <Input id="register-email" name="email" type="email" placeholder="you@email.com" required disabled={isLoading} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="register-password">Senha</Label>
-            <Input
-              id="register-password"
-              name="password"
-              type="password"
-              placeholder="******"
-              required
-              disabled={isLoading}
-            />
+            <Label htmlFor="register-password">Password</Label>
+            <Input id="register-password" name="password" type="password" placeholder="******" required disabled={isLoading} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="register-confirm">Confirmar Senha</Label>
-            <Input
-              id="register-confirm"
-              name="confirmPassword"
-              type="password"
-              placeholder="******"
-              required
-              disabled={isLoading}
-            />
+            <Label htmlFor="register-confirm">Confirm Password</Label>
+            <Input id="register-confirm" name="confirmPassword" type="password" placeholder="******" required disabled={isLoading} />
           </div>
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Criando conta...
+                Creating account...
               </>
             ) : (
-              'Criar Conta'
+              'Create Account'
             )}
           </Button>
         </form>
@@ -110,34 +75,20 @@ export function AuthFormTabs({ isLoading, onLogin, onRegister, onReactivate }: A
         <form onSubmit={onReactivate} className="space-y-4 mt-4">
           <div className="space-y-2">
             <Label htmlFor="reactivate-email">Email</Label>
-            <Input
-              id="reactivate-email"
-              name="email"
-              type="email"
-              placeholder="seu@email.com"
-              required
-              disabled={isLoading}
-            />
+            <Input id="reactivate-email" name="email" type="email" placeholder="you@email.com" required disabled={isLoading} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="reactivate-password">Senha</Label>
-            <Input
-              id="reactivate-password"
-              name="password"
-              type="password"
-              placeholder="******"
-              required
-              disabled={isLoading}
-            />
+            <Label htmlFor="reactivate-password">Password</Label>
+            <Input id="reactivate-password" name="password" type="password" placeholder="******" required disabled={isLoading} />
           </div>
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Reativando...
+                Reactivating...
               </>
             ) : (
-              'Reativar Conta'
+              'Reactivate Account'
             )}
           </Button>
         </form>

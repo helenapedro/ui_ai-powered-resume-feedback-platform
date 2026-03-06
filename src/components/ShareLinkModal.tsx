@@ -54,76 +54,69 @@ export function ShareLinkModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <LinkIcon className="h-5 w-5" />
-            Gerar Link de Partilha
+            Create Share Link
           </DialogTitle>
           <DialogDescription>
-            Crie um link para partilhar este currículo com outras pessoas.
+            Create a link to share this resume with other people.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
           <div className="space-y-3">
-            <Label>Permissões</Label>
-            <RadioGroup
-              value={permission}
-              onValueChange={(v) => setPermission(v as SharePermission)}
-            >
+            <Label>Permissions</Label>
+            <RadioGroup value={permission} onValueChange={(value) => setPermission(value as SharePermission)}>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="VIEW" id="view" />
                 <Label htmlFor="view" className="font-normal cursor-pointer">
-                  Apenas visualizar
+                  View only
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="COMMENT" id="comment" />
                 <Label htmlFor="comment" className="font-normal cursor-pointer">
-                  Visualizar e comentar
+                  View and comment
                 </Label>
               </div>
             </RadioGroup>
           </div>
 
           <div className="space-y-3">
-            <Label htmlFor="expiresAt">Data de Expiração (opcional)</Label>
+            <Label htmlFor="expiresAt">Expiration date (optional)</Label>
             <Input
               id="expiresAt"
               type="datetime-local"
               value={expiresAt}
-              onChange={(e) => setExpiresAt(e.target.value)}
+              onChange={(event) => setExpiresAt(event.target.value)}
             />
-            <p className="text-xs text-muted-foreground">
-              Deixe em branco para link sem expiração.
-            </p>
+            <p className="text-xs text-muted-foreground">Leave blank for a link with no expiration.</p>
           </div>
 
           <div className="space-y-3">
-            <Label htmlFor="maxUses">Número Máximo de Utilizações (opcional)</Label>
+            <Label htmlFor="maxUses">Maximum uses (optional)</Label>
             <Input
               id="maxUses"
               type="number"
               min="1"
-              placeholder="Sem limite"
+              placeholder="Unlimited"
               value={maxUses}
-              onChange={(e) => setMaxUses(e.target.value)}
+              onChange={(event) => setMaxUses(event.target.value)}
             />
-            <p className="text-xs text-muted-foreground">
-              Deixe em branco para utilizações ilimitadas.
-            </p>
+            <p className="text-xs text-muted-foreground">Leave blank for unlimited uses.</p>
           </div>
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancelar
+            Cancel
           </Button>
           <Button onClick={handleSubmit} disabled={isLoading}>
             {isLoading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Gerando...
+                Creating...
               </>
             ) : (
-              'Gerar Link'
+              'Create Link'
             )}
           </Button>
         </DialogFooter>

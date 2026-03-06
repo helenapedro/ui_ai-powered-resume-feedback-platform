@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { FileText, Calendar, Eye, Pin, Upload } from 'lucide-react';
 import type { ResumeSummary } from '@/types';
 import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 
 interface ResumeCardProps {
   resume: ResumeSummary;
@@ -24,16 +23,10 @@ export function ResumeCard({ resume, showActions, isPinned = false, onTogglePin 
             <FileText className="h-8 w-8 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-lg truncate">
-              {resume.title || 'Currículo sem título'}
-            </h3>
+            <h3 className="font-semibold text-lg truncate">{resume.title || 'Untitled resume'}</h3>
             <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
               <Calendar className="h-3.5 w-3.5" />
-              <span>
-                {format(new Date(resume.createdAt), "dd 'de' MMM, yyyy", {
-                  locale: ptBR,
-                })}
-              </span>
+              <span>{format(new Date(resume.createdAt), 'MMM dd, yyyy')}</span>
             </div>
           </div>
           <div className="flex flex-col items-end gap-2">
@@ -44,14 +37,14 @@ export function ResumeCard({ resume, showActions, isPinned = false, onTogglePin 
                 size="icon"
                 className={isPinned ? 'text-amber-600 hover:text-amber-700' : 'text-muted-foreground'}
                 onClick={() => onTogglePin(resume.id)}
-                title={isPinned ? 'Remover do topo' : 'Fixar no topo'}
+                title={isPinned ? 'Unpin from top' : 'Pin to top'}
               >
                 <Pin className={`h-4 w-4 ${isPinned ? 'fill-current' : ''}`} />
               </Button>
             )}
             {resume.currentVersionId && (
               <Badge variant="secondary" className="text-xs shrink-0">
-                Ativo
+                Active
               </Badge>
             )}
           </div>
@@ -61,7 +54,7 @@ export function ResumeCard({ resume, showActions, isPinned = false, onTogglePin 
         <Button asChild variant="outline" className="flex-1">
           <Link to={`/resume/${resume.id}`}>
             <Eye className="h-4 w-4 mr-2" />
-            Ver Detalhes
+            View Details
           </Link>
         </Button>
         {showActions && (

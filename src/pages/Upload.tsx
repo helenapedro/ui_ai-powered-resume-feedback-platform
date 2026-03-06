@@ -34,22 +34,22 @@ export default function Upload() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <UploadIcon className="h-6 w-6 text-primary" />
-              {isAddingVersion ? 'Adicionar Nova Versao' : 'Enviar Curriculo'}
+              {isAddingVersion ? 'Add New Version' : 'Upload Resume'}
             </CardTitle>
             <CardDescription>
               {isAddingVersion
-                ? 'Adicione uma nova versao ao curriculo existente'
-                : 'Faca upload do seu curriculo e receba feedback de IA em minutos'}
+                ? 'Add a new version to an existing resume'
+                : 'Upload your resume and receive AI feedback in minutes'}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               {!isAddingVersion && (
                 <div className="space-y-2">
-                  <Label htmlFor="title">Titulo (opcional)</Label>
+                  <Label htmlFor="title">Title (optional)</Label>
                   <Input
                     id="title"
-                    placeholder="Ex: Curriculo Backend Developer"
+                    placeholder="Example: Backend Developer Resume"
                     value={title}
                     onChange={(event) => setTitle(event.target.value)}
                     disabled={isUploading}
@@ -72,9 +72,7 @@ export default function Upload() {
                     <FileText className="h-10 w-10 text-primary" />
                     <div className="text-left">
                       <p className="font-medium">{file.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {(file.size / 1024 / 1024).toFixed(2)} MB
-                      </p>
+                      <p className="text-sm text-muted-foreground">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
                     </div>
                     <Button type="button" variant="ghost" size="icon" onClick={clearFile} className="ml-2">
                       <X className="h-4 w-4" />
@@ -83,8 +81,8 @@ export default function Upload() {
                 ) : (
                   <>
                     <UploadIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-lg font-medium mb-2">Arraste e solte seu curriculo aqui</p>
-                    <p className="text-sm text-muted-foreground mb-4">ou clique para selecionar</p>
+                    <p className="text-lg font-medium mb-2">Drag and drop your resume here</p>
+                    <p className="text-sm text-muted-foreground mb-4">or click to browse</p>
                     <input
                       type="file"
                       accept=".pdf,.jpg,.jpeg,.png"
@@ -94,10 +92,10 @@ export default function Upload() {
                     />
                     <Button type="button" variant="outline" asChild>
                       <label htmlFor="file-upload" className="cursor-pointer">
-                        Selecionar Arquivo
+                        Select File
                       </label>
                     </Button>
-                    <p className="text-xs text-muted-foreground mt-4">PDF, JPEG ou PNG | Maximo 10MB</p>
+                    <p className="text-xs text-muted-foreground mt-4">PDF, JPEG, or PNG | Max 10MB</p>
                   </>
                 )}
               </div>
@@ -105,7 +103,7 @@ export default function Upload() {
               {isUploading && (
                 <div className="space-y-2">
                   <Progress value={progress} />
-                  <p className="text-sm text-muted-foreground text-center">Enviando curriculo...</p>
+                  <p className="text-sm text-muted-foreground text-center">Uploading resume...</p>
                 </div>
               )}
 
@@ -113,12 +111,12 @@ export default function Upload() {
                 {isUploading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Enviando...
+                    Uploading...
                   </>
                 ) : (
                   <>
                     <UploadIcon className="mr-2 h-4 w-4" />
-                    {isAddingVersion ? 'Adicionar Versao' : 'Enviar Curriculo'}
+                    {isAddingVersion ? 'Add Version' : 'Upload Resume'}
                   </>
                 )}
               </Button>

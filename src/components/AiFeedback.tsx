@@ -29,22 +29,22 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
   const statusConfig: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
     PENDING: {
       icon: <Clock className="h-4 w-4" />,
-      label: 'Aguardando',
+      label: 'Pending',
       color: 'bg-muted text-muted-foreground',
     },
     PROCESSING: {
       icon: <Loader2 className="h-4 w-4 animate-spin" />,
-      label: 'Analisando...',
+      label: 'Processing...',
       color: 'bg-primary/10 text-primary',
     },
     DONE: {
       icon: <CheckCircle2 className="h-4 w-4" />,
-      label: 'Concluido',
+      label: 'Done',
       color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
     },
     FAILED: {
       icon: <XCircle className="h-4 w-4" />,
-      label: 'Falhou',
+      label: 'Failed',
       color: 'bg-destructive/10 text-destructive',
     },
   };
@@ -55,7 +55,7 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Brain className="h-5 w-5" />
-            Feedback IA
+            AI Feedback
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -73,18 +73,18 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Brain className="h-5 w-5" />
-            Feedback IA
+            AI Feedback
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground mb-4">Nenhuma analise disponivel para esta versao.</p>
+          <p className="text-sm text-muted-foreground mb-4">No analysis is available for this version.</p>
           <Button onClick={handleRegenerate} disabled={isRegenerating} size="sm">
             {isRegenerating ? (
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
             ) : (
               <RefreshCw className="h-4 w-4 mr-2" />
             )}
-            Gerar Feedback
+            Generate Feedback
           </Button>
         </CardContent>
       </Card>
@@ -99,7 +99,7 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Brain className="h-5 w-5" />
-            Feedback IA
+            AI Feedback
           </CardTitle>
           <div className="flex items-center gap-2">
             <Badge className={status.color}>
@@ -113,7 +113,7 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
                 ) : (
                   <RefreshCw className="h-4 w-4 mr-1" />
                 )}
-                Regenerar
+                Regenerate
               </Button>
             )}
           </div>
@@ -124,7 +124,7 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
           <div className="flex flex-col items-center py-8 text-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
             <p className="text-sm text-muted-foreground">
-              A IA esta a analisar o seu curriculo. Isto pode demorar alguns segundos...
+              AI is analyzing your resume. This may take a few seconds...
             </p>
           </div>
         )}
@@ -146,7 +146,7 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
               ) : (
                 <RefreshCw className="h-4 w-4 mr-2" />
               )}
-              Tentar Novamente
+              Try Again
             </Button>
           </div>
         )}
@@ -156,7 +156,7 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
             <div>
               <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
                 <Lightbulb className="h-4 w-4 text-primary" />
-                Resumo
+                Summary
               </h4>
               <p className="text-sm text-muted-foreground leading-relaxed">{feedback.summary}</p>
             </div>
@@ -165,7 +165,7 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
               <div>
                 <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
                   <ThumbsUp className="h-4 w-4 text-green-600 dark:text-green-400" />
-                  Pontos Fortes
+                  Strengths
                 </h4>
                 <ul className="space-y-2">
                   {feedback.strengths.map((item, index) => (
@@ -182,7 +182,7 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
               <div>
                 <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
                   <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                  Melhorias Sugeridas
+                  Suggested Improvements
                 </h4>
                 <ul className="space-y-2">
                   {feedback.improvements.map((item, index) => (

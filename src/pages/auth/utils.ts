@@ -7,11 +7,11 @@ export function getFormValue(formData: FormData, field: string): string {
 
 export function getRegisterValidationError(password: string, confirmPassword: string): string | null {
   if (password !== confirmPassword) {
-    return 'As senhas nao coincidem';
+    return 'Passwords do not match.';
   }
 
   if (password.length < MIN_PASSWORD_LENGTH) {
-    return `A senha deve ter pelo menos ${MIN_PASSWORD_LENGTH} caracteres`;
+    return `Password must be at least ${MIN_PASSWORD_LENGTH} characters long.`;
   }
 
   return null;

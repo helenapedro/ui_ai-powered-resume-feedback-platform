@@ -83,12 +83,12 @@ export function useAuthPageActions({ redirectTo }: UseAuthPageActionsParams) {
         await loginWithGoogle(idToken);
         await trySetGoogleFullName(idToken);
         toast({
-          title: 'Login com Google realizado!',
-          description: 'Bem-vindo de volta.',
+          title: 'Signed in with Google',
+          description: 'Welcome back.',
         });
         navigate(redirectTo);
       } catch (error) {
-        showErrorToast('Erro no login com Google', error, 'Nao foi possivel autenticar com Google');
+        showErrorToast('Google sign-in failed', error, 'Unable to authenticate with Google.');
       } finally {
         setIsGoogleLoading(false);
       }
@@ -104,10 +104,10 @@ export function useAuthPageActions({ redirectTo }: UseAuthPageActionsParams) {
       const password = getFormValue(formData, 'password');
 
       await runAuthTask(() => login(email, password), {
-        successTitle: 'Login realizado!',
-        successDescription: 'Bem-vindo de volta.',
-        errorTitle: 'Erro no login',
-        fallbackError: 'Credenciais invalidas',
+        successTitle: 'Signed in',
+        successDescription: 'Welcome back.',
+        errorTitle: 'Login failed',
+        fallbackError: 'Invalid credentials.',
       });
     },
     [login, runAuthTask]
@@ -124,7 +124,7 @@ export function useAuthPageActions({ redirectTo }: UseAuthPageActionsParams) {
 
       if (validationError) {
         toast({
-          title: 'Erro',
+          title: 'Registration error',
           description: validationError,
           variant: 'destructive',
         });
@@ -132,10 +132,10 @@ export function useAuthPageActions({ redirectTo }: UseAuthPageActionsParams) {
       }
 
       await runAuthTask(() => register(email, password), {
-        successTitle: 'Conta criada!',
-        successDescription: 'Voce foi autenticado automaticamente.',
-        errorTitle: 'Erro no registro',
-        fallbackError: 'Nao foi possivel criar a conta',
+        successTitle: 'Account created',
+        successDescription: 'You have been signed in automatically.',
+        errorTitle: 'Registration failed',
+        fallbackError: 'Unable to create your account.',
       });
     },
     [register, runAuthTask, toast]
@@ -149,10 +149,10 @@ export function useAuthPageActions({ redirectTo }: UseAuthPageActionsParams) {
       const password = getFormValue(formData, 'password');
 
       await runAuthTask(async () => { await authService.reactivate({ email, password }); }, {
-        successTitle: 'Conta reativada!',
-        successDescription: 'Sua conta foi reativada com sucesso.',
-        errorTitle: 'Erro ao reativar conta',
-        fallbackError: 'Nao foi possivel reativar a conta',
+        successTitle: 'Account reactivated',
+        successDescription: 'Your account has been successfully reactivated.',
+        errorTitle: 'Reactivation failed',
+        fallbackError: 'Unable to reactivate your account.',
       });
     },
     [runAuthTask]
@@ -167,9 +167,9 @@ export function useAuthPageActions({ redirectTo }: UseAuthPageActionsParams) {
     handleGoogleCredential,
     showMissingGoogleCredentialError: () =>
       showErrorToast(
-        'Erro no login com Google',
+        'Google sign-in failed',
         null,
-        'Nao foi recebido um token de autenticacao do Google.'
+        'No authentication token was received from Google.'
       ),
   };
 }

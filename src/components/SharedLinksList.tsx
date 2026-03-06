@@ -16,7 +16,6 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Link2, Copy, Trash2, Check, Clock, Eye, MessageSquare } from 'lucide-react';
 import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import type { SharedLink } from '@/types';
 
 interface SharedLinksListProps {
@@ -26,12 +25,7 @@ interface SharedLinksListProps {
   baseUrl: string;
 }
 
-export function SharedLinksList({
-  links,
-  isLoading,
-  onRevoke,
-  baseUrl,
-}: SharedLinksListProps) {
+export function SharedLinksList({ links, isLoading, onRevoke, baseUrl }: SharedLinksListProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [revokingId, setRevokingId] = useState<string | null>(null);
 
@@ -52,7 +46,7 @@ export function SharedLinksList({
     }
   };
 
-  const activeLinks = links.filter((l) => !l.revokedAt);
+  const activeLinks = links.filter((link) => !link.revokedAt);
 
   if (isLoading) {
     return (
@@ -60,12 +54,12 @@ export function SharedLinksList({
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
             <Link2 className="h-5 w-5" />
-            Links de Partilha
+            Share Links
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {[1, 2].map((i) => (
-            <Skeleton key={i} className="h-16 w-full" />
+          {[1, 2].map((index) => (
+            <Skeleton key={index} className="h-16 w-full" />
           ))}
         </CardContent>
       </Card>
@@ -77,20 +71,17 @@ export function SharedLinksList({
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
           <Link2 className="h-5 w-5" />
-          Links de Partilha
+          Share Links
         </CardTitle>
       </CardHeader>
       <CardContent>
         {activeLinks.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-4">
-            Nenhum link de partilha ativo.
-          </p>
+          <p className="text-sm text-muted-foreground text-center py-4">No active share links.</p>
         ) : (
           <div className="space-y-3">
             {activeLinks.map((link) => {
-              const isExpired =
-                link.expiresAt && new Date(link.expiresAt) < new Date();
-              
+              const isExpired = link.expiresAt && new Date(link.expiresAt) < new Date();
+
               return (
                 <div
                   key={link.id}
@@ -102,34 +93,27 @@ export function SharedLinksList({
                         {link.permission === 'VIEW' ? (
                           <Badge variant="secondary" className="gap-1">
                             <Eye className="h-3 w-3" />
-                            Visualizar
+                            View
                           </Badge>
                         ) : (
                           <Badge variant="default" className="gap-1">
                             <MessageSquare className="h-3 w-3" />
-                            Comentar
+                            Comment
                           </Badge>
                         )}
-                        {isExpired && (
-                          <Badge variant="destructive">Expirado</Badge>
-                        )}
+                        {isExpired && <Badge variant="destructive">Expired</Badge>}
                       </div>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <Clock className="h-3 w-3" />
                         <span>
-                          Criado{' '}
+                          Created{' '}
                           {link.createdAt && !isNaN(new Date(link.createdAt).getTime())
-                            ? format(new Date(link.createdAt), "dd/MM/yyyy 'às' HH:mm", {
-                                locale: ptBR,
-                              })
-                            : 'Data desconhecida'}
+                            ? format(new Date(link.createdAt), 'MM/dd/yyyy HH:mm')
+                            : 'Unknown date'}
                         </span>
                         {link.expiresAt && !isNaN(new Date(link.expiresAt).getTime()) && (
                           <span className="text-muted-foreground">
-                            · Expira{' '}
-                            {format(new Date(link.expiresAt), 'dd/MM/yyyy', {
-                              locale: ptBR,
-                            })}
+                            | Expires {format(new Date(link.expiresAt), 'MM/dd/yyyy')}
                           </span>
                         )}
                       </div>
@@ -143,10 +127,10 @@ export function SharedLinksList({
                         size="icon"
                         onClick={() => copyToClipboard(link)}
                         disabled={isExpired}
-                        title="Copiar link"
+                        title="Copy link"
                       >
                         {copiedId === link.id ? (
-                          <Check className="h-4 w-4 text-success" />
+                          <Check className="h-4 w-4 text-green-600" />
                         ) : (
                           <Copy className="h-4 w-4" />
                         )}
@@ -155,28 +139,24 @@ export function SharedLinksList({
 
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          disabled={revokingId === link.id}
-                        >
+                        <Button variant="ghost" size="icon" disabled={revokingId === link.id}>
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Revogar link?</AlertDialogTitle>
+                          <AlertDialogTitle>Revoke link?</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Pessoas com este link não poderão mais aceder ao currículo.
+                            People with this link will no longer be able to access the resume.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <AlertDialogAction
                             onClick={() => handleRevoke(link.id)}
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                           >
-                            Revogar
+                            Revoke
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>

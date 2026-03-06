@@ -17,7 +17,6 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Edit, Trash2, Send } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import type { Comment } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -76,13 +75,14 @@ export function CommentList({
   const getUserId = () => user?.id || (user as any)?._id || '';
   const getCommentAuthorId = (comment: Comment) => comment.authorUserId || comment.commenterId?.id || '';
   const getCommentContent = (comment: Comment) => comment.body || comment.content || '';
-  const getCommentAuthorLabel = (comment: Comment) => comment.authorLabel || comment.commenterId?.username || 'Visitante';
+  const getCommentAuthorLabel = (comment: Comment) =>
+    comment.authorLabel || comment.commenterId?.username || 'Guest';
 
   if (isLoading) {
     return (
       <div className="space-y-4">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="flex gap-3">
+        {[1, 2, 3].map((index) => (
+          <div key={index} className="flex gap-3">
             <Skeleton className="h-10 w-10 rounded-full" />
             <div className="flex-1 space-y-2">
               <Skeleton className="h-4 w-32" />
@@ -105,33 +105,27 @@ export function CommentList({
         <div className="flex-1 space-y-2">
           {!user && (
             <Input
-              placeholder="O seu nome (ex: Recruiter, HR Manager)"
+              placeholder="Your name (e.g. Recruiter, Hiring Manager)"
               value={guestLabel}
-              onChange={(e) => setGuestLabel(e.target.value)}
+              onChange={(event) => setGuestLabel(event.target.value)}
               className="mb-2"
             />
           )}
           <Textarea
-            placeholder="Adicionar um comentário..."
+            placeholder="Add a comment..."
             value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
+            onChange={(event) => setNewComment(event.target.value)}
             className="min-h-[80px]"
           />
-          <Button
-            onClick={handleSubmit}
-            disabled={!newComment.trim() || isSubmitting}
-            size="sm"
-          >
+          <Button onClick={handleSubmit} disabled={!newComment.trim() || isSubmitting} size="sm">
             <Send className="h-4 w-4 mr-2" />
-            Comentar
+            Comment
           </Button>
         </div>
       </div>
 
       {comments.length === 0 ? (
-        <p className="text-center text-muted-foreground py-8">
-          Nenhum comentário ainda. Seja o primeiro a comentar!
-        </p>
+        <p className="text-center text-muted-foreground py-8">No comments yet. Be the first to leave one.</p>
       ) : (
         <div className="space-y-4">
           {comments.map((comment) => {
@@ -148,10 +142,7 @@ export function CommentList({
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-sm">{getCommentAuthorLabel(comment)}</span>
                       <span className="text-xs text-muted-foreground">
-                        {formatDistanceToNow(new Date(comment.createdAt), {
-                          addSuffix: true,
-                          locale: ptBR,
-                        })}
+                        {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
                       </span>
                     </div>
                     {user && getUserId() === getCommentAuthorId(comment) && (onEditComment || onDeleteComment) && (
@@ -182,18 +173,16 @@ export function CommentList({
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Deletar comentário?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Esta ação não pode ser desfeita.
-                                </AlertDialogDescription>
+                                <AlertDialogTitle>Delete comment?</AlertDialogTitle>
+                                <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
-                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
                                 <AlertDialogAction
                                   onClick={() => handleDelete(commentId)}
                                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                 >
-                                  Deletar
+                                  Delete
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>
@@ -206,16 +195,12 @@ export function CommentList({
                     <div className="space-y-2 mt-2">
                       <Textarea
                         value={editText}
-                        onChange={(e) => setEditText(e.target.value)}
+                        onChange={(event) => setEditText(event.target.value)}
                         className="min-h-[60px]"
                       />
                       <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          onClick={() => handleEdit(commentId)}
-                          disabled={isSubmitting}
-                        >
-                          Salvar
+                        <Button size="sm" onClick={() => handleEdit(commentId)} disabled={isSubmitting}>
+                          Save
                         </Button>
                         <Button
                           size="sm"
@@ -225,7 +210,7 @@ export function CommentList({
                             setEditText('');
                           }}
                         >
-                          Cancelar
+                          Cancel
                         </Button>
                       </div>
                     </div>

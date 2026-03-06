@@ -23,7 +23,7 @@ export function PdfViewer({ fileUrl, httpHeaders, className = '' }: PdfViewerPro
 
   const documentOptions = useMemo(
     () => (httpHeaders ? { httpHeaders, withCredentials: false } : undefined),
-    [httpHeaders],
+    [httpHeaders]
   );
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export function PdfViewer({ fileUrl, httpHeaders, className = '' }: PdfViewerPro
 
   const onDocumentLoadError = useCallback((error: Error) => {
     console.error('PDF load error:', error);
-    setError('Nao foi possivel carregar o PDF.');
+    setError('Unable to load the PDF.');
     setIsLoading(false);
   }, []);
 
@@ -68,7 +68,7 @@ export function PdfViewer({ fileUrl, httpHeaders, className = '' }: PdfViewerPro
             size="icon"
             onClick={goToPrevPage}
             disabled={pageNumber <= 1 || isLoading}
-            aria-label="Pagina anterior"
+            aria-label="Previous page"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -80,7 +80,7 @@ export function PdfViewer({ fileUrl, httpHeaders, className = '' }: PdfViewerPro
             size="icon"
             onClick={goToNextPage}
             disabled={pageNumber >= numPages || isLoading}
-            aria-label="Proxima pagina"
+            aria-label="Next page"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -91,7 +91,7 @@ export function PdfViewer({ fileUrl, httpHeaders, className = '' }: PdfViewerPro
             size="icon"
             onClick={zoomOut}
             disabled={scale <= 0.5 || isLoading}
-            aria-label="Diminuir zoom"
+            aria-label="Zoom out"
           >
             <ZoomOut className="h-4 w-4" />
           </Button>
@@ -103,7 +103,7 @@ export function PdfViewer({ fileUrl, httpHeaders, className = '' }: PdfViewerPro
             size="icon"
             onClick={zoomIn}
             disabled={scale >= 2.5 || isLoading}
-            aria-label="Aumentar zoom"
+            aria-label="Zoom in"
           >
             <ZoomIn className="h-4 w-4" />
           </Button>
@@ -114,7 +114,7 @@ export function PdfViewer({ fileUrl, httpHeaders, className = '' }: PdfViewerPro
         {isLoading && (
           <div className="flex flex-col items-center justify-center gap-3 py-16">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="text-sm text-muted-foreground">A carregar PDF...</p>
+            <p className="text-sm text-muted-foreground">Loading PDF...</p>
           </div>
         )}
 

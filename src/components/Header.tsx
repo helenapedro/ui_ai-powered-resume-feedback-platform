@@ -30,15 +30,15 @@ export function Header() {
             <Link
               to="/profile"
               className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-              title="Abrir perfil"
+              title="Open profile"
             >
               <User className="h-4 w-4" />
-              <span>Perfil</span>
+              <span>Profile</span>
               <ChevronRight className="h-3.5 w-3.5 opacity-70" />
             </Link>
             <Button variant="ghost" size="sm" onClick={handleLogout}>
               <LogOut className="h-4 w-4 mr-2" />
-              Sair
+              Sign out
             </Button>
           </div>
 
@@ -56,11 +56,11 @@ export function Header() {
                   onClick={() => setMobileOpen(false)}
                 >
                   <User className="h-4 w-4" />
-                  <span>Perfil</span>
+                  <span>Profile</span>
                 </Link>
                 <Button variant="ghost" size="sm" onClick={handleLogout} className="justify-start">
                   <LogOut className="h-4 w-4 mr-2" />
-                  Sair
+                  Sign out
                 </Button>
               </nav>
             </SheetContent>

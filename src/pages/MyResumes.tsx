@@ -40,8 +40,8 @@ export default function MyResumes() {
     } catch (error) {
       toast({
         variant: 'destructive',
-        title: 'Erro ao carregar curriculos',
-        description: error instanceof Error ? error.message : 'Tente novamente.',
+        title: 'Unable to load resumes',
+        description: error instanceof Error ? error.message : 'Please try again.',
       });
     } finally {
       setIsLoading(false);
@@ -83,10 +83,10 @@ export default function MyResumes() {
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-3">
               <FileText className="h-8 w-8 text-primary" />
-              Meus Curriculos
+              My Resumes
             </h1>
             <p className="text-muted-foreground mt-1">
-              Gerencie seus curriculos, pesquise por titulo e mantenha os mais importantes no topo
+              Manage your resumes, search by title, and keep the most important ones pinned at the top
             </p>
           </div>
 
@@ -96,14 +96,14 @@ export default function MyResumes() {
               <Input
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder="Pesquisar por titulo"
+                placeholder="Search by title"
                 className="pl-9"
               />
             </div>
             <Button asChild>
               <Link to="/upload">
                 <Plus className="h-4 w-4 mr-2" />
-                Novo Curriculo
+                New Resume
               </Link>
             </Button>
           </div>
@@ -118,22 +118,22 @@ export default function MyResumes() {
         ) : resumes.length === 0 ? (
           <div className="text-center py-20">
             <FileText className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-xl font-semibold mb-2">Voce ainda nao tem curriculos</h2>
+            <h2 className="text-xl font-semibold mb-2">You do not have any resumes yet</h2>
             <p className="text-muted-foreground mb-6">
-              Faca o upload do seu primeiro curriculo e receba feedback de IA!
+              Upload your first resume and get AI feedback.
             </p>
             <Button asChild>
               <Link to="/upload">
                 <Plus className="h-4 w-4 mr-2" />
-                Enviar Curriculo
+                Upload Resume
               </Link>
             </Button>
           </div>
         ) : filteredResumes.length === 0 ? (
           <div className="text-center py-20">
             <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-xl font-semibold mb-2">Nenhum curriculo encontrado</h2>
-            <p className="text-muted-foreground">Tente pesquisar com outro titulo.</p>
+            <h2 className="text-xl font-semibold mb-2">No resumes found</h2>
+            <p className="text-muted-foreground">Try searching with a different title.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
