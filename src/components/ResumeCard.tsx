@@ -3,7 +3,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { FileText, Calendar, Eye, Upload } from 'lucide-react';
+import { FileText, Calendar, Eye, Pin, Upload } from 'lucide-react';
 import type { ResumeSummary } from '@/types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -11,9 +11,11 @@ import { ptBR } from 'date-fns/locale';
 interface ResumeCardProps {
   resume: ResumeSummary;
   showActions?: boolean;
+  isPinned?: boolean;
+  onTogglePin?: (resumeId: string) => void;
 }
 
-export function ResumeCard({ resume, showActions }: ResumeCardProps) {
+export function ResumeCard({ resume, showActions, isPinned = false, onTogglePin }: ResumeCardProps) {
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full">
       <CardContent className="p-6">
@@ -33,15 +35,26 @@ export function ResumeCard({ resume, showActions }: ResumeCardProps) {
                 })}
               </span>
             </div>
-            <p className="text-xs text-muted-foreground mt-2 font-mono">
-              ID: {resume.id.slice(0, 8)}...
-            </p>
           </div>
-          {resume.currentVersionId && (
-            <Badge variant="secondary" className="text-xs shrink-0">
-              Ativo
-            </Badge>
-          )}
+          <div className="flex flex-col items-end gap-2">
+            {onTogglePin && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className={isPinned ? 'text-amber-600 hover:text-amber-700' : 'text-muted-foreground'}
+                onClick={() => onTogglePin(resume.id)}
+                title={isPinned ? 'Remover do topo' : 'Fixar no topo'}
+              >
+                <Pin className={`h-4 w-4 ${isPinned ? 'fill-current' : ''}`} />
+              </Button>
+            )}
+            {resume.currentVersionId && (
+              <Badge variant="secondary" className="text-xs shrink-0">
+                Ativo
+              </Badge>
+            )}
+          </div>
         </div>
       </CardContent>
       <CardFooter className="px-6 pb-6 pt-0 flex gap-2">

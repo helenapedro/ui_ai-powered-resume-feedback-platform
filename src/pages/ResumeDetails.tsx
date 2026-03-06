@@ -162,10 +162,6 @@ export default function ResumeDetails() {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div>
-                <h4 className="text-sm font-medium mb-2">ID do Curriculo</h4>
-                <code className="text-xs bg-muted px-2 py-1 rounded">{resume.id}</code>
-              </div>
               {currentVersion && (
                 <div>
                   <h4 className="text-sm font-medium mb-2">Versao Atual</h4>
