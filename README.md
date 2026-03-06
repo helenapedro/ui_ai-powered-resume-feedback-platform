@@ -1,21 +1,22 @@
 # Resume Feedback Frontend
 
-Frontend SPA para upload, versionamento, partilha e revisão colaborativa de currículos, com feedback gerado por IA e autenticação JWT/Google.
+Frontend SPA for uploading, versioning, sharing, and collaboratively reviewing resumes, with AI-generated feedback and JWT/Google authentication.
 
-O projeto consome uma API externa para autenticação, gestão de utilizadores, ficheiros, comentários, links públicos e análise assíncrona por IA.
+The project consumes an external API for authentication, user management, file handling, comments, public share links, and asynchronous AI analysis.
 
-## Visão Geral
+## Overview
 
-O produto cobre estes fluxos principais:
+The product currently supports these main flows:
 
-- autenticação com email/password
-- login e registo com Google Identity Services
-- upload de currículo e envio de novas versões
-- preview e download de ficheiros
-- criação e revogação de links de partilha
-- comentários por versão
-- feedback de IA com polling de jobs assíncronos
-- gestão básica de perfil
+- email/password authentication
+- Google sign-in and registration through Google Identity Services
+- resume upload and new version submission
+- file preview and download
+- share link creation and revocation
+- version-specific comments
+- AI feedback with async job polling
+- basic profile management
+- resume pinning and title search in the dashboard
 
 ## Stack
 
@@ -32,99 +33,99 @@ O produto cobre estes fluxos principais:
 - Zod
 - react-pdf
 
-## Arquitetura
+## Architecture
 
-A aplicação está organizada em camadas simples:
+The application is organized into a few clear layers:
 
-- `src/pages`: screens ligadas às rotas
-- `src/components`: componentes reutilizáveis e blocos de UI
-- `src/features`: hooks e lógica por feature
-- `src/store`: store Redux, typed hooks e slices
-- `src/services`: client HTTP e serviços por domínio
-- `src/contexts`: compatibilidade e providers globais
-- `src/types`: contratos TypeScript partilhados
+- `src/pages`: route-level screens
+- `src/components`: reusable UI and feature components
+- `src/features`: feature-specific hooks and orchestration logic
+- `src/store`: Redux store, typed hooks, and slices
+- `src/services`: HTTP client and domain services
+- `src/contexts`: compatibility and global providers
+- `src/types`: shared TypeScript contracts
 
-Hoje o state management segue este modelo:
+State management currently follows this model:
 
-- estado global e fluxos assíncronos críticos em Redux
-- estado efémero e estritamente visual continua local ao componente
-- acesso à API centralizado em `src/services`
+- critical global state and async flows live in Redux
+- short-lived, purely visual state stays local to components
+- API access is centralized in `src/services`
 
-Slices atuais:
+Current slices:
 
 - `authSlice`
 - `uploadSlice`
 - `resumeDetailsSlice`
 - `aiFeedbackSlice`
 
-Feature hooks atuais:
+Current feature hooks:
 
 - `src/features/upload/useUploadPage.ts`
 - `src/features/resume-details/useResumeDetailsPage.ts`
 - `src/features/ai/useAiFeedback.ts`
 
-## Rotas
+## Routes
 
-Públicas:
+Public:
 
 - `/`
 - `/about`
 - `/auth`
 - `/share/:token`
 
-Protegidas:
+Protected:
 
 - `/my-resumes`
 - `/upload`
 - `/resume/:id`
 - `/profile`
 
-## Variáveis de Ambiente
+## Environment Variables
 
-Criar `.env` na raiz:
+Create a `.env` file in the project root:
 
 ```bash
 VITE_API_URL=https://your-api-host.com
 VITE_GOOGLE_CLIENT_ID=your_google_oauth_client_id
 ```
 
-Notas:
+Notes:
 
-- `VITE_API_URL` pode ser informado com ou sem `/api`; o cliente normaliza a base internamente
-- `VITE_GOOGLE_CLIENT_ID` é necessário para renderizar e usar o login com Google
+- `VITE_API_URL` may be provided with or without `/api`; the client normalizes the base URL internally
+- `VITE_GOOGLE_CLIENT_ID` is required to render and use Google sign-in
 
 ## Setup
 
-Pré-requisitos:
+Prerequisites:
 
 - Node.js 18+
-- npm 9+ ou Bun
+- npm 9+ or Bun
 
-Instalação:
+Install dependencies:
 
 ```bash
 npm install
 ```
 
-Desenvolvimento:
+Start development:
 
 ```bash
 npm run dev
 ```
 
-Build de produção:
+Build for production:
 
 ```bash
 npm run build
 ```
 
-Preview local:
+Preview the production build locally:
 
 ```bash
 npm run preview
 ```
 
-Lint:
+Run lint:
 
 ```bash
 npm run lint
@@ -142,100 +143,104 @@ npm run lint
 }
 ```
 
-## Integração com API
+## API Integration
 
-O frontend usa uma camada pequena e explícita em `src/services`.
+The frontend uses a small, explicit service layer in `src/services`.
 
-Pontos importantes:
+Important details:
 
-- `api-config.ts` normaliza a base URL
-- `api-client.ts` injeta o token JWT a partir de `localStorage`
-- requests sem `FormData` são enviados como JSON
-- erros da API são convertidos para um formato consistente no frontend
-- endpoints de preview/download usam URLs diretas porque podem responder com `302`
+- `api-config.ts` normalizes the base URL
+- `api-client.ts` injects the JWT token from `localStorage`
+- requests that are not `FormData` are sent as JSON
+- API errors are converted into a consistent frontend error shape
+- preview/download endpoints use direct URLs because they may return `302` redirects
 
-Base padrão atualmente configurada:
+Current default API base:
 
 ```text
 https://resumefeedback-api.hmpedro.com
 ```
 
-## Autenticação
+## Authentication
 
-O modelo atual é simples e pragmático:
+The current auth model is simple and pragmatic:
 
-- o access token JWT é persistido em `localStorage`
-- o utilizador é reconstruído a partir do payload do token
-- o bootstrap de auth passa pelo store Redux
-- `useAuth()` continua disponível como interface de compatibilidade para o resto da app
-- páginas protegidas usam `ProtectedRoute`
+- the JWT access token is stored in `localStorage`
+- the user is reconstructed from the token payload
+- auth bootstrap is driven by the Redux store
+- `useAuth()` still exists as a compatibility interface for the rest of the app
+- protected pages are enforced through `ProtectedRoute`
 
-Fluxos suportados:
+Supported flows:
 
-- registo com email/password
-- login com email/password
-- login/registo com Google
-- reativação de conta via endpoint backend
+- register with email/password
+- login with email/password
+- login/register with Google
+- reactivate account through a backend endpoint
 
-## Features Principais
+## Main Features
 
 ### Resume Management
 
-- upload de currículo inicial
-- envio de novas versões para um currículo existente
-- histórico de versões
-- preview autenticado do ficheiro atual ou da versão selecionada
+- upload an initial resume
+- add new versions to an existing resume
+- view version history
+- preview the current or selected version
+- pin important resumes to the top of the dashboard
+- search resumes by title
 
 ### Sharing and Collaboration
 
-- criação de links com permissão, expiração e limite de uso
-- revogação de links existentes
-- comentários associados à versão em preview
+- create links with permission, expiration, and usage limits
+- revoke existing links
+- comment on the version currently being previewed
 
 ### AI Feedback
 
-- leitura do último job de IA por versão
-- polling automático enquanto o job está `PENDING` ou `PROCESSING`
-- carregamento do feedback quando o job termina com sucesso
-- regeneração manual de feedback
+- fetch the latest AI job per version
+- poll automatically while the job is `PENDING` or `PROCESSING`
+- load feedback when the job completes successfully
+- regenerate feedback manually
 
-## Estrutura Atual Relevante
+## Relevant Structure
 
-- store principal em `src/store/index.ts`
-- typed hooks Redux em `src/store/hooks.ts`
-- auth em `src/store/slices/authSlice.ts`
-- upload em `src/store/slices/uploadSlice.ts`
-- resume details em `src/store/slices/resumeDetailsSlice.ts`
-- ai feedback em `src/store/slices/aiFeedbackSlice.ts`
-- orquestração de upload em `src/features/upload/useUploadPage.ts`
-- orquestração de detalhes do currículo em `src/features/resume-details/useResumeDetailsPage.ts`
-- orquestração de polling de IA em `src/features/ai/useAiFeedback.ts`
+- main store in `src/store/index.ts`
+- typed Redux hooks in `src/store/hooks.ts`
+- auth logic in `src/store/slices/authSlice.ts`
+- upload logic in `src/store/slices/uploadSlice.ts`
+- resume details logic in `src/store/slices/resumeDetailsSlice.ts`
+- AI feedback logic in `src/store/slices/aiFeedbackSlice.ts`
+- upload orchestration in `src/features/upload/useUploadPage.ts`
+- resume details orchestration in `src/features/resume-details/useResumeDetailsPage.ts`
+- AI polling orchestration in `src/features/ai/useAiFeedback.ts`
+- pinned resume persistence in `src/lib/pinned-resumes.ts`
 
-## Estado do Projeto
+## Project Status
 
-Estado atual validado:
+Currently validated:
 
-- dependências Redux instaladas
-- build de produção a passar com `npm run build`
-- arquitetura parcialmente migrada para Redux nas features mais state-heavy
+- Redux dependencies are installed
+- production build passes with `npm run build`
+- the most state-heavy flows have already been moved to Redux-backed feature modules
+- the UI language has been migrated to English
 
-Observações técnicas:
+Technical notes:
 
-- ainda não existe suite de testes automatizada no `package.json`
-- o token continua em `localStorage`, o que é funcional mas não é o modelo mais robusto para cenários com requisitos de segurança mais fortes
-- ainda há ficheiros grandes no projeto, especialmente `Profile.tsx`, `SharedResume.tsx` e alguns componentes reutilizáveis
-- o bundle de produção ainda emite warning de chunk grande; isso sugere code-splitting/manual chunks como próximo passo
-- o repositório mantém `package-lock.json` e `bun.lockb`; convém padronizar o package manager da equipa
+- there is still no automated test suite wired into `package.json`
+- tokens still live in `localStorage`, which is functional but not the strongest model for higher-security environments
+- there are still large files in the codebase, especially `Profile.tsx` and some reusable components
+- the production bundle still emits a large chunk warning, which points to code-splitting/manual chunking as a next step
+- the repository contains both `package-lock.json` and `bun.lockb`; the team should standardize on one package manager
 
-## Próximos Passos Recomendados
+## Recommended Next Steps
 
-- continuar a refatoração dos ficheiros mais extensos para hooks/feature modules menores
-- introduzir testes unitários para services, slices e hooks críticos
-- adicionar testes de integração para auth, upload e resume details
-- criar `.env.example`
-- adicionar CI para lint e build
-- avaliar code-splitting para reduzir o tamanho do bundle inicial
+- continue refactoring the largest files into smaller feature modules/hooks
+- add unit tests for services, slices, and critical hooks
+- add integration tests for auth, upload, and resume details
+- create a `.env.example`
+- add CI for lint and build
+- evaluate code-splitting to reduce the initial bundle size
 
-## Nota
+## Note
 
-Existe documentação de handoff backend em `docs/frontend-handoff.local.md`, útil para integração local e troubleshooting dos endpoints.
+Backend handoff documentation is available at `docs/frontend-handoff.local.md`, which is useful for local integration and endpoint troubleshooting.
