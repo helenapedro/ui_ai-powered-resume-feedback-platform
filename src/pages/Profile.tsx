@@ -310,7 +310,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-muted/40">
       <Header />
       <main className="container max-w-3xl py-10 px-4">
         <div className="mb-8 space-y-3">
