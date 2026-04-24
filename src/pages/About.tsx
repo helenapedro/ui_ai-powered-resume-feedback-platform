@@ -155,7 +155,7 @@ export default function About() {
 
       <footer className="py-8 border-t">
         <div className="container text-center text-sm text-muted-foreground">
-          <p>© 2024 Resume Feedback. All rights reserved.</p>
+          <p><p>© 2025 Resume Feedback. All rights reserved.</p>. All rights reserved.</p>
         </div>
       </footer>
     </div>
