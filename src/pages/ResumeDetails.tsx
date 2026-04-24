@@ -23,8 +23,9 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useResumeDetailsPage } from '@/features/resume-details/useResumeDetailsPage';
-import { ArrowLeft, Trash2, FileText, Calendar, Loader2, Upload, Hash, Share2, MessageSquare } from 'lucide-react';
+import { ArrowLeft, Trash2, FileText, Calendar, Loader2, Upload, Hash, Share2, MessageSquare, Eye } from 'lucide-react';
 import { format } from 'date-fns';
+import { resumeService } from '@/services/resumes';
 
 export default function ResumeDetails() {
   const navigate = useNavigate();
@@ -78,13 +79,13 @@ export default function ResumeDetails() {
         <div className="flex items-center justify-between mb-6">
           <Button variant="ghost" onClick={() => navigate(-1)}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
+            Back to Workflows
           </Button>
 
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={() => setIsShareModalOpen(true)}>
               <Share2 className="h-4 w-4 mr-2" />
-              Share
+              Create Share Link
             </Button>
             <Button variant="outline" asChild>
               <Link to={`/upload?resumeId=${resume.id}`}>
@@ -125,13 +126,14 @@ export default function ResumeDetails() {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
-          <Card>
+          <Card className="overflow-hidden border-border/70 bg-[linear-gradient(135deg,hsl(var(--primary)/0.07),transparent_45%),linear-gradient(180deg,hsl(var(--background)),hsl(var(--muted)/0.2))] shadow-sm">
             <CardHeader>
               <div className="flex items-start gap-4">
                 <div className="p-3 bg-primary/10 rounded-lg">
                   <FileText className="h-8 w-8 text-primary" />
                 </div>
                 <div className="flex-1">
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">Resume Feedback Platform</p>
                   <CardTitle className="text-2xl mb-2">{resume.title || 'Untitled resume'}</CardTitle>
                   <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
@@ -148,11 +150,19 @@ export default function ResumeDetails() {
             </CardHeader>
             <CardContent className="space-y-4">
               {currentVersion && (
-                <div>
-                  <h4 className="text-sm font-medium mb-2">Current Version</h4>
-                  <div className="flex items-center gap-2">
-                    <Badge>v{currentVersion.versionNumber}</Badge>
-                    <span className="text-sm text-muted-foreground">{currentVersion.originalFilename}</span>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="rounded-2xl border bg-background/90 p-4">
+                    <h4 className="text-sm font-medium mb-2">Active Version</h4>
+                    <div className="flex items-center gap-2">
+                      <Badge>v{currentVersion.versionNumber}</Badge>
+                      <span className="text-sm text-muted-foreground">{currentVersion.originalFilename}</span>
+                    </div>
+                  </div>
+                  <div className="rounded-2xl border bg-background/90 p-4">
+                    <h4 className="text-sm font-medium mb-2">Review Focus</h4>
+                    <p className="text-sm text-muted-foreground">
+                      AI feedback, version history, resume preview, and controlled shared reviews.
+                    </p>
                   </div>
                 </div>
               )}
@@ -172,11 +182,18 @@ export default function ResumeDetails() {
         {previewUrl && authHeaders && (
           <div className="mt-8">
             <Card>
-              <CardHeader>
+              <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
-                  Preview
+                  <Eye className="h-5 w-5" />
+                  Resume Preview
                 </CardTitle>
+                {activePreviewId && (
+                  <Button asChild variant="outline" size="sm">
+                    <a href={resumeService.getVersionDownloadUrl(resume.id, activePreviewId)} target="_blank" rel="noreferrer">
+                      Download Version
+                    </a>
+                  </Button>
+                )}
               </CardHeader>
               <CardContent>
                 <PdfViewer fileUrl={previewUrl} httpHeaders={authHeaders} className="min-h-[600px]" />
@@ -196,7 +213,7 @@ export default function ResumeDetails() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <MessageSquare className="h-5 w-5" />
-                Comments
+                Shared Reviews & Comments
               </CardTitle>
             </CardHeader>
             <CardContent>

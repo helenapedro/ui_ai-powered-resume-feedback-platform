@@ -112,20 +112,20 @@ export function CommentList({
             />
           )}
           <Textarea
-            placeholder="Add a comment..."
+            placeholder="Add a review comment for this version"
             value={newComment}
             onChange={(event) => setNewComment(event.target.value)}
             className="min-h-[80px]"
           />
           <Button onClick={handleSubmit} disabled={!newComment.trim() || isSubmitting} size="sm">
             <Send className="h-4 w-4 mr-2" />
-            Comment
+            Add Comment
           </Button>
         </div>
       </div>
 
       {comments.length === 0 ? (
-        <p className="text-center text-muted-foreground py-8">No comments yet. Be the first to leave one.</p>
+        <p className="text-center text-muted-foreground py-8">No review comments yet for this version.</p>
       ) : (
         <div className="space-y-4">
           {comments.map((comment) => {

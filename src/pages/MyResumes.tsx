@@ -83,10 +83,10 @@ export default function MyResumes() {
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-3">
               <FileText className="h-8 w-8 text-primary" />
-              My Resumes
+              My Resume Workflow
             </h1>
             <p className="text-muted-foreground mt-1">
-              Manage your resumes, search by title, and keep the most important ones pinned at the top
+              Track resume versions, reopen active drafts, and keep your most important review workflows pinned at the top.
             </p>
           </div>
 
@@ -96,7 +96,7 @@ export default function MyResumes() {
               <Input
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder="Search by title"
+                placeholder="Search resume workflows"
                 className="pl-9"
               />
             </div>
@@ -118,9 +118,9 @@ export default function MyResumes() {
         ) : resumes.length === 0 ? (
           <div className="text-center py-20">
             <FileText className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-xl font-semibold mb-2">You do not have any resumes yet</h2>
+            <h2 className="text-xl font-semibold mb-2">You do not have any resume workflows yet</h2>
             <p className="text-muted-foreground mb-6">
-              Upload your first resume and get AI feedback.
+              Upload your first resume to start a version-aware feedback workflow.
             </p>
             <Button asChild>
               <Link to="/upload">
@@ -132,7 +132,7 @@ export default function MyResumes() {
         ) : filteredResumes.length === 0 ? (
           <div className="text-center py-20">
             <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-xl font-semibold mb-2">No resumes found</h2>
+            <h2 className="text-xl font-semibold mb-2">No resume workflows found</h2>
             <p className="text-muted-foreground">Try searching with a different title.</p>
           </div>
         ) : (

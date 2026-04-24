@@ -16,8 +16,8 @@ export function AuthFormTabs({ isLoading, onLogin, onRegister, onReactivate }: A
   return (
     <Tabs defaultValue="login" className="w-full">
       <TabsList className="grid w-full grid-cols-3">
-        <TabsTrigger value="login">Login</TabsTrigger>
-        <TabsTrigger value="register">Register</TabsTrigger>
+        <TabsTrigger value="login">Sign In</TabsTrigger>
+        <TabsTrigger value="register">Create Account</TabsTrigger>
         <TabsTrigger value="reactivate">Reactivate</TabsTrigger>
       </TabsList>
 
@@ -35,10 +35,10 @@ export function AuthFormTabs({ isLoading, onLogin, onRegister, onReactivate }: A
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Signing in...
+                Entering workspace...
               </>
             ) : (
-              'Sign In'
+              'Enter Workspace'
             )}
           </Button>
         </form>
@@ -62,10 +62,10 @@ export function AuthFormTabs({ isLoading, onLogin, onRegister, onReactivate }: A
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating account...
+                Creating workspace...
               </>
             ) : (
-              'Create Account'
+              'Create Workspace'
             )}
           </Button>
         </form>
@@ -85,10 +85,10 @@ export function AuthFormTabs({ isLoading, onLogin, onRegister, onReactivate }: A
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Reactivating...
+                Restoring workspace...
               </>
             ) : (
-              'Reactivate Account'
+              'Restore Access'
             )}
           </Button>
         </form>

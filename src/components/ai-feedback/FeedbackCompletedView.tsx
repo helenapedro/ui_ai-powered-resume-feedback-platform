@@ -42,9 +42,9 @@ export function FeedbackCompletedView({ feedback }: FeedbackCompletedViewProps) 
 
       <div className="grid gap-6 xl:grid-cols-[0.96fr_1.04fr]">
         <FeedbackSection
-          eyebrow="What's Working"
-          title="Signals already helping your candidacy"
-          description="These are the parts that read clearly, create confidence, or support your current positioning."
+          eyebrow="AI Feedback"
+          title="Strength Signals"
+          description="These are the parts already helping the current version read clearly and credibly."
           icon={<ThumbsUp className="h-5 w-5 text-emerald-700 dark:text-emerald-300" />}
           accentClassName="border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/70 dark:bg-emerald-950/40"
         >
@@ -66,9 +66,9 @@ export function FeedbackCompletedView({ feedback }: FeedbackCompletedViewProps) 
         </FeedbackSection>
 
         <FeedbackSection
-          eyebrow="What's Holding It Back"
-          title="Highest-leverage improvements"
-          description="Treat these as coaching priorities. They are the issues most likely to weaken fit, level, or clarity."
+          eyebrow="AI Feedback"
+          title="Gaps to Close"
+          description="Treat these as the highest-leverage changes for the current version."
           icon={<ArrowUpRight className="h-5 w-5 text-amber-700 dark:text-amber-300" />}
           accentClassName="border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/70 dark:bg-amber-950/40"
         >

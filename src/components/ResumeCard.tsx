@@ -54,7 +54,7 @@ export function ResumeCard({ resume, showActions, isPinned = false, onTogglePin 
         <Button asChild variant="outline" className="flex-1">
           <Link to={`/resume/${resume.id}`}>
             <Eye className="h-4 w-4 mr-2" />
-            View Details
+            Open Workflow
           </Link>
         </Button>
         {showActions && (

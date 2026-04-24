@@ -32,7 +32,7 @@ export function FeedbackCardShell({ children, action, description, status }: Fee
             </div>
             <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
               {description ??
-                'A structured read on current positioning, what is already credible, and the gaps most likely to affect recruiter confidence.'}
+                'A structured read on the selected resume version: overall assessment, strength signals, and the gaps most likely to affect reviewer confidence.'}
             </p>
           </div>
 

@@ -2,9 +2,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { History, FileText, Eye } from 'lucide-react';
+import { History, FileText, Eye, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import type { ResumeVersion } from '@/types';
+import { resumeService } from '@/services/resumes';
 
 interface VersionHistoryProps {
   resumeId: string;
@@ -108,6 +109,12 @@ export function VersionHistory({
                 >
                   <Eye className="h-3.5 w-3.5 mr-1" />
                   Preview
+                </Button>
+                <Button asChild variant="outline" size="sm">
+                  <a href={resumeService.getVersionDownloadUrl(resumeId, version.id)} target="_blank" rel="noreferrer">
+                    <Download className="h-3.5 w-3.5 mr-1" />
+                    Download
+                  </a>
                 </Button>
                 <Badge variant="outline" className="text-xs">
                   {version.contentType.split('/')[1]?.toUpperCase() || 'FILE'}

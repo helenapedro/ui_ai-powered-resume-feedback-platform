@@ -54,7 +54,7 @@ export function SharedLinksList({ links, isLoading, onRevoke, baseUrl }: SharedL
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
             <Link2 className="h-5 w-5" />
-            Share Links
+            Shared Reviews
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -67,16 +67,16 @@ export function SharedLinksList({ links, isLoading, onRevoke, baseUrl }: SharedL
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <Link2 className="h-5 w-5" />
-          Share Links
-        </CardTitle>
-      </CardHeader>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Link2 className="h-5 w-5" />
+            Shared Reviews
+          </CardTitle>
+        </CardHeader>
       <CardContent>
         {activeLinks.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-4">No active share links.</p>
+          <p className="text-sm text-muted-foreground text-center py-4">No active share links for this resume.</p>
         ) : (
           <div className="space-y-3">
             {activeLinks.map((link) => {

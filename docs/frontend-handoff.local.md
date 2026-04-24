@@ -13,10 +13,12 @@ Use:
 export const API_BASE_URL = "https://resumefeedback-api.hmpedro.com";
 ```
 
-## CORS Status (temporary)
+## CORS Status
 
-Backend CORS is intentionally open for integration:
-- Any origin allowed
+Backend CORS allowlist:
+- `http://localhost:8080`
+- `https://resumefeedback.hmpedro.com`
+- `https://feedback.hmpedro.com`
 - Methods: `GET, POST, PUT, DELETE, PATCH, OPTIONS`
 - Headers: `*`
 
@@ -61,7 +63,11 @@ Frontend should still send standard headers only (`Authorization`, `Content-Type
   - `VITE_GOOGLE_CLIENT_ID=<google_oauth_web_client_id>`
 - Authorized JavaScript origins in Google Cloud OAuth client must include:
   - `https://resumefeedback.hmpedro.com`
-  - local dev origin (example: `http://localhost:5173`)
+  - `https://feedback.hmpedro.com`
+  - your actual local frontend origin
+- Important local dev note:
+  - Backend CORS currently allows `http://localhost:8080`, not `http://localhost:5173`.
+  - If the frontend runs on `5173`, backend CORS must be updated before browser requests will succeed.
 - ID token acquisition:
   - Use Google Identity Services in frontend and request an ID token.
   - Send received ID token to backend `/api/auth/google`.
@@ -74,6 +80,17 @@ Minimal client-side flow:
 
 Store token and send:
 `Authorization: Bearer <jwt>`
+
+### Reactivate disabled account
+- `POST /api/auth/reactivate`
+- Body:
+```json
+{ "email": "user@test.com", "password": "1234" }
+```
+- Response:
+```json
+{ "accessToken": "<jwt>" }
+```
 
 ## User Profile (JWT required)
 
@@ -91,6 +108,22 @@ Store token and send:
   "avatarUrl": "https://cdn.example.com/avatars/helena.jpg"
 }
 ```
+
+### Upload current user avatar
+- `POST /api/users/me/avatar`
+- `multipart/form-data`
+  - `file` (required, `png|jpg|jpeg|webp`, max `2MB`)
+- Response: updated `UserProfileDTO` with new `avatarUrl`
+
+### Deactivate current user account
+- `POST /api/users/me/deactivate`
+- Response:
+  - `204 No Content`
+
+### Permanently delete current user account
+- `DELETE /api/users/me`
+- Response:
+  - `204 No Content`
 
 ## Resume Flows (JWT required)
 
@@ -116,6 +149,11 @@ Use each `version.id` to support per-version preview/download in UI.
 - `POST /api/resumes/{resumeId}/versions`
 - `multipart/form-data`
   - `file` (required)
+
+### Delete resume
+- `DELETE /api/resumes/{resumeId}`
+- Response:
+  - `204 No Content`
 
 ### Download version
 - `GET /api/resumes/{resumeId}/versions/{versionId}/download`
@@ -219,9 +257,16 @@ Status values:
 
 ### Regenerate
 - `POST /api/resumes/{resumeId}/versions/{versionId}/ai-jobs/regenerate`
+- Optional query param:
+  - `language=EN|PT`
 
 ### Fetch feedback
 - `GET /api/resumes/{resumeId}/versions/{versionId}/ai-feedback`
+
+### Fetch version-to-version progress analysis
+- `GET /api/resumes/{resumeId}/versions/{versionId}/ai-progress`
+- Use when the current version has a previous version with baseline feedback.
+- Frontend should treat missing progress as a valid state for first versions or versions without baseline history.
 
 ## Recommended Frontend Polling
 

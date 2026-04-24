@@ -79,8 +79,10 @@ export default function Auth() {
             <div className="flex justify-center mb-4">
               <FileText className="h-12 w-12 text-primary" />
             </div>
-            <CardTitle className="text-2xl">Resume Feedback</CardTitle>
-            <CardDescription>Get valuable feedback on your resume</CardDescription>
+            <CardTitle className="text-2xl">Resume Feedback Platform</CardTitle>
+            <CardDescription>
+              Enter your resume review workspace to upload versions, run AI feedback, and manage shared reviews.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {!showEmailForm ? (
@@ -107,7 +109,7 @@ export default function Auth() {
                   onClick={() => setShowEmailForm(true)}
                 >
                   <Mail className="h-5 w-5" />
-                  Continue with email
+                  Continue with Email
                 </Button>
               </div>
             ) : (

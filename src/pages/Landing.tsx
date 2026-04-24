@@ -1,8 +1,36 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { FileText, MessageSquare, History, Sparkles, ArrowRight } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { FileText, MessageSquare, History, Sparkles, ArrowRight, Eye, Share2, BrainCircuit } from 'lucide-react';
 
 export default function Landing() {
+  const pillars = [
+    {
+      icon: Sparkles,
+      title: 'AI Feedback',
+      description:
+        'Generate a focused resume review with an overall assessment, clear strength signals, and concrete gaps to close.',
+    },
+    {
+      icon: History,
+      title: 'Version History',
+      description:
+        'Keep multiple resume versions in one workflow so you can review changes, compare progress, and keep iterating with context.',
+    },
+    {
+      icon: Eye,
+      title: 'Resume Preview',
+      description:
+        'Preview the current version in the product and download specific versions when you need the exact file.',
+    },
+    {
+      icon: Share2,
+      title: 'Shared Reviews',
+      description:
+        'Create controlled share links, collect comments, and keep collaboration tied to the resume version under review.',
+    },
+  ];
+
   return (
     <div className="min-h-screen flex flex-col">
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -24,70 +52,166 @@ export default function Landing() {
 
       <section className="flex-1 flex items-center justify-center py-20 px-4">
         <div className="container max-w-6xl">
-          <div className="text-center space-y-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
-              <Sparkles className="h-4 w-4" />
-              AI feedback for your resume
+          <div className="grid gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-center">
+            <div className="space-y-8">
+              <div className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
+                <BrainCircuit className="h-4 w-4" />
+                Resume Feedback Platform
+              </div>
+
+              <div className="space-y-5">
+                <h1 className="text-4xl font-bold leading-tight text-primary md:text-6xl">
+                  AI resume review
+                  <br />
+                  <span className="text-primary/80">with version tracking</span>
+                </h1>
+
+                <p className="max-w-2xl text-lg text-muted-foreground md:text-xl">
+                  Upload resume versions, generate AI feedback, preview the file under review, and share controlled links
+                  for comments and collaboration.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4 pt-2">
+                <Button asChild size="lg" className="gap-2">
+                  <Link to="/auth">
+                    Start Reviewing
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="lg">
+                  <Link to="/about">See How It Works</Link>
+                </Button>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-3">
+                <div className="rounded-2xl border bg-background p-4 shadow-sm">
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Review</p>
+                  <p className="mt-2 text-sm text-foreground">AI-generated feedback with clear strengths and improvement priorities.</p>
+                </div>
+                <div className="rounded-2xl border bg-background p-4 shadow-sm">
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Track</p>
+                  <p className="mt-2 text-sm text-foreground">Multiple resume versions kept in one version-aware workflow.</p>
+                </div>
+                <div className="rounded-2xl border bg-background p-4 shadow-sm">
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Share</p>
+                  <p className="mt-2 text-sm text-foreground">Controlled links, comments, preview, and download for real review cycles.</p>
+                </div>
+              </div>
             </div>
 
-            <h1 className="text-4xl md:text-6xl font-bold text-primary leading-tight">
-              Improve your resume with
-              <br />
-              <span className="text-primary/80">artificial intelligence</span>
-            </h1>
+            <Card className="overflow-hidden border-border/70 bg-[linear-gradient(135deg,hsl(var(--primary)/0.07),transparent_42%),linear-gradient(180deg,hsl(var(--background)),hsl(var(--muted)/0.2))] shadow-xl">
+              <CardContent className="space-y-6 p-6 sm:p-8">
+                <div className="flex items-center justify-between rounded-2xl border bg-background/90 px-4 py-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Current Workflow</p>
+                    <p className="mt-1 text-lg font-semibold text-foreground">Resume Review in Progress</p>
+                  </div>
+                  <div className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">v3 selected</div>
+                </div>
 
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Get instant, detailed feedback on your resume, share it with others, and keep improving your career materials.
-            </p>
+                <div className="grid gap-4">
+                  <div className="rounded-2xl border bg-background p-5 shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-xl bg-primary/10 p-2.5">
+                        <Sparkles className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="text-base font-semibold">AI Feedback</h3>
+                        <p className="text-sm text-muted-foreground">Overall assessment, strength signals, and gaps to close.</p>
+                      </div>
+                    </div>
+                  </div>
 
-            <div className="flex items-center justify-center gap-4 pt-4">
-              <Button asChild size="lg" className="gap-2">
-                <Link to="/auth">
-                  Get Started
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg">
-                <Link to="/about">Learn more</Link>
-              </Button>
-            </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="rounded-2xl border bg-background p-5 shadow-sm">
+                      <div className="flex items-center gap-3">
+                        <History className="h-5 w-5 text-primary" />
+                        <div>
+                          <h3 className="text-base font-semibold">Version History</h3>
+                          <p className="text-sm text-muted-foreground">Track iteration across resume versions.</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="rounded-2xl border bg-background p-5 shadow-sm">
+                      <div className="flex items-center gap-3">
+                        <Eye className="h-5 w-5 text-primary" />
+                        <div>
+                          <h3 className="text-base font-semibold">Resume Preview</h3>
+                          <p className="text-sm text-muted-foreground">Open the exact file being reviewed.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border bg-background p-5 shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <MessageSquare className="h-5 w-5 text-primary" />
+                      <div>
+                        <h3 className="text-base font-semibold">Shared Reviews</h3>
+                        <p className="text-sm text-muted-foreground">Comments and share-link access controls for collaboration.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
 
-      <section className="py-20 bg-muted/50">
+      <section className="bg-muted/40 py-20">
         <div className="container max-w-6xl px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Why use Resume Feedback?</h2>
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-primary">Product Pillars</p>
+            <h2 className="mt-4 text-3xl font-bold text-foreground md:text-4xl">
+              A production workflow for resume review and iteration
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              The platform is built around real resume review tasks: analyze the current version, track changes over time,
+              preview the file, and collaborate through controlled sharing.
+            </p>
+          </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-background rounded-xl p-6 shadow-sm border">
-              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                <Sparkles className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">AI Feedback</h3>
-              <p className="text-muted-foreground">
-                Advanced AI analyzes your resume and highlights areas to improve.
-              </p>
+          <div className="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+            {pillars.map((pillar) => (
+              <Card key={pillar.title} className="h-full border bg-background shadow-sm">
+                <CardContent className="space-y-4 p-6">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+                    <pillar.icon className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-semibold">{pillar.title}</h3>
+                    <p className="text-sm leading-6 text-muted-foreground">{pillar.description}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20">
+        <div className="container max-w-6xl px-4">
+          <div className="grid gap-8 rounded-[2rem] border bg-background p-8 shadow-sm lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:items-center">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-primary">Built for Resume Iteration</p>
+              <h2 className="mt-4 text-3xl font-bold text-foreground">Move from one draft to the next with better review context.</h2>
             </div>
 
-            <div className="bg-background rounded-xl p-6 shadow-sm border">
-              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                <MessageSquare className="h-6 w-6 text-primary" />
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="rounded-2xl border bg-muted/20 p-5">
+                <h3 className="text-base font-semibold">Upload</h3>
+                <p className="mt-2 text-sm text-muted-foreground">Start a resume record or add a new version to an existing one.</p>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Collaboration</h3>
-              <p className="text-muted-foreground">
-                Share your resume and collect feedback from other professionals.
-              </p>
-            </div>
-
-            <div className="bg-background rounded-xl p-6 shadow-sm border">
-              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                <History className="h-6 w-6 text-primary" />
+              <div className="rounded-2xl border bg-muted/20 p-5">
+                <h3 className="text-base font-semibold">Review</h3>
+                <p className="mt-2 text-sm text-muted-foreground">Run async AI jobs and read feedback for the selected version.</p>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Version History</h3>
-              <p className="text-muted-foreground">
-                Keep every resume version organized and revisit older iterations when needed.
-              </p>
+              <div className="rounded-2xl border bg-muted/20 p-5">
+                <h3 className="text-base font-semibold">Collaborate</h3>
+                <p className="mt-2 text-sm text-muted-foreground">Preview, download, comment, and share with controlled access.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -96,13 +220,13 @@ export default function Landing() {
       <section className="py-20 bg-primary text-primary-foreground">
         <div className="container max-w-4xl px-4 text-center">
           <FileText className="h-12 w-12 mx-auto mb-6 opacity-90" />
-          <h2 className="text-3xl font-bold mb-4">Ready to improve your resume?</h2>
+          <h2 className="text-3xl font-bold mb-4">Start a cleaner, version-aware resume review workflow.</h2>
           <p className="text-lg opacity-90 mb-8">
-            Join professionals who are refining their resumes with faster, clearer feedback.
+            Create an account to upload your resume, run AI review jobs, and manage feedback across versions.
           </p>
           <Button asChild size="lg" variant="secondary" className="gap-2">
             <Link to="/auth">
-              Create a free account
+              Enter the Platform
               <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
@@ -111,7 +235,7 @@ export default function Landing() {
 
       <footer className="py-8 border-t">
         <div className="container text-center text-sm text-muted-foreground">
-          <p>© 2025 Resume Feedback. All rights reserved.</p>
+          <p>© 2026 Resume Feedback. All rights reserved.</p>
         </div>
       </footer>
     </div>
