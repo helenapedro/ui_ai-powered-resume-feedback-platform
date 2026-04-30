@@ -23,6 +23,14 @@ const initialEntry = (): AiFeedbackEntry => ({
   error: null,
 });
 
+const emptyEntry: AiFeedbackEntry = {
+  job: null,
+  feedback: null,
+  isLoading: true,
+  isRegenerating: false,
+  error: null,
+};
+
 const initialState: AiFeedbackState = {
   entries: {},
 };
@@ -151,6 +159,6 @@ export const { resetAiFeedbackEntry, setAiFeedbackError, setAiFeedbackLoading } 
   aiFeedbackSlice.actions;
 
 export const selectAiFeedbackEntry = (state: RootState, resumeId: string, versionId: string) =>
-  state.aiFeedback.entries[getKey(resumeId, versionId)] || initialEntry();
+  state.aiFeedback.entries[getKey(resumeId, versionId)] || emptyEntry;
 
 export default aiFeedbackSlice.reducer;
