@@ -1,15 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
 import uploadReducer from './slices/uploadSlice';
-import resumeDetailsReducer from './slices/resumeDetailsSlice';
-import aiFeedbackReducer from './slices/aiFeedbackSlice';
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     upload: uploadReducer,
-    resumeDetails: resumeDetailsReducer,
-    aiFeedback: aiFeedbackReducer,
   },
 });
 

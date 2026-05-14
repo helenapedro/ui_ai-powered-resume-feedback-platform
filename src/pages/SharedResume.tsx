@@ -1,8 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { sharingService } from '@/services/sharing';
 import { useAuth } from '@/contexts/AuthContext';
-import type { SharedResumeData } from '@/types';
 import { CommentList } from '@/components/CommentList';
 import { PdfViewer } from '@/components/PdfViewer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,54 +9,41 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import type { Comment } from '@/types';
+import {
+  useAddSharedCommentMutation,
+  useSharedCommentsQuery,
+  useSharedResumeQuery,
+} from '@/features/sharing/queries';
 import { FileText, AlertCircle, ExternalLink, LogIn } from 'lucide-react';
 
 export default function SharedResume() {
   const { token } = useParams<{ token: string }>();
   const { toast } = useToast();
   const { isAuthenticated } = useAuth();
-  const [data, setData] = useState<SharedResumeData | null>(null);
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingComments, setIsLoadingComments] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const sharedResumeQuery = useSharedResumeQuery(token);
+  const data = sharedResumeQuery.data ?? null;
+  const commentsQuery = useSharedCommentsQuery(token, data?.permission === 'COMMENT' && isAuthenticated);
+  const addCommentMutation = useAddSharedCommentMutation(token);
+  const error = sharedResumeQuery.error
+    ? sharedResumeQuery.error instanceof Error
+      ? sharedResumeQuery.error.message
+      : 'Invalid, expired, or revoked link.'
+    : null;
 
   useEffect(() => {
-    if (token) {
-      void fetchSharedResume();
+    if (commentsQuery.error) {
+      toast({
+        variant: 'destructive',
+        title: 'Unable to load comments',
+        description: commentsQuery.error instanceof Error ? commentsQuery.error.message : 'Please try again.',
+      });
     }
-  }, [token]);
-
-  const fetchSharedResume = async () => {
-    try {
-      const response = await sharingService.getSharedResume(token!);
-      setData(response);
-      if (response.permission === 'COMMENT') {
-        void fetchComments();
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Invalid, expired, or revoked link.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const fetchComments = async () => {
-    setIsLoadingComments(true);
-    try {
-      const commentsData = await sharingService.getSharedComments(token!);
-      setComments(commentsData);
-    } finally {
-      setIsLoadingComments(false);
-    }
-  };
+  }, [commentsQuery.error, toast]);
 
   const handleAddComment = useCallback(
     async (content: string) => {
       try {
-        const newComment = await sharingService.postSharedComment(token!, { body: content });
-        setComments((prev) => [...prev, newComment]);
+        await addCommentMutation.mutateAsync(content);
         toast({ title: 'Comment added!' });
       } catch (err) {
         toast({
@@ -67,7 +53,7 @@ export default function SharedResume() {
         });
       }
     },
-    [token, toast]
+    [addCommentMutation, toast]
   );
 
   const handleDownload = () => {
@@ -75,7 +61,7 @@ export default function SharedResume() {
     window.open(downloadUrl, '_blank');
   };
 
-  if (isLoading) {
+  if (sharedResumeQuery.isLoading) {
     return (
       <div className="min-h-screen bg-muted/30 flex items-center justify-center p-4">
         <Card className="w-full max-w-2xl">
@@ -151,7 +137,11 @@ export default function SharedResume() {
               <div className="border-t pt-6">
                 <h3 className="font-semibold mb-4">Comments</h3>
                 {isAuthenticated ? (
-                  <CommentList comments={comments} isLoading={isLoadingComments} onAddComment={handleAddComment} />
+                  <CommentList
+                    comments={commentsQuery.data ?? []}
+                    isLoading={commentsQuery.isLoading}
+                    onAddComment={handleAddComment}
+                  />
                 ) : (
                   <div className="text-center py-6">
                     <p className="text-sm text-muted-foreground mb-4">

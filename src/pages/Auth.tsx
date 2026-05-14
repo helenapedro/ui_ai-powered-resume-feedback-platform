@@ -9,6 +9,9 @@ import { DEFAULT_REDIRECT, GOOGLE_GSI_SCRIPT } from '@/pages/auth/constants';
 import { useAuthPageActions } from '@/pages/auth/useAuthPageActions';
 import '@/pages/auth/types';
 
+let initializedGoogleClientId: string | null = null;
+let googleCredentialHandler: ((credential: string | undefined) => void) | null = null;
+
 export default function Auth() {
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get('redirect') || DEFAULT_REDIRECT;
@@ -29,18 +32,25 @@ export default function Auth() {
   useEffect(() => {
     if (!googleClientId) return;
 
+    googleCredentialHandler = (credential) => {
+      if (!credential) {
+        showMissingGoogleCredentialError();
+        return;
+      }
+      handleGoogleCredential(credential);
+    };
+
     const init = () => {
       if (!window.google) return;
-      window.google.accounts.id.initialize({
-        client_id: googleClientId,
-        callback: ({ credential }) => {
-          if (!credential) {
-            showMissingGoogleCredentialError();
-            return;
-          }
-          handleGoogleCredential(credential);
-        },
-      });
+
+      if (initializedGoogleClientId !== googleClientId) {
+        window.google.accounts.id.initialize({
+          client_id: googleClientId,
+          callback: ({ credential }) => googleCredentialHandler?.(credential),
+        });
+        initializedGoogleClientId = googleClientId;
+      }
+
       setGoogleReady(true);
     };
 
@@ -61,7 +71,10 @@ export default function Auth() {
     script.defer = true;
     script.addEventListener('load', init);
     document.head.appendChild(script);
-    return () => script.removeEventListener('load', init);
+    return () => {
+      script.removeEventListener('load', init);
+      googleCredentialHandler = null;
+    };
   }, [googleClientId, handleGoogleCredential, showMissingGoogleCredentialError]);
 
   const handleGoogleClick = useCallback(() => {

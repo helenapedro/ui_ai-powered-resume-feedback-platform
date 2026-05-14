@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { ResumeCard, ResumeCardSkeleton } from '@/components/ResumeCard';
@@ -6,41 +6,30 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { resumeService } from '@/services/resumes';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { getPinnedResumeIds, togglePinnedResumeId } from '@/lib/pinned-resumes';
+import { useResumesQuery } from '@/features/resumes/queries';
 import type { ResumeSummary } from '@/types';
 import { Calendar, FileText, Pin, Plus, Search, Upload } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function MyResumes() {
-  const [resumes, setResumes] = useState<ResumeSummary[]>([]);
   const [pinnedResumeIds, setPinnedResumeIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const { user } = useAuth();
+  const { data: resumes = [], isLoading, error } = useResumesQuery();
 
-  const fetchResumes = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const data = await resumeService.getAllResumes();
-      setResumes(data);
-    } catch (error) {
+  useEffect(() => {
+    if (error) {
       toast({
         variant: 'destructive',
         title: 'Unable to load resumes',
         description: error instanceof Error ? error.message : 'Please try again.',
       });
-    } finally {
-      setIsLoading(false);
     }
-  }, [toast]);
-
-  useEffect(() => {
-    void fetchResumes();
-  }, [fetchResumes]);
+  }, [error, toast]);
 
   useEffect(() => {
     if (!user?.id) {

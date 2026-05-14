@@ -1,11 +1,10 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { resumeService } from '@/services/resumes';
 import { useToast } from '@/hooks/use-toast';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { useAddResumeVersionMutation, useCreateResumeMutation } from '@/features/resumes/queries';
 import {
   resetUploadState,
-  setFile,
   setIsDragging,
   setIsUploading,
   setProgress,
@@ -20,11 +19,14 @@ export function useUploadPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
-  const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const resumeId = searchParams.get('resumeId');
   const isAddingVersion = !!resumeId;
+  const createResumeMutation = useCreateResumeMutation();
+  const addVersionMutation = useAddResumeVersionMutation(resumeId);
+  const [file, setFile] = useState<File | null>(null);
+  const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const { file, title, isUploading, progress, isDragging } = useAppSelector(
+  const { title, isUploading, progress, isDragging } = useAppSelector(
     (state) => state.upload
   );
 
@@ -38,6 +40,7 @@ export function useUploadPage() {
   useEffect(() => {
     return () => {
       clearProgressInterval();
+      setFile(null);
       dispatch(resetUploadState());
     };
   }, [clearProgressInterval, dispatch]);
@@ -62,9 +65,9 @@ export function useUploadPage() {
         return;
       }
 
-      dispatch(setFile(nextFile));
+      setFile(nextFile);
     },
-    [dispatch, toast]
+    [toast]
   );
 
   const handleDrop = useCallback(
@@ -125,14 +128,14 @@ export function useUploadPage() {
 
       try {
         if (isAddingVersion && resumeId) {
-          await resumeService.addVersion(resumeId, file);
+          await addVersionMutation.mutateAsync(file);
           toast({
             title: 'New version added',
             description: 'The new version was added successfully.',
           });
           navigate(`/resume/${resumeId}`);
         } else {
-          const resume = await resumeService.createResume(file, title || undefined);
+          const resume = await createResumeMutation.mutateAsync({ file, title: title || undefined });
           toast({
             title: 'Resume created',
             description: 'Your resume was uploaded successfully.',
@@ -154,7 +157,18 @@ export function useUploadPage() {
         dispatch(setIsUploading(false));
       }
     },
-    [clearProgressInterval, dispatch, file, isAddingVersion, navigate, resumeId, title, toast]
+    [
+      addVersionMutation,
+      clearProgressInterval,
+      createResumeMutation,
+      dispatch,
+      file,
+      isAddingVersion,
+      navigate,
+      resumeId,
+      title,
+      toast,
+    ]
   );
 
   return {
@@ -165,7 +179,7 @@ export function useUploadPage() {
     isDragging,
     isAddingVersion,
     setTitle: (value: string) => dispatch(setTitle(value)),
-    clearFile: () => dispatch(setFile(null)),
+    clearFile: () => setFile(null),
     handleDrop,
     handleDragOver,
     handleDragLeave,

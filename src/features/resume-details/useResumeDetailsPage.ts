@@ -1,70 +1,64 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { resumeService } from '@/services/resumes';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
-  addComment,
-  createShareLink,
-  deleteComment,
-  deleteResume,
-  fetchComments,
-  fetchResumeDetails,
-  fetchSharedLinks,
-  resetResumeDetailsState,
-  revokeShareLink,
-  setPreviewVersionId,
-} from '@/store/slices/resumeDetailsSlice';
+  useAddCommentMutation,
+  useCreateShareLinkMutation,
+  useDeleteCommentMutation,
+  useDeleteResumeMutation,
+  useResumeCommentsQuery,
+  useResumeDetailsQuery,
+  useRevokeShareLinkMutation,
+  useShareLinksQuery,
+} from '@/features/resumes/queries';
 import type { ShareLinkFormData } from '@/components/ShareLinkModal';
+import type { ResumeVersion } from '@/types';
+
+const EMPTY_VERSIONS: ResumeVersion[] = [];
 
 export function useResumeDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const dispatch = useAppDispatch();
   const token = localStorage.getItem('token');
-  const state = useAppSelector((store) => store.resumeDetails);
+  const [previewVersionId, setPreviewVersionId] = useState<string | null>(null);
+  const resumeQuery = useResumeDetailsQuery(id);
+  const shareLinksQuery = useShareLinksQuery(id);
+  const resume = resumeQuery.data?.resume ?? null;
+  const versions = resumeQuery.data?.versions ?? EMPTY_VERSIONS;
+  const activePreviewId = previewVersionId || resume?.currentVersionId || null;
+  const commentsQuery = useResumeCommentsQuery(id, activePreviewId);
+  const addCommentMutation = useAddCommentMutation(id, activePreviewId);
+  const deleteCommentMutation = useDeleteCommentMutation(id, activePreviewId);
+  const createShareLinkMutation = useCreateShareLinkMutation(id);
+  const revokeShareLinkMutation = useRevokeShareLinkMutation(id);
+  const deleteResumeMutation = useDeleteResumeMutation();
 
   useEffect(() => {
-    if (!id) {
+    setPreviewVersionId(null);
+  }, [id]);
+
+  useEffect(() => {
+    if (!resumeQuery.error) {
       return;
     }
 
-    void dispatch(fetchResumeDetails(id))
-      .unwrap()
-      .catch((error) => {
-        toast({
-          variant: 'destructive',
-          title: 'Unable to load resume',
-          description: error instanceof Error ? error.message : 'Please try again.',
-        });
-        navigate('/my-resumes');
-      });
-
-    void dispatch(fetchSharedLinks(id));
-
-    return () => {
-      dispatch(resetResumeDetailsState());
-    };
-  }, [dispatch, id, navigate, toast]);
-
-  const activePreviewId = state.previewVersionId || state.resume?.currentVersionId || null;
-
-  useEffect(() => {
-    if (!id || !activePreviewId) {
-      return;
-    }
-
-    void dispatch(fetchComments({ resumeId: id, versionId: activePreviewId }));
-  }, [activePreviewId, dispatch, id]);
+    toast({
+      variant: 'destructive',
+      title: 'Unable to load resume',
+      description: resumeQuery.error instanceof Error ? resumeQuery.error.message : 'Please try again.',
+    });
+    navigate('/my-resumes');
+  }, [navigate, resumeQuery.error, toast]);
 
   const currentVersion = useMemo(
-    () => state.versions.find((version) => version.id === state.resume?.currentVersionId),
-    [state.resume?.currentVersionId, state.versions]
+    () => versions.find((version) => version.id === resume?.currentVersionId),
+    [resume?.currentVersionId, versions]
   );
 
-  const previewUrl = activePreviewId && state.resume
-    ? resumeService.getVersionPreviewUrl(state.resume.id, activePreviewId)
+  const previewUrl = activePreviewId && resume
+    ? resumeService.getVersionPreviewUrl(resume.id, activePreviewId)
     : null;
 
   const authHeaders = useMemo(
@@ -78,9 +72,9 @@ export function useResumeDetailsPage() {
         return;
       }
 
-      await dispatch(addComment({ resumeId: id, versionId: activePreviewId, body: content })).unwrap();
+      await addCommentMutation.mutateAsync(content);
     },
-    [activePreviewId, dispatch, id]
+    [activePreviewId, addCommentMutation, id]
   );
 
   const handleDeleteComment = useCallback(
@@ -89,9 +83,9 @@ export function useResumeDetailsPage() {
         return;
       }
 
-      await dispatch(deleteComment({ resumeId: id, versionId: activePreviewId, commentId })).unwrap();
+      await deleteCommentMutation.mutateAsync(commentId);
     },
-    [activePreviewId, dispatch, id]
+    [activePreviewId, deleteCommentMutation, id]
   );
 
   const handleCreateShareLink = useCallback(
@@ -100,16 +94,11 @@ export function useResumeDetailsPage() {
         return;
       }
 
-      const newLink = await dispatch(
-        createShareLink({
-          resumeId: id,
-          data: {
-            permission: data.permission,
-            expiresAt: data.expiresAt,
-            maxUses: data.maxUses,
-          },
-        })
-      ).unwrap();
+      const newLink = await createShareLinkMutation.mutateAsync({
+        permission: data.permission,
+        expiresAt: data.expiresAt,
+        maxUses: data.maxUses,
+      });
 
       const url = `${window.location.origin}/share/${newLink.token}`;
       await navigator.clipboard.writeText(url);
@@ -118,7 +107,7 @@ export function useResumeDetailsPage() {
         description: 'The share link was copied to your clipboard.',
       });
     },
-    [dispatch, id, toast]
+    [createShareLinkMutation, id, toast]
   );
 
   const handleRevokeLink = useCallback(
@@ -127,10 +116,10 @@ export function useResumeDetailsPage() {
         return;
       }
 
-      await dispatch(revokeShareLink({ resumeId: id, linkId })).unwrap();
+      await revokeShareLinkMutation.mutateAsync(linkId);
       toast({ title: 'Link revoked' });
     },
-    [dispatch, id, toast]
+    [id, revokeShareLinkMutation, toast]
   );
 
   const handleDeleteResume = useCallback(async () => {
@@ -138,26 +127,26 @@ export function useResumeDetailsPage() {
       return;
     }
 
-    await dispatch(deleteResume(id)).unwrap();
+    await deleteResumeMutation.mutateAsync(id);
     toast({ title: 'Resume deleted' });
     navigate('/my-resumes');
-  }, [dispatch, id, navigate, toast]);
+  }, [deleteResumeMutation, id, navigate, toast]);
 
   return {
-    resume: state.resume,
-    versions: state.versions,
-    sharedLinks: state.sharedLinks,
-    comments: state.comments,
-    isLoading: state.isLoadingResume,
-    isDeleting: state.isDeletingResume,
-    isLoadingLinks: state.isLoadingLinks,
-    isLoadingComments: state.isLoadingComments,
-    isCreatingLink: state.isCreatingLink,
+    resume,
+    versions,
+    sharedLinks: shareLinksQuery.data ?? [],
+    comments: commentsQuery.data ?? [],
+    isLoading: resumeQuery.isLoading,
+    isDeleting: deleteResumeMutation.isPending,
+    isLoadingLinks: shareLinksQuery.isLoading,
+    isLoadingComments: commentsQuery.isLoading,
+    isCreatingLink: createShareLinkMutation.isPending,
     currentVersion,
     activePreviewId,
     previewUrl,
     authHeaders,
-    setPreviewVersion: (versionId: string | null) => dispatch(setPreviewVersionId(versionId)),
+    setPreviewVersion: setPreviewVersionId,
     handleAddComment,
     handleDeleteComment,
     handleCreateShareLink,

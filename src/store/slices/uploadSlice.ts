@@ -1,7 +1,6 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 type UploadState = {
-  file: File | null;
   title: string;
   isUploading: boolean;
   progress: number;
@@ -9,7 +8,6 @@ type UploadState = {
 };
 
 const initialState: UploadState = {
-  file: null,
   title: '',
   isUploading: false,
   progress: 0,
@@ -20,9 +18,6 @@ const uploadSlice = createSlice({
   name: 'upload',
   initialState,
   reducers: {
-    setFile(state, action: PayloadAction<File | null>) {
-      state.file = action.payload;
-    },
     setTitle(state, action: PayloadAction<string>) {
       state.title = action.payload;
     },
@@ -42,7 +37,6 @@ const uploadSlice = createSlice({
 });
 
 export const {
-  setFile,
   setTitle,
   setIsUploading,
   setProgress,

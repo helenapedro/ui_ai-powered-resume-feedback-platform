@@ -1,9 +1,16 @@
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { FileText, Menu, User, LogOut, ChevronRight, Info, LogIn } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { FileText, Menu, User, LogOut, ChevronRight, Info, LogIn } from 'lucide-react';
-import { useState } from 'react';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 
 export function Header() {
   const { isAuthenticated, logout } = useAuth();
@@ -68,6 +75,10 @@ export function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-64">
+              <SheetHeader className="sr-only">
+                <SheetTitle>Navigation menu</SheetTitle>
+                <SheetDescription>Primary navigation links and account actions.</SheetDescription>
+              </SheetHeader>
               <nav className="flex flex-col gap-4 mt-8">
                 {isAuthenticated ? (
                   <>
