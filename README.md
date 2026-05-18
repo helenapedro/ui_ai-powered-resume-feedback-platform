@@ -1,6 +1,6 @@
 # Resume Feedback Frontend
 
-Frontend SPA for uploading, versioning, sharing, and collaboratively reviewing resumes, with AI-generated feedback and JWT/Google authentication.
+Frontend SPA for uploading, versioning, sharing, and collaboratively reviewing resumes, with AI-generated feedback.
 
 The project consumes an external API for authentication, user management, file handling, comments, public share links, and asynchronous AI analysis.
 
