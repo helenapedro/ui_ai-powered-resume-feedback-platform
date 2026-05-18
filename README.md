@@ -1,31 +1,31 @@
 # Resume Feedback Frontend
 
-Frontend SPA for uploading, versioning, sharing, and collaboratively reviewing resumes, with AI-generated feedback and JWT/Google authentication.
+Frontend application for a version-aware resume review workflow. Users can upload resumes, manage multiple versions, preview the selected file, generate AI feedback, create controlled share links, and collect comments in context.
 
-The project consumes an external API for authentication, user management, file handling, comments, public share links, and asynchronous AI analysis.
+This project is a React SPA that talks to an external backend API for authentication, resume storage, sharing, comments, and asynchronous AI analysis.
 
-## Overview
+## Product Scope
 
-The product currently supports these main flows:
+The current app supports:
 
-- email/password authentication
-- Google sign-in and registration through Google Identity Services
-- resume upload and new version submission
-- file preview and download
-- share link creation and revocation
+- email/password sign up and sign in
+- Google sign in via Google Identity Services
+- resume creation and version uploads
+- version-aware preview and download
+- AI feedback generation with async job polling
+- recruiter-style feedback display with summary, strengths, and improvements
+- share link creation, revocation, expiration, and usage limits
 - version-specific comments
-- AI feedback with async job polling
+- pinned resumes and dashboard search
 - basic profile management
-- resume pinning and title search in the dashboard
 
-## Stack
+## Tech Stack
 
 - React 18
 - TypeScript
 - Vite 5
 - React Router 6
-- Redux Toolkit
-- React Redux
+- Redux Toolkit + React Redux
 - TanStack Query
 - Tailwind CSS
 - shadcn/ui + Radix UI
@@ -33,52 +33,83 @@ The product currently supports these main flows:
 - Zod
 - react-pdf
 
-## Architecture
+## Application Structure
 
-The application is organized into a few clear layers:
+The codebase is organized by responsibility:
 
-- `src/pages`: route-level screens
-- `src/components`: reusable UI and feature components
-- `src/features`: feature-specific hooks and orchestration logic
-- `src/store`: Redux store, typed hooks, and slices
-- `src/services`: HTTP client and domain services
-- `src/contexts`: compatibility and global providers
-- `src/types`: shared TypeScript contracts
+- `src/pages` route-level screens
+- `src/components` reusable UI and feature components
+- `src/components/ai-feedback` modularized AI feedback presentation components
+- `src/features` feature hooks and orchestration logic
+- `src/store` Redux store, slices, and typed hooks
+- `src/services` API client and service layer
+- `src/contexts` app-wide providers and compatibility wrappers
+- `src/lib` small shared utilities
+- `src/types` shared TypeScript contracts
 
-State management currently follows this model:
+## UI Architecture
 
-- critical global state and async flows live in Redux
-- short-lived, purely visual state stays local to components
-- API access is centralized in `src/services`
+The UI layer is intentionally split across route screens, feature orchestration, and reusable presentation components.
 
-Current slices:
+- `src/pages` owns route composition, page shells, and page-level layout
+- `src/features` owns stateful hooks and feature orchestration
+- `src/components` owns reusable presentational building blocks and feature UI
+- `src/components/ui` owns low-level design-system primitives
+- `src/components/ai-feedback` is the current example of a feature UI broken into focused modules instead of one large file
 
-- `authSlice`
-- `uploadSlice`
-- `resumeDetailsSlice`
-- `aiFeedbackSlice`
+Typical flow:
 
-Current feature hooks:
+1. a route component in `src/pages` renders the screen shell
+2. the page or feature component calls a hook from `src/features`
+3. that hook coordinates Redux actions, queries, and service calls
+4. resulting data is passed into focused presentational components in `src/components`
 
-- `src/features/upload/useUploadPage.ts`
-- `src/features/resume-details/useResumeDetailsPage.ts`
-- `src/features/ai/useAiFeedback.ts`
+The goal is to keep business flow and async coordination out of large JSX files, while avoiding premature abstraction for simple screens.
 
-## Routes
+For the deeper UI-layer conventions, see [docs/ui-architecture.md](docs/ui-architecture.md).
 
-Public:
+## Main Routes
+
+Public routes:
 
 - `/`
 - `/about`
 - `/auth`
 - `/share/:token`
 
-Protected:
+Protected routes:
 
 - `/my-resumes`
 - `/upload`
 - `/resume/:id`
 - `/profile`
+
+## AI Feedback Model
+
+The backend returns feedback in this shape:
+
+```ts
+{
+  summary: string;
+  strengths: string[];
+  improvements: string[];
+}
+```
+
+On the frontend, each resume version can have an async AI job with status:
+
+- `PENDING`
+- `PROCESSING`
+- `DONE`
+- `FAILED`
+
+When a job completes, the UI renders:
+
+- an overall assessment from `summary`
+- a "What's Working" section from `strengths`
+- a "What's Holding It Back" section from `improvements`
+
+Items with prefixes like `Experience: ...` or `Skills: ...` are parsed and shown with structured labels in the UI.
 
 ## Environment Variables
 
@@ -86,15 +117,16 @@ Create a `.env` file in the project root:
 
 ```bash
 VITE_API_URL=https://your-api-host.com
-VITE_GOOGLE_CLIENT_ID=your_google_oauth_client_id
+VITE_GOOGLE_CLIENT_ID=your_google_client_id
 ```
 
 Notes:
 
-- `VITE_API_URL` may be provided with or without `/api`; the client normalizes the base URL internally
-- `VITE_GOOGLE_CLIENT_ID` is required to render and use Google sign-in
+- `VITE_API_URL` is optional. If omitted, the app defaults to `https://resumefeedback-api.hmpedro.com`
+- if `VITE_API_URL` ends with `/api`, the frontend normalizes it automatically
+- `VITE_GOOGLE_CLIENT_ID` is required for Google sign in
 
-## Setup
+## Local Development
 
 Prerequisites:
 
@@ -107,7 +139,7 @@ Install dependencies:
 npm install
 ```
 
-Start development:
+Start the dev server:
 
 ```bash
 npm run dev
@@ -119,7 +151,7 @@ Build for production:
 npm run build
 ```
 
-Preview the production build locally:
+Preview the production build:
 
 ```bash
 npm run preview
@@ -131,7 +163,7 @@ Run lint:
 npm run lint
 ```
 
-## Scripts
+## Available Scripts
 
 ```json
 {
@@ -143,104 +175,66 @@ npm run lint
 }
 ```
 
-## API Integration
+## State and Data Flow
 
-The frontend uses a small, explicit service layer in `src/services`.
+The app currently uses both Redux Toolkit and TanStack Query:
 
-Important details:
+- Redux manages auth, upload flow, resume details, comments, share links, and AI feedback job state
+- TanStack Query is used for resume list fetching
+- local component state handles transient UI-only behavior
 
-- `api-config.ts` normalizes the base URL
-- `api-client.ts` injects the JWT token from `localStorage`
-- requests that are not `FormData` are sent as JSON
-- API errors are converted into a consistent frontend error shape
-- preview/download endpoints use direct URLs because they may return `302` redirects
+Current Redux slices:
 
-Current default API base:
+- `authSlice`
+- `uploadSlice`
+- `resumeDetailsSlice`
+- `aiFeedbackSlice`
 
-```text
-https://resumefeedback-api.hmpedro.com
-```
+Important feature hooks:
 
-## Authentication
+- `src/features/upload/useUploadPage.ts`
+- `src/features/resume-details/useResumeDetailsPage.ts`
+- `src/features/ai/useAiFeedback.ts`
 
-The current auth model is simple and pragmatic:
+## API Integration Notes
 
-- the JWT access token is stored in `localStorage`
-- the user is reconstructed from the token payload
-- auth bootstrap is driven by the Redux store
-- `useAuth()` still exists as a compatibility interface for the rest of the app
-- protected pages are enforced through `ProtectedRoute`
+- `src/services/api-config.ts` normalizes the backend base URL
+- `src/services/api-client.ts` injects the JWT token from `localStorage`
+- non-`FormData` requests are sent as JSON
+- preview and file endpoints may use direct URLs instead of standard JSON fetch flows
+- API failures are mapped into a normalized frontend error shape
 
-Supported flows:
+## Authentication Notes
+
+Current auth behavior:
+
+- JWT access token is stored in `localStorage`
+- the frontend reconstructs user state from the token payload
+- `ProtectedRoute` guards authenticated pages
+- `AuthProvider` exposes a compatibility layer for the rest of the app
+
+Supported auth flows:
 
 - register with email/password
-- login with email/password
-- login/register with Google
-- reactivate account through a backend endpoint
+- sign in with email/password
+- sign in with Google
 
-## Main Features
+## Current UX Areas
 
-### Resume Management
+- landing and about pages describe the product workflow
+- dashboard shows searchable and pinnable resume workflows
+- upload page supports new resumes and additional versions
+- resume details page combines preview, version history, AI feedback, comments, and share links
+- shared resume page supports external review through tokenized access
 
-- upload an initial resume
-- add new versions to an existing resume
-- view version history
-- preview the current or selected version
-- pin important resumes to the top of the dashboard
-- search resumes by title
+## Project Notes
 
-### Sharing and Collaboration
+- the app currently has no automated test suite wired into `package.json`
+- the production build currently emits a large chunk warning, so code-splitting is still a useful next step
+- the repository contains both `package-lock.json` and `bun.lockb`; standardizing on one package manager would reduce drift
+- local storage is currently used for auth token persistence and pinned resume preferences
 
-- create links with permission, expiration, and usage limits
-- revoke existing links
-- comment on the version currently being previewed
+## Related Docs
 
-### AI Feedback
-
-- fetch the latest AI job per version
-- poll automatically while the job is `PENDING` or `PROCESSING`
-- load feedback when the job completes successfully
-- regenerate feedback manually
-
-## Relevant Structure
-
-- main store in `src/store/index.ts`
-- typed Redux hooks in `src/store/hooks.ts`
-- auth logic in `src/store/slices/authSlice.ts`
-- upload logic in `src/store/slices/uploadSlice.ts`
-- resume details logic in `src/store/slices/resumeDetailsSlice.ts`
-- AI feedback logic in `src/store/slices/aiFeedbackSlice.ts`
-- upload orchestration in `src/features/upload/useUploadPage.ts`
-- resume details orchestration in `src/features/resume-details/useResumeDetailsPage.ts`
-- AI polling orchestration in `src/features/ai/useAiFeedback.ts`
-- pinned resume persistence in `src/lib/pinned-resumes.ts`
-
-## Project Status
-
-Currently validated:
-
-- Redux dependencies are installed
-- production build passes with `npm run build`
-- the most state-heavy flows have already been moved to Redux-backed feature modules
-- the UI language has been migrated to English
-
-Technical notes:
-
-- there is still no automated test suite wired into `package.json`
-- tokens still live in `localStorage`, which is functional but not the strongest model for higher-security environments
-- there are still large files in the codebase, especially `Profile.tsx` and some reusable components
-- the production bundle still emits a large chunk warning, which points to code-splitting/manual chunking as a next step
-- the repository contains both `package-lock.json` and `bun.lockb`; the team should standardize on one package manager
-
-## Recommended Next Steps
-
-- continue refactoring the largest files into smaller feature modules/hooks
-- add unit tests for services, slices, and critical hooks
-- add integration tests for auth, upload, and resume details
-- create a `.env.example`
-- add CI for lint and build
-- evaluate code-splitting to reduce the initial bundle size
-
-## Note
-
-Backend handoff documentation is available at `docs/frontend-handoff.local.md`, which is useful for local integration and endpoint troubleshooting.
+- `docs/frontend-handoff.local.md` for backend integration and local handoff notes
+- `docs/ui-architecture.md` for UI-layer structure, boundaries, and conventions
