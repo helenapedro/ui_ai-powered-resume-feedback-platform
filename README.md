@@ -1,4 +1,4 @@
-# Resume Feedback Frontend
+# AI-powered Resume Feedback Platform
 
 Frontend application for a version-aware resume review workflow. Users can upload resumes, manage multiple versions, preview the selected file, generate AI feedback, create controlled share links, and collect comments in context.
 
