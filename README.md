@@ -1,5 +1,6 @@
 # Resume Feedback Frontend
 
+Frontend SPA for uploading, versioning, sharing, and collaboratively reviewing resumes, with AI-generated feedback.
 Frontend application for a version-aware resume review workflow. Users can upload resumes, manage multiple versions, preview the selected file, generate AI feedback, create controlled share links, and collect comments in context.
 
 This project is a React SPA that talks to an external backend API for authentication, resume storage, sharing, comments, and asynchronous AI analysis.
