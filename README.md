@@ -1,6 +1,12 @@
 # AI-powered Resume Feedback Platform
 
-Frontend application for a version-aware resume review workflow. Users can upload resumes, manage multiple versions, preview the selected file, generate AI feedback, create controlled share links, and collect comments in context.
+Frontend application for a version-aware resume review workflow.
+
+**The project was recently [Featured in the Handshake AI Showcase](https://app.joinhandshake.com/ai-showcase?project_id=3056375) as part of the OpenAI Developers x Handshake Codex Creator Challenge.**
+
+![Handshake Featured Image](./docs/project-images/handshake_featured.png)
+
+Users can upload resumes, manage multiple versions, preview the selected file, generate AI feedback, create controlled share links, and collect comments in context.
 
 This project is a React SPA that talks to an external backend API for authentication, resume storage, sharing, comments, and asynchronous AI analysis.
 

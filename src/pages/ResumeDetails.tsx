@@ -67,7 +67,11 @@ export default function ResumeDetails() {
         />
 
         <div className="mx-auto max-w-[1440px] space-y-6">
-          <ResumeFeedbackSection resumeId={resume.id} versionId={activePreviewId} />
+          <ResumeFeedbackSection
+            resumeId={resume.id}
+            version={activePreviewVersion}
+            versions={versions}
+          />
 
           <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
             <div className="min-w-0 space-y-6">

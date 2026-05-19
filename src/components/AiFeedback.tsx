@@ -1,23 +1,32 @@
 import { useAiFeedback } from '@/features/ai/useAiFeedback';
+import { useAiProgress } from '@/features/ai/useAiProgress';
 import { feedbackStatusConfig } from '@/components/ai-feedback/constants';
 import { FeedbackCardShell } from '@/components/ai-feedback/FeedbackCardShell';
 import { FeedbackCompletedView } from '@/components/ai-feedback/FeedbackCompletedView';
+import { ProgressReviewCard } from '@/components/ai-feedback/ProgressReviewCard';
 import {
   FeedbackLoadingState,
   FeedbackMessageState,
   FeedbackProcessingState,
 } from '@/components/ai-feedback/FeedbackStates';
+import type { ResumeVersion } from '@/types';
 
 interface AiFeedbackProps {
   resumeId: string;
   versionId: string;
+  versionNumber: number;
+  versions: ResumeVersion[];
 }
 
-export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
+export function AiFeedback({ resumeId, versionId, versionNumber, versions }: AiFeedbackProps) {
   const { job, feedback, isLoading, error, isRegenerating, handleRegenerate } = useAiFeedback(
     resumeId,
     versionId
   );
+  const progressState = useAiProgress(resumeId, versionId, versionNumber > 1);
+  const baselineVersionNumber = versions.find(
+    (version) => version.id === progressState.progress?.baselineResumeVersionId
+  )?.versionNumber;
 
   if (isLoading) {
     return (
@@ -64,6 +73,16 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
           : undefined
       }
     >
+      <ProgressReviewCard
+        baselineVersionNumber={baselineVersionNumber}
+        currentVersionNumber={versionNumber}
+        error={progressState.error}
+        hasPreviousVersion={progressState.hasPreviousVersion}
+        isPending={progressState.isPending}
+        isUnavailable={progressState.isUnavailable}
+        progress={progressState.progress}
+      />
+
       {(job.status === 'PENDING' || job.status === 'PROCESSING') && <FeedbackProcessingState />}
 
       {error && job.status === 'FAILED' && (
@@ -96,7 +115,9 @@ export function AiFeedback({ resumeId, versionId }: AiFeedbackProps) {
         />
       )}
 
-      {feedback && job.status === 'DONE' && <FeedbackCompletedView feedback={feedback} />}
+      {feedback && job.status === 'DONE' && (
+        <FeedbackCompletedView feedback={feedback} versionNumber={versionNumber} />
+      )}
 
       {!feedback && job.status === 'DONE' && !error && (
         <FeedbackMessageState

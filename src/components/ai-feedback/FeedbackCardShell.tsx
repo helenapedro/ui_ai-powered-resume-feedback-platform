@@ -24,12 +24,12 @@ export function FeedbackCardShell({ children, action, description, status }: Fee
                 <Brain className="h-5 w-5 text-primary" />
               </div>
               <div className="space-y-1">
-                <CardTitle className="text-xl sm:text-2xl">AI Feedback</CardTitle>
+                <CardTitle className="text-xl sm:text-2xl">AI Review</CardTitle>
               </div>
             </div>
             <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
               {description ??
-                'A structured read on the selected resume version: overall assessment, strength signals, and the gaps most likely to affect reviewer confidence.'}
+                'Review for the selected resume version, including version-to-version progress when available.'}
             </p>
           </div>
 

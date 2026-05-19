@@ -1,16 +1,23 @@
 import { AiFeedback } from '@/components/AiFeedback';
 import { Card, CardContent } from '@/components/ui/card';
+import type { ResumeVersion } from '@/types';
 
 interface ResumeFeedbackSectionProps {
   resumeId: string;
-  versionId: string | null;
+  version: ResumeVersion | undefined;
+  versions: ResumeVersion[];
 }
 
-export function ResumeFeedbackSection({ resumeId, versionId }: ResumeFeedbackSectionProps) {
+export function ResumeFeedbackSection({ resumeId, version, versions }: ResumeFeedbackSectionProps) {
   return (
     <section>
-      {versionId ? (
-        <AiFeedback resumeId={resumeId} versionId={versionId} />
+      {version ? (
+        <AiFeedback
+          resumeId={resumeId}
+          versionId={version.id}
+          versionNumber={version.versionNumber}
+          versions={versions}
+        />
       ) : (
         <Card>
           <CardContent className="flex min-h-40 items-center justify-center text-sm text-muted-foreground">

@@ -127,3 +127,23 @@ export interface AiFeedbackDTO {
   strengths: string[];
   improvements: string[];
 }
+
+export type AiProgressStatus = 'IMPROVED' | 'UNCHANGED' | 'DECLINED';
+
+export interface AiProgressDTO {
+  resumeId: string;
+  resumeVersionId: string;
+  baselineResumeVersionId: string;
+  jobId: string;
+  progressVersion: number;
+  mongoDocId: string;
+  model: string;
+  promptVersion: string;
+  createdAt: string;
+  summary: string;
+  progressStatus: AiProgressStatus;
+  progressScore: number;
+  improvedAreas: string[];
+  unchangedIssues: string[];
+  newIssues: string[];
+}

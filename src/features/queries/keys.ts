@@ -9,6 +9,8 @@ export const queryKeys = {
       ['resumes', resumeId, 'versions', versionId, 'ai-job'] as const,
     aiFeedback: (resumeId: string, versionId: string) =>
       ['resumes', resumeId, 'versions', versionId, 'ai-feedback'] as const,
+    aiProgress: (resumeId: string, versionId: string) =>
+      ['resumes', resumeId, 'versions', versionId, 'ai-progress'] as const,
   },
   sharedResume: {
     detail: (token: string) => ['shared-resume', token] as const,

@@ -8,15 +8,21 @@ import { parseFeedbackItem } from '@/components/ai-feedback/utils';
 
 interface FeedbackCompletedViewProps {
   feedback: AiFeedbackDTO;
+  versionNumber: number;
 }
 
-export function FeedbackCompletedView({ feedback }: FeedbackCompletedViewProps) {
+export function FeedbackCompletedView({ feedback, versionNumber }: FeedbackCompletedViewProps) {
   return (
     <div className="space-y-6">
       <section className="overflow-hidden rounded-[1.75rem] border border-primary/10 bg-[linear-gradient(135deg,hsl(var(--primary)/0.12),transparent_58%),linear-gradient(180deg,hsl(var(--background)),hsl(var(--background)))] p-6 shadow-sm sm:p-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-3xl space-y-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.26em] text-primary/75">Overall Assessment</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.26em] text-primary/75">
+              Feedback for v{versionNumber}
+            </p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+              Overall Assessment
+            </p>
             <p className="text-base leading-8 text-foreground/80 sm:text-lg">{feedback.summary}</p>
           </div>
 

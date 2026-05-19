@@ -24,6 +24,15 @@ export function useAiFeedbackQuery(resumeId: string, versionId: string, enabled:
   });
 }
 
+export function useAiProgressQuery(resumeId: string, versionId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: queryKeys.resumes.aiProgress(resumeId, versionId),
+    queryFn: () => aiService.getProgress(resumeId, versionId),
+    enabled: Boolean(resumeId && versionId && enabled),
+    retry: false,
+  });
+}
+
 export function useRegenerateAiFeedbackMutation(resumeId: string, versionId: string) {
   const queryClient = useQueryClient();
 
@@ -32,6 +41,9 @@ export function useRegenerateAiFeedbackMutation(resumeId: string, versionId: str
     onSuccess: () => {
       void queryClient.removeQueries({
         queryKey: queryKeys.resumes.aiFeedback(resumeId, versionId),
+      });
+      void queryClient.removeQueries({
+        queryKey: queryKeys.resumes.aiProgress(resumeId, versionId),
       });
       void queryClient.invalidateQueries({
         queryKey: queryKeys.resumes.aiJob(resumeId, versionId),
