@@ -12,7 +12,7 @@ interface ProgressReviewCardProps {
   progress: AiProgressDTO | null;
 }
 
-const progressStatusStyles: Record<AiProgressStatus, { label: string; badgeClassName: string; icon: typeof TrendingUp }> = {
+const progressStatusStyles: Record<string, { label: string; badgeClassName: string; icon: typeof TrendingUp }> = {
   IMPROVED: {
     label: 'Improved',
     badgeClassName:
@@ -32,6 +32,13 @@ const progressStatusStyles: Record<AiProgressStatus, { label: string; badgeClass
     icon: TrendingDown,
   },
 };
+
+const fallbackProgressStatus = {
+  label: 'Updated',
+  badgeClassName:
+    'border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-300',
+  icon: Minus,
+} as const;
 
 export function ProgressReviewCard({
   baselineVersionNumber,
@@ -101,7 +108,7 @@ export function ProgressReviewCard({
     );
   }
 
-  const statusPresentation = progressStatusStyles[progress.progressStatus];
+  const statusPresentation = getProgressStatusPresentation(progress.progressStatus);
   const StatusIcon = statusPresentation.icon;
 
   return (
@@ -205,4 +212,26 @@ function getProgressTitle(baselineVersionNumber: number | undefined, currentVers
   }
 
   return 'Progress Since Previous Version';
+}
+
+function getProgressStatusPresentation(status: AiProgressStatus) {
+  const normalizedStatus = status.trim().toUpperCase();
+
+  if (normalizedStatus in progressStatusStyles) {
+    return progressStatusStyles[normalizedStatus];
+  }
+
+  if (normalizedStatus === 'STABLE' || normalizedStatus === 'SAME') {
+    return progressStatusStyles.UNCHANGED;
+  }
+
+  if (normalizedStatus === 'REGRESSED' || normalizedStatus === 'WORSE') {
+    return progressStatusStyles.DECLINED;
+  }
+
+  if (normalizedStatus === 'BETTER') {
+    return progressStatusStyles.IMPROVED;
+  }
+
+  return fallbackProgressStatus;
 }

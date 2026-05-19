@@ -128,7 +128,7 @@ export interface AiFeedbackDTO {
   improvements: string[];
 }
 
-export type AiProgressStatus = 'IMPROVED' | 'UNCHANGED' | 'DECLINED';
+export type AiProgressStatus = string;
 
 export interface AiProgressDTO {
   resumeId: string;
