@@ -156,7 +156,20 @@ export default function ResumeDetails() {
           </div>
         </div>
 
-        <div className="mx-auto grid max-w-[1440px] gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
+        <div className="mx-auto max-w-[1440px] space-y-6">
+          <section>
+            {activePreviewId ? (
+              <AiFeedback resumeId={resume.id} versionId={activePreviewId} />
+            ) : (
+              <Card>
+                <CardContent className="flex min-h-40 items-center justify-center text-sm text-muted-foreground">
+                  Select a version to review AI feedback.
+                </CardContent>
+              </Card>
+            )}
+          </section>
+
+          <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
           <div className="min-w-0 space-y-6">
             <Card className="overflow-hidden">
               <CardHeader className="flex flex-col gap-4 border-b bg-background sm:flex-row sm:items-center sm:justify-between">
@@ -218,9 +231,8 @@ export default function ResumeDetails() {
             </div>
 
             <Tabs defaultValue="versions" className="w-full">
-              <TabsList className="grid h-auto w-full grid-cols-4">
+              <TabsList className="grid h-auto w-full grid-cols-3">
                 <TabsTrigger value="versions">Versions</TabsTrigger>
-                <TabsTrigger value="ai">AI</TabsTrigger>
                 <TabsTrigger value="comments">Comments</TabsTrigger>
                 <TabsTrigger value="share">Share</TabsTrigger>
               </TabsList>
@@ -234,18 +246,6 @@ export default function ResumeDetails() {
                   onPreview={setPreviewVersion}
                   isLoading={false}
                 />
-              </TabsContent>
-
-              <TabsContent value="ai" className="mt-4">
-                {activePreviewId ? (
-                  <AiFeedback resumeId={resume.id} versionId={activePreviewId} />
-                ) : (
-                  <Card>
-                    <CardContent className="flex min-h-40 items-center justify-center text-sm text-muted-foreground">
-                      Select a version to review AI feedback.
-                    </CardContent>
-                  </Card>
-                )}
               </TabsContent>
 
               <TabsContent value="comments" className="mt-4">
@@ -292,6 +292,7 @@ export default function ResumeDetails() {
               </TabsContent>
             </Tabs>
           </aside>
+          </div>
         </div>
 
         <ShareLinkModal

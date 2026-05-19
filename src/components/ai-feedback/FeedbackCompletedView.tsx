@@ -17,9 +17,6 @@ export function FeedbackCompletedView({ feedback }: FeedbackCompletedViewProps) 
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-3xl space-y-4">
             <p className="text-xs font-semibold uppercase tracking-[0.26em] text-primary/75">Overall Assessment</p>
-            <h3 className="text-3xl font-semibold leading-tight text-foreground sm:text-4xl">
-              Executive review of current resume positioning
-            </h3>
             <p className="text-base leading-8 text-foreground/80 sm:text-lg">{feedback.summary}</p>
           </div>
 

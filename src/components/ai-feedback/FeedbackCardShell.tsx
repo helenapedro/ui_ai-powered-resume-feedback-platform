@@ -24,9 +24,6 @@ export function FeedbackCardShell({ children, action, description, status }: Fee
                 <Brain className="h-5 w-5 text-primary" />
               </div>
               <div className="space-y-1">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-                  Recruiter Review
-                </p>
                 <CardTitle className="text-xl sm:text-2xl">AI Feedback</CardTitle>
               </div>
             </div>
