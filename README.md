@@ -2,15 +2,57 @@
 
 Frontend application for a version-aware resume review workflow.
 
-**The project was recently [Featured in the Handshake AI Showcase](https://app.joinhandshake.com/ai-showcase?project_id=3056375) as part of the OpenAI Developers x Handshake Codex Creator Challenge.**
+**Featured in the [Handshake AI Showcase](https://app.joinhandshake.com/ai-showcase?project_id=3056375) as part of the OpenAI Developers x Handshake Codex Creator Challenge.**
 
 ![Handshake Featured Image](./docs/project-images/handshake_featured.png)
 
-Users can upload resumes, manage multiple versions, preview the selected file, generate AI feedback, create controlled share links, and collect comments in context.
+## Why this project exists
 
-This project is a React SPA that talks to an external backend API for authentication, resume storage, sharing, comments, and asynchronous AI analysis.
+Most resume review workflows are fragmented.
 
-## Product Scope
+People usually end up with:
+
+- multiple renamed PDF files with no clear progression
+- isolated feedback that does not stay attached to the version being reviewed
+- generic AI suggestions that do not explain whether a new version actually improved
+- comments and collaboration spread across chat, email, and separate documents
+
+The result is noisy iteration. A candidate may get feedback on version 1, change the file, upload version 2, and still have no clear answer to the most important question:
+
+**Did this new version actually get better?**
+
+## The problem we solve
+
+This project turns resume review into a version-aware product workflow instead of a one-off file upload.
+
+It solves three practical problems:
+
+- `Review context loss`: feedback, comments, and file versions often drift apart
+- `Weak iteration visibility`: most tools can review a file, but cannot explain progress between versions
+- `Low-quality collaboration`: external reviewers need a simpler, controlled way to preview and comment without joining the full account workflow
+
+## The impact this creates
+
+The platform changes the user experience from “upload and get generic feedback” to “iterate with evidence.”
+
+That creates product impact in a few ways:
+
+- users can see both the current AI review and how the latest version compares to the previous one
+- improvements, unresolved issues, and new regressions become explicit
+- reviewers can comment in context on the version actually under discussion
+- version history stays structured, which makes resume iteration more disciplined and less chaotic
+
+In short, the product is designed to help job seekers improve faster because the system tracks not only what is wrong, but what changed.
+
+## Featured
+
+This project was also shared in a LinkedIn post about the Handshake feature.
+
+- [Open the embedded feature page](./docs/featured.html)
+- [Open the LinkedIn post directly](https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7462595076766982145)
+- [Open the Handshake showcase entry](https://app.joinhandshake.com/ai-showcase?project_id=3056375)
+
+## What the product does
 
 The current app supports:
 
@@ -19,11 +61,24 @@ The current app supports:
 - resume creation and version uploads
 - version-aware preview and download
 - AI feedback generation with async job polling
+- AI progress comparison between resume versions
 - recruiter-style feedback display with summary, strengths, and improvements
 - share link creation, revocation, expiration, and usage limits
 - version-specific comments
 - pinned resumes and dashboard search
 - basic profile management
+
+## Product model
+
+The product makes two different AI promises and keeps them separate in the UI:
+
+1. `AI Feedback for the current version`
+   This answers: “Is this version good?”
+
+2. `Progress since the previous version`
+   This answers: “Did this version improve compared to the last one?”
+
+That distinction is central to the product. The goal is not only to analyze resumes, but to support better iteration over time.
 
 ## Tech Stack
 
@@ -46,6 +101,7 @@ The codebase is organized by responsibility:
 - `src/pages` route-level screens
 - `src/components` reusable UI and feature components
 - `src/components/ai-feedback` modularized AI feedback presentation components
+- `src/components/resume-details` modularized resume details page components
 - `src/features` feature hooks and orchestration logic
 - `src/store` Redux store, slices, and typed hooks
 - `src/services` API client and service layer
@@ -61,7 +117,7 @@ The UI layer is intentionally split across route screens, feature orchestration,
 - `src/features` owns stateful hooks and feature orchestration
 - `src/components` owns reusable presentational building blocks and feature UI
 - `src/components/ui` owns low-level design-system primitives
-- `src/components/ai-feedback` is the current example of a feature UI broken into focused modules instead of one large file
+- feature folders like `src/components/ai-feedback` and `src/components/resume-details` keep larger areas maintainable
 
 Typical flow:
 
@@ -70,9 +126,7 @@ Typical flow:
 3. that hook coordinates Redux actions, queries, and service calls
 4. resulting data is passed into focused presentational components in `src/components`
 
-The goal is to keep business flow and async coordination out of large JSX files, while avoiding premature abstraction for simple screens.
-
-For the deeper UI-layer conventions, see [docs/ui-architecture.md](docs/ui-architecture.md).
+For deeper UI conventions, see [docs/ui-architecture.md](docs/ui-architecture.md).
 
 ## Main Routes
 
@@ -90,9 +144,9 @@ Protected routes:
 - `/resume/:id`
 - `/profile`
 
-## AI Feedback Model
+## AI data model
 
-The backend returns feedback in this shape:
+The backend returns version feedback in this shape:
 
 ```ts
 {
@@ -102,20 +156,23 @@ The backend returns feedback in this shape:
 }
 ```
 
-On the frontend, each resume version can have an async AI job with status:
+For version-to-version comparison, the backend also returns progress data:
 
-- `PENDING`
-- `PROCESSING`
-- `DONE`
-- `FAILED`
+```ts
+{
+  summary: string;
+  progressStatus: string;
+  progressScore: number;
+  improvedAreas: string[];
+  unchangedIssues: string[];
+  newIssues: string[];
+}
+```
 
-When a job completes, the UI renders:
+The frontend uses these two responses differently:
 
-- an overall assessment from `summary`
-- a "What's Working" section from `strengths`
-- a "What's Holding It Back" section from `improvements`
-
-Items with prefixes like `Experience: ...` or `Skills: ...` are parsed and shown with structured labels in the UI.
+- feedback explains the quality of the current version
+- progress explains what changed between the current version and the previous one
 
 ## Environment Variables
 
@@ -186,21 +243,15 @@ npm run lint
 The app currently uses both Redux Toolkit and TanStack Query:
 
 - Redux manages auth, upload flow, resume details, comments, share links, and AI feedback job state
-- TanStack Query is used for resume list fetching
+- TanStack Query is used for resume list fetching and newer API-backed query flows
 - local component state handles transient UI-only behavior
-
-Current Redux slices:
-
-- `authSlice`
-- `uploadSlice`
-- `resumeDetailsSlice`
-- `aiFeedbackSlice`
 
 Important feature hooks:
 
 - `src/features/upload/useUploadPage.ts`
 - `src/features/resume-details/useResumeDetailsPage.ts`
 - `src/features/ai/useAiFeedback.ts`
+- `src/features/ai/useAiProgress.ts`
 
 ## API Integration Notes
 
@@ -227,20 +278,18 @@ Supported auth flows:
 
 ## Current UX Areas
 
-- landing and about pages describe the product workflow
+- landing and about pages explain the problem and the workflow
 - dashboard shows searchable and pinnable resume workflows
 - upload page supports new resumes and additional versions
-- resume details page combines preview, version history, AI feedback, comments, and share links
+- resume details page combines AI review, progress comparison, preview, version history, comments, and share links
 - shared resume page supports external review through tokenized access
 
 ## Project Notes
 
-- the app currently has no automated test suite wired into `package.json`
-- the production build currently emits a large chunk warning, so code-splitting is still a useful next step
-- the repository contains both `package-lock.json` and `bun.lockb`; standardizing on one package manager would reduce drift
 - local storage is currently used for auth token persistence and pinned resume preferences
 
 ## Related Docs
 
+- `docs/featured.html` for the LinkedIn embed page
 - `docs/frontend-handoff.local.md` for backend integration and local handoff notes
 - `docs/ui-architecture.md` for UI-layer structure, boundaries, and conventions

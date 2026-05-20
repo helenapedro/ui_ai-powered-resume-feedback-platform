@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resume Feedback Platform - Featured</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f5f7fb;
+        --card: #ffffff;
+        --text: #16375b;
+        --muted: #5d7491;
+        --border: #d9e3ef;
+        --accent: #1f4a7a;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Inter, system-ui, sans-serif;
+        background: linear-gradient(180deg, #f7f9fc 0%, #eef3f9 100%);
+        color: var(--text);
+      }
+
+      .page {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 40px 20px 72px;
+      }
+
+      .hero {
+        margin-bottom: 24px;
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: clamp(32px, 5vw, 52px);
+        line-height: 1.05;
+      }
+
+      .hero p {
+        margin: 0;
+        max-width: 760px;
+        font-size: 18px;
+        line-height: 1.7;
+        color: var(--muted);
+      }
+
+      .card {
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        background: var(--card);
+        box-shadow: 0 20px 60px rgba(31, 74, 122, 0.08);
+        overflow: hidden;
+      }
+
+      .card-header {
+        padding: 24px 24px 0;
+      }
+
+      .card-header h2 {
+        margin: 0;
+        font-size: 22px;
+      }
+
+      .card-header p {
+        margin: 10px 0 0;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .embed-wrap {
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+      }
+
+      iframe {
+        width: 100%;
+        max-width: 504px;
+        min-height: 1677px;
+        border: 0;
+        border-radius: 16px;
+        background: #fff;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 0 24px 24px;
+      }
+
+      .actions a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 18px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 600;
+        background: #fff;
+      }
+
+      .actions a.primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+      }
+
+      @media (max-width: 640px) {
+        .page {
+          padding: 24px 12px 48px;
+        }
+
+        .card-header,
+        .actions {
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+
+        .embed-wrap {
+          padding: 16px 12px;
+        }
+
+        iframe {
+          min-height: 1500px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <p class="eyebrow">Featured</p>
+        <h1>Resume Feedback Platform on LinkedIn</h1>
+        <p>
+          This page embeds the LinkedIn post about the project being featured in the Handshake AI
+          Showcase through the OpenAI Developers x Handshake Codex Creator Challenge.
+        </p>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <h2>Embedded LinkedIn Post</h2>
+          <p>
+            If the embed does not load in your browser, use the direct links below to open the
+            original post or the Handshake feature page.
+          </p>
+        </div>
+
+        <div class="embed-wrap">
+          <iframe
+            src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7462595076766982145"
+            height="1677"
+            width="504"
+            frameborder="0"
+            allowfullscreen
+            title="Embedded LinkedIn post"
+          ></iframe>
+        </div>
+
+        <div class="actions">
+          <a
+            class="primary"
+            href="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7462595076766982145"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Open LinkedIn Post
+          </a>
+          <a
+            href="https://app.joinhandshake.com/ai-showcase?project_id=3056375"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Open Handshake Feature
+          </a>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
