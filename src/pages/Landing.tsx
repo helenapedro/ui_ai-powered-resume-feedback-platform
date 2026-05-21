@@ -9,25 +9,25 @@ export default function Landing() {
       icon: Sparkles,
       title: 'AI Feedback',
       description:
-        'Generate a focused resume review with an overall assessment, clear strength signals, and concrete gaps to close.',
+        'Generate structured feedback that explains the resume’s current strengths and the most important gaps to close.',
     },
     {
       icon: History,
       title: 'Version History',
       description:
-        'Keep multiple resume versions in one workflow so you can review changes, compare progress, and keep iterating with context.',
+        'Keep each draft organized, compare progress, and understand whether the resume is getting stronger over time.',
     },
     {
       icon: Eye,
       title: 'Resume Preview',
       description:
-        'Preview the current version in the product and download specific versions when you need the exact file.',
+        'Preview and download the exact version under review so feedback stays connected to the right file.',
     },
     {
       icon: Share2,
       title: 'Shared Reviews',
       description:
-        'Create controlled share links, collect comments, and keep collaboration tied to the resume version under review.',
+        'Create controlled share links, collect comments, and keep collaboration tied to the selected resume version.',
     },
   ];
 
@@ -61,14 +61,12 @@ export default function Landing() {
 
               <div className="space-y-5">
                 <h1 className="text-4xl font-bold leading-tight text-primary md:text-6xl">
-                  AI resume review
-                  <br />
-                  <span className="text-primary/80">with version tracking</span>
+                  Improve your resume across drafts with AI feedback
                 </h1>
 
                 <p className="max-w-2xl text-lg text-muted-foreground md:text-xl">
-                  Upload resume versions, generate AI feedback, preview the file under review, and share controlled links
-                  for comments and collaboration.
+                  Upload a resume, get structured AI feedback, track what changed across versions, and share the right
+                  draft for review.
                 </p>
               </div>
 
@@ -87,15 +85,21 @@ export default function Landing() {
               <div className="grid gap-3 sm:grid-cols-3">
                 <div className="rounded-2xl border bg-background p-4 shadow-sm">
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Review</p>
-                  <p className="mt-2 text-sm text-foreground">AI-generated feedback with clear strengths and improvement priorities.</p>
+                  <p className="mt-2 text-sm text-foreground">
+                    Get focused AI feedback with a summary, strengths, and the highest-priority improvements.
+                  </p>
                 </div>
                 <div className="rounded-2xl border bg-background p-4 shadow-sm">
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Track</p>
-                  <p className="mt-2 text-sm text-foreground">Multiple resume versions kept in one version-aware workflow.</p>
+                  <p className="mt-2 text-sm text-foreground">
+                    Keep resume versions in one place and see how each draft changes over time.
+                  </p>
                 </div>
                 <div className="rounded-2xl border bg-background p-4 shadow-sm">
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Share</p>
-                  <p className="mt-2 text-sm text-foreground">Controlled links, comments, preview, and download for real review cycles.</p>
+                  <p className="mt-2 text-sm text-foreground">
+                    Use controlled share links and comments to get feedback without losing review context.
+                  </p>
                 </div>
               </div>
             </div>
@@ -118,7 +122,7 @@ export default function Landing() {
                       </div>
                       <div>
                         <h3 className="text-base font-semibold">AI Feedback</h3>
-                        <p className="text-sm text-muted-foreground">Overall assessment, strength signals, and gaps to close.</p>
+                        <p className="text-sm text-muted-foreground">Structured review for the selected resume version.</p>
                       </div>
                     </div>
                   </div>
@@ -129,7 +133,7 @@ export default function Landing() {
                         <History className="h-5 w-5 text-primary" />
                         <div>
                           <h3 className="text-base font-semibold">Version History</h3>
-                          <p className="text-sm text-muted-foreground">Track iteration across resume versions.</p>
+                          <p className="text-sm text-muted-foreground">Compare progress across drafts.</p>
                         </div>
                       </div>
                     </div>
@@ -149,7 +153,7 @@ export default function Landing() {
                       <MessageSquare className="h-5 w-5 text-primary" />
                       <div>
                         <h3 className="text-base font-semibold">Shared Reviews</h3>
-                        <p className="text-sm text-muted-foreground">Comments and share-link access controls for collaboration.</p>
+                        <p className="text-sm text-muted-foreground">Comments and controlled access stay tied to the resume version.</p>
                       </div>
                     </div>
                   </div>
@@ -165,11 +169,11 @@ export default function Landing() {
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-sm font-semibold uppercase tracking-[0.22em] text-primary">Product Pillars</p>
             <h2 className="mt-4 text-3xl font-bold text-foreground md:text-4xl">
-              A production workflow for resume review and iteration
+              Built for real resume improvement cycles
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              The platform is built around real resume review tasks: analyze the current version, track changes over time,
-              preview the file, and collaborate through controlled sharing.
+              Resume Feedback keeps the review process organized across AI feedback, version history, preview, and
+              controlled sharing.
             </p>
           </div>
 
@@ -196,21 +200,21 @@ export default function Landing() {
           <div className="grid gap-8 rounded-[2rem] border bg-background p-8 shadow-sm lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:items-center">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.22em] text-primary">Built for Resume Iteration</p>
-              <h2 className="mt-4 text-3xl font-bold text-foreground">Move from one draft to the next with better review context.</h2>
+              <h2 className="mt-4 text-3xl font-bold text-foreground">Turn resume feedback into a repeatable improvement process.</h2>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="rounded-2xl border bg-muted/20 p-5">
                 <h3 className="text-base font-semibold">Upload</h3>
-                <p className="mt-2 text-sm text-muted-foreground">Start a resume record or add a new version to an existing one.</p>
+                <p className="mt-2 text-sm text-muted-foreground">Create a resume record or add a new version as your application materials evolve.</p>
               </div>
               <div className="rounded-2xl border bg-muted/20 p-5">
                 <h3 className="text-base font-semibold">Review</h3>
-                <p className="mt-2 text-sm text-muted-foreground">Run async AI jobs and read feedback for the selected version.</p>
+                <p className="mt-2 text-sm text-muted-foreground">Run AI feedback in the background and review structured results for the selected version.</p>
               </div>
               <div className="rounded-2xl border bg-muted/20 p-5">
                 <h3 className="text-base font-semibold">Collaborate</h3>
-                <p className="mt-2 text-sm text-muted-foreground">Preview, download, comment, and share with controlled access.</p>
+                <p className="mt-2 text-sm text-muted-foreground">Share the right draft, collect comments, and keep feedback connected to the version being reviewed.</p>
               </div>
             </div>
           </div>
@@ -220,9 +224,9 @@ export default function Landing() {
       <section className="py-20 bg-primary text-primary-foreground">
         <div className="container max-w-4xl px-4 text-center">
           <FileText className="h-12 w-12 mx-auto mb-6 opacity-90" />
-          <h2 className="text-3xl font-bold mb-4">Start a cleaner, version-aware resume review workflow.</h2>
+          <h2 className="text-3xl font-bold mb-4">Start improving your resume with better review context.</h2>
           <p className="text-lg opacity-90 mb-8">
-            Create an account to upload your resume, run AI review jobs, and manage feedback across versions.
+            Create an account, upload a resume, review AI feedback, and track how each draft changes.
           </p>
           <Button asChild size="lg" variant="secondary" className="gap-2">
             <Link to="/auth">
