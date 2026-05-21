@@ -24,7 +24,7 @@ export function useAiFeedback(resumeId: string, versionId: string) {
     }
 
     const timeoutId = window.setTimeout(() => {
-      setTimeoutError('Tempo limite atingido. Tente regenerar o feedback.');
+      setTimeoutError('The AI review timed out. Try regenerating the review.');
     }, POLL_TIMEOUT);
 
     return () => window.clearTimeout(timeoutId);
@@ -41,11 +41,11 @@ export function useAiFeedback(resumeId: string, versionId: string) {
     }
 
     if (job?.status === 'FAILED') {
-      return job.errorDetail || 'A analise falhou.';
+      return job.errorDetail || 'The AI review failed.';
     }
 
     if (feedbackQuery.error) {
-      return 'Nao foi possivel carregar o feedback.';
+      return 'Unable to load AI feedback.';
     }
 
     if (jobQuery.error && !job) {
@@ -53,7 +53,7 @@ export function useAiFeedback(resumeId: string, versionId: string) {
     }
 
     if (regenerateMutation.error) {
-      return 'Nao foi possivel regenerar o feedback.';
+      return 'Unable to regenerate AI feedback.';
     }
 
     return null;

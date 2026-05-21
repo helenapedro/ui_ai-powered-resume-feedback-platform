@@ -57,6 +57,7 @@ export function AiFeedback({ resumeId, versionId, versionNumber, versions }: AiF
 
   const status = feedbackStatusConfig[job.status] ?? feedbackStatusConfig.PENDING;
   const canRegenerate = job.status === 'DONE' || job.status === 'FAILED';
+  const isLegacyFeedback = Boolean(feedback && (!feedback.promptVersion || feedback.promptVersion < 'v3'));
 
   return (
     <FeedbackCardShell
@@ -73,6 +74,12 @@ export function AiFeedback({ resumeId, versionId, versionNumber, versions }: AiF
           : undefined
       }
     >
+      {isLegacyFeedback && (
+        <div className="rounded-[1.25rem] border border-amber-200 bg-amber-50/80 px-4 py-3 text-sm leading-6 text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-100">
+          This review uses an older feedback format. Regenerate to get the latest English-only review.
+        </div>
+      )}
+
       <ProgressReviewCard
         baselineVersionNumber={baselineVersionNumber}
         currentVersionNumber={versionNumber}

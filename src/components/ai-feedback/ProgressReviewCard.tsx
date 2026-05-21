@@ -14,19 +14,19 @@ interface ProgressReviewCardProps {
 
 const progressStatusStyles: Record<string, { label: string; badgeClassName: string; icon: typeof TrendingUp }> = {
   IMPROVED: {
-    label: 'Improved',
+    label: 'Updated',
     badgeClassName:
       'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/70 dark:bg-emerald-950/40 dark:text-emerald-300',
     icon: TrendingUp,
   },
   UNCHANGED: {
-    label: 'Unchanged',
+    label: 'No major change',
     badgeClassName:
       'border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-300',
     icon: Minus,
   },
   DECLINED: {
-    label: 'Declined',
+    label: 'Needs review',
     badgeClassName:
       'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900/70 dark:bg-rose-950/40 dark:text-rose-300',
     icon: TrendingDown,
@@ -110,6 +110,7 @@ export function ProgressReviewCard({
 
   const statusPresentation = getProgressStatusPresentation(progress.progressStatus);
   const StatusIcon = statusPresentation.icon;
+  const progressScore = getProgressScore(progress);
 
   return (
     <section className="rounded-[1.75rem] border border-primary/10 bg-[linear-gradient(145deg,hsl(var(--primary)/0.09),transparent_48%),linear-gradient(180deg,hsl(var(--background)),hsl(var(--background)))] p-6 shadow-sm sm:p-8">
@@ -134,7 +135,9 @@ export function ProgressReviewCard({
           </div>
           <div className="rounded-2xl border border-border/70 bg-background/85 px-4 py-3">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Score</p>
-            <p className="mt-2 text-2xl font-semibold text-foreground">{progress.progressScore}/100</p>
+            <p className="mt-2 text-2xl font-semibold text-foreground">
+              {progressScore === null ? 'Not scored' : `${progressScore}/100`}
+            </p>
           </div>
         </div>
       </div>
@@ -144,18 +147,21 @@ export function ProgressReviewCard({
           title="What improved"
           description="Signals that got stronger in this version."
           items={progress.improvedAreas}
+          emptyText="No improvements detected for this comparison."
           tone="emerald"
         />
         <ProgressList
           title="Still needs work"
           description="Issues that remain unresolved from the previous version."
           items={progress.unchangedIssues}
+          emptyText="No items in this category for the current comparison."
           tone="slate"
         />
         <ProgressList
           title="New issues"
           description="Problems introduced or made more visible in this version."
           items={progress.newIssues}
+          emptyText="No items in this category for the current comparison."
           tone="amber"
         />
       </div>
@@ -165,11 +171,13 @@ export function ProgressReviewCard({
 
 function ProgressList({
   description,
+  emptyText,
   items,
   title,
   tone,
 }: {
   description: string;
+  emptyText: string;
   items: string[];
   title: string;
   tone: 'emerald' | 'slate' | 'amber';
@@ -200,7 +208,7 @@ function ProgressList({
           ))}
         </ul>
       ) : (
-        <p className="mt-4 text-sm leading-6 text-muted-foreground">No items in this category for the current comparison.</p>
+        <p className="mt-4 text-sm leading-6 text-muted-foreground">{emptyText}</p>
       )}
     </div>
   );
@@ -234,4 +242,15 @@ function getProgressStatusPresentation(status: AiProgressStatus) {
   }
 
   return fallbackProgressStatus;
+}
+
+function getProgressScore(progress: AiProgressDTO) {
+  const rawProgressScore = progress.progressScore ?? progress.score;
+  const hasProgressScore = rawProgressScore !== null && rawProgressScore !== undefined;
+
+  if (!hasProgressScore) {
+    return null;
+  }
+
+  return Math.max(0, Math.min(100, Math.round(rawProgressScore)));
 }

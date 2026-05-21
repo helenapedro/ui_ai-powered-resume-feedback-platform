@@ -12,6 +12,8 @@ interface FeedbackCompletedViewProps {
 }
 
 export function FeedbackCompletedView({ feedback, versionNumber }: FeedbackCompletedViewProps) {
+  const summary = feedback.summary?.trim() || 'No AI summary is available for this version.';
+
   return (
     <div className="space-y-6">
       <section className="overflow-hidden rounded-[1.75rem] border border-primary/10 bg-[linear-gradient(135deg,hsl(var(--primary)/0.12),transparent_58%),linear-gradient(180deg,hsl(var(--background)),hsl(var(--background)))] p-6 shadow-sm sm:p-8">
@@ -23,7 +25,7 @@ export function FeedbackCompletedView({ feedback, versionNumber }: FeedbackCompl
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
               Overall Assessment
             </p>
-            <p className="text-base leading-8 text-foreground/80 sm:text-lg">{feedback.summary}</p>
+            <p className="text-base leading-8 text-foreground/80 sm:text-lg">{summary}</p>
           </div>
 
           <div className="grid gap-3 sm:min-w-[220px]">
