@@ -16,42 +16,61 @@ export default function About() {
   const differentiators = [
     {
       icon: Sparkles,
-      title: 'AI Feedback',
-      description: 'Each version can trigger an async AI review that returns a summary, strengths, and improvement items.',
+      title: 'Version-aware AI feedback',
+      description: 'The AI review is connected to a specific resume version, so feedback does not get detached from the draft it was generated for.',
     },
     {
       icon: History,
-      title: 'Version History',
-      description: 'Resume iteration stays organized in one place instead of being scattered across duplicate files.',
+      title: 'Progress across drafts',
+      description: 'Users can upload a new version and see how it changed compared with the previous resume, including improved areas, remaining issues, and new issues.',
     },
     {
       icon: Eye,
-      title: 'Resume Preview',
-      description: 'The product keeps the file in view so review context stays tied to the exact version being discussed.',
+      title: 'Review context in one place',
+      description: 'Resume preview, AI feedback, version history, comments, and sharing stay together, instead of being spread across separate files and conversations.',
     },
     {
       icon: Share2,
-      title: 'Shared Reviews',
-      description: 'Share links support controlled access and collaboration flows without opening the entire account.',
+      title: 'Controlled sharing',
+      description: 'Users can create share links for reviewers, revoke access, set limits, and keep an audit trail of shared resume activity.',
     },
   ];
 
   const steps = [
     {
       title: '1. Upload a resume',
-      description: 'Create a resume entry, then keep adding new versions as your application materials evolve.',
+      description: 'Users create a resume entry and can keep adding new versions as their application materials improve.',
     },
     {
-      title: '2. Select the version under review',
-      description: 'Preview the exact file, open version history, and keep review context anchored to the current draft.',
+      title: '2. Review the exact version',
+      description: 'Each version keeps its own file preview, AI feedback, comments, and review context, so feedback stays tied to the right draft.',
     },
     {
-      title: '3. Run AI review jobs',
-      description: 'Worker services process AI feedback asynchronously and return a structured review for that version.',
+      title: '3. Get AI feedback',
+      description: 'AI review runs in the background and returns structured feedback, including a summary, strengths, and improvement areas for that version.',
     },
     {
-      title: '4. Review, revise, and share',
-      description: 'Use comments, controlled share links, preview, and download to move through real review cycles.',
+      title: '4. Compare progress',
+      description: 'When users upload a newer version, the platform can show what improved, what still needs work, and what new issues appeared.',
+    },
+  ];
+
+  const technicalDesign = [
+    {
+      title: 'Fast uploads',
+      description: 'The app saves the resume and creates an AI review job right away, instead of making the user wait while the AI model processes the file.',
+    },
+    {
+      title: 'Background AI processing',
+      description: 'A separate worker handles slower AI tasks like extracting resume text, calling the AI model, retrying failures, and saving feedback.',
+    },
+    {
+      title: 'Structured data storage',
+      description: 'MySQL stores users, resumes, versions, jobs, sharing, comments, and audit records. MongoDB stores the AI-generated feedback and progress documents.',
+    },
+    {
+      title: 'Practical architecture',
+      description: 'The backend is organized into clear parts: one for user-facing API work, one for background AI work, and one shared area for common data structures.',
     },
   ];
 
@@ -78,11 +97,12 @@ export default function About() {
         <div className="container max-w-5xl text-center space-y-6 animate-fade-in">
           <p className="text-sm font-semibold uppercase tracking-[0.22em] text-primary">Resume Feedback Platform</p>
           <h1 className="text-4xl md:text-5xl font-bold text-foreground leading-tight">
-            AI resume review with version tracking, preview, and shared feedback
+            AI resume feedback that helps users improve across drafts
           </h1>
           <p className="mx-auto max-w-3xl text-lg text-muted-foreground">
-            Resume Feedback is built for one job: helping people improve resumes through a real review workflow that
-            supports multiple versions, AI-generated feedback, controlled sharing, and collaboration.
+            Resume Feedback helps job seekers move from scattered resume edits to a structured review workflow. Users
+            can upload a resume, get AI-generated feedback, add new versions, compare progress, and share the right
+            draft for review.
           </p>
         </div>
       </section>
@@ -92,32 +112,26 @@ export default function About() {
           <div className="grid gap-6 lg:grid-cols-2">
             <Card className="border bg-background shadow-sm">
               <CardHeader>
-                <CardTitle>What it does</CardTitle>
+                <CardTitle>The problem</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
                 <p>
-                  The product accepts resume uploads, stores multiple versions, runs async AI feedback jobs, and keeps
-                  version-specific preview, download, comments, and sharing in one workflow.
-                </p>
-                <p>
-                  The result is a cleaner review process: one place to inspect the current file, understand what changed,
-                  and decide what to improve next.
+                  Resume feedback often gets split across renamed files, email threads, messages, and disconnected
+                  comments. Once a new draft appears, it becomes hard to know what changed, what improved, and what
+                  still needs work.
                 </p>
               </CardContent>
             </Card>
 
             <Card className="border bg-background shadow-sm">
               <CardHeader>
-                <CardTitle>Why it exists</CardTitle>
+                <CardTitle>The impact</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
                 <p>
-                  Resume work usually breaks across email threads, renamed PDFs, and feedback that loses context as soon
-                  as a new draft appears.
-                </p>
-                <p>
-                  Resume Feedback keeps the review attached to the version being evaluated so iteration feels structured
-                  instead of chaotic.
+                  The platform keeps the resume, feedback, version history, preview, comments, and sharing in one
+                  workflow. That helps users review the exact version being discussed and understand how their resume is
+                  improving over time.
                 </p>
               </CardContent>
             </Card>
@@ -177,8 +191,8 @@ export default function About() {
       <section className="py-20 bg-muted/50 px-4">
         <div className="container max-w-5xl">
           <div className="mx-auto max-w-3xl text-center">
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-primary">What makes it different</p>
-            <h2 className="mt-4 text-3xl font-bold text-foreground">A real workflow, not a generic feedback form</h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-primary">What Makes It Different</p>
+            <h2 className="mt-4 text-3xl font-bold text-foreground">More than a one-time AI response</h2>
           </div>
           <div className="mt-12 grid gap-6 md:grid-cols-2">
             {differentiators.map((highlight, index) => (
@@ -203,8 +217,8 @@ export default function About() {
       <section className="py-20 px-4">
         <div className="container max-w-6xl">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-primary">How it works</p>
-            <h2 className="mt-4 text-3xl font-bold text-foreground">Built for version-aware resume improvement</h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-primary">How It Works</p>
+            <h2 className="mt-4 text-3xl font-bold text-foreground">Built around real resume improvement cycles</h2>
             <div className="mt-8 grid gap-6 md:grid-cols-2">
               {steps.map((step, index) => (
                 <div
@@ -219,14 +233,35 @@ export default function About() {
             </div>
           </div>
 
+          <div className="mt-8">
+            <div className="mb-8">
+              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-primary">Technical Design</p>
+              <h2 className="mt-4 text-3xl font-bold text-foreground">Designed to keep uploads fast and feedback reliable</h2>
+            </div>
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+              {technicalDesign.map((item, index) => (
+                <Card
+                  key={item.title}
+                  className="border bg-background shadow-sm animate-fade-in"
+                  style={{ animationDelay: `${index * 120}ms`, animationFillMode: 'both' }}
+                >
+                  <CardContent className="p-6 space-y-3">
+                    <h3 className="text-lg font-semibold text-foreground">{item.title}</h3>
+                    <p className="text-sm leading-7 text-muted-foreground">{item.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+
           <Card className="mt-8 border bg-background shadow-sm">
             <CardHeader>
               <CardTitle>Who it's for</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4 text-sm leading-7 text-muted-foreground md:grid-cols-3">
-              <p>Job seekers improving resumes over multiple drafts.</p>
-              <p>Mentors and peers who want a cleaner way to review and comment.</p>
-              <p>Anyone who wants AI feedback without losing version history or review context.</p>
+              <p>Job seekers improving resumes through multiple drafts and wanting clearer feedback after each revision.</p>
+              <p>Students who want AI feedback that is tied to their actual resume version instead of generic resume advice.</p>
+              <p>Mentors, peers, or reviewers who need a cleaner way to view, comment on, and discuss the right resume draft.</p>
             </CardContent>
           </Card>
         </div>
@@ -234,8 +269,8 @@ export default function About() {
 
       <section className="py-20 bg-primary text-primary-foreground px-4">
         <div className="container max-w-3xl text-center space-y-6">
-          <h2 className="text-3xl font-bold">Enter the resume review workflow.</h2>
-          <p className="text-lg opacity-90">Create your account, upload a version, and start reviewing with better context.</p>
+          <h2 className="text-3xl font-bold">Start improving your resume with better review context.</h2>
+          <p className="text-lg opacity-90">Create an account, upload a resume version, review AI feedback, and track how each draft changes.</p>
           <Button asChild size="lg" variant="secondary" className="gap-2">
             <Link to="/auth">
               Start Reviewing
