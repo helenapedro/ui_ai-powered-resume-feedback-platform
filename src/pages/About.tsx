@@ -11,6 +11,7 @@ import {
   Sparkles,
   Trophy,
 } from 'lucide-react';
+import handshakeFeaturedImage from '../../docs/project-images/handshake_featured.png';
 
 export default function About() {
   const differentiators = [
@@ -178,7 +179,7 @@ export default function About() {
 
               <div className="rounded-[1.5rem] border bg-background/90 p-3 shadow-sm">
                 <img
-                  src="/docs/project-images/handshake_featured.png"
+                  src={handshakeFeaturedImage}
                   alt="Resume Feedback Platform featured in the Handshake AI Showcase"
                   className="w-full rounded-[1rem] object-cover"
                 />
