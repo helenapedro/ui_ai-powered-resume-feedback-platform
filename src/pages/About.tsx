@@ -2,12 +2,14 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
+  ArrowRight,
+  ExternalLink,
+  Eye,
   FileText,
-  Sparkles,
   History,
   Share2,
-  ArrowRight,
-  Eye,
+  Sparkles,
+  Trophy,
 } from 'lucide-react';
 
 export default function About() {
@@ -123,6 +125,55 @@ export default function About() {
         </div>
       </section>
 
+      <section className="pb-20 px-4">
+        <div className="container max-w-6xl">
+          <div className="overflow-hidden rounded-[2rem] border bg-[linear-gradient(135deg,hsl(var(--primary)/0.08),transparent_50%),linear-gradient(180deg,hsl(var(--background)),hsl(var(--muted)/0.18))] shadow-sm">
+            <div className="grid gap-8 p-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-center">
+              <div className="space-y-5">
+                <div className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
+                  <Trophy className="h-4 w-4" />
+                  Featured Project
+                </div>
+                <div className="space-y-3">
+                  <h2 className="text-3xl font-bold text-foreground">Recognized in the Handshake AI Showcase</h2>
+                  <p className="text-base leading-7 text-muted-foreground">
+                    Resume Feedback Platform was featured in the Handshake AI Showcase through the OpenAI Developers x
+                    Handshake Codex Creator Challenge, highlighting the project’s approach to version-aware AI resume
+                    review and structured iteration.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <Button asChild>
+                    <a
+                      href="https://app.joinhandshake.com/ai-showcase?project_id=3056375"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      View Handshake Feature
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  </Button>
+                  <Button asChild variant="outline">
+                    <a href="/docs/featured.html" target="_blank" rel="noreferrer">
+                      View LinkedIn Embed
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  </Button>
+                </div>
+              </div>
+
+              <div className="rounded-[1.5rem] border bg-background/90 p-3 shadow-sm">
+                <img
+                  src="/docs/project-images/handshake_featured.png"
+                  alt="Resume Feedback Platform featured in the Handshake AI Showcase"
+                  className="w-full rounded-[1rem] object-cover"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="py-20 bg-muted/50 px-4">
         <div className="container max-w-5xl">
           <div className="mx-auto max-w-3xl text-center">
@@ -170,7 +221,7 @@ export default function About() {
 
           <Card className="mt-8 border bg-background shadow-sm">
             <CardHeader>
-              <CardTitle>Who it’s for</CardTitle>
+              <CardTitle>Who it's for</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4 text-sm leading-7 text-muted-foreground md:grid-cols-3">
               <p>Job seekers improving resumes over multiple drafts.</p>
