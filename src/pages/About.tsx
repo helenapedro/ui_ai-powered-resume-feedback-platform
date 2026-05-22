@@ -169,7 +169,7 @@ export default function About() {
                     </a>
                   </Button>
                   <Button asChild variant="outline">
-                    <a href="/docs/featured.html" target="_blank" rel="noreferrer">
+                    <a href="/featured" target="_blank" rel="noreferrer">
                       View LinkedIn Embed
                       <ExternalLink className="h-4 w-4" />
                     </a>

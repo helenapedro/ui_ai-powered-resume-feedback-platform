@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Landing from "./pages/Landing";
 import About from "./pages/About";
+import FeaturedPost from "./pages/FeaturedPost";
 import MyResumes from "./pages/MyResumes";
 import Upload from "./pages/Upload";
 import ResumeDetails from "./pages/ResumeDetails";
@@ -35,6 +36,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<Landing />} />
                 <Route path="/about" element={<About />} />
+                <Route path="/featured" element={<FeaturedPost />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/share/:token" element={<SharedResume />} />
                 <Route
