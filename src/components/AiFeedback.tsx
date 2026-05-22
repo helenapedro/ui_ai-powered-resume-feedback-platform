@@ -19,7 +19,7 @@ interface AiFeedbackProps {
 }
 
 export function AiFeedback({ resumeId, versionId, versionNumber, versions }: AiFeedbackProps) {
-  const { job, feedback, isLoading, error, isRegenerating, handleRegenerate } = useAiFeedback(
+  const { job, feedback, isFeedbackUnavailable, isLoading, error, isRegenerating, handleRegenerate } = useAiFeedback(
     resumeId,
     versionId
   );
@@ -126,7 +126,15 @@ export function AiFeedback({ resumeId, versionId, versionNumber, versions }: AiF
         <FeedbackCompletedView feedback={feedback} versionNumber={versionNumber} />
       )}
 
-      {!feedback && job.status === 'DONE' && !error && (
+      {!feedback && job.status === 'DONE' && isFeedbackUnavailable && (
+        <FeedbackMessageState
+          eyebrow="AI Review Pending"
+          title="AI review is still being generated"
+          description="The job has completed, but the latest review document is not available yet. Try refreshing in a moment."
+        />
+      )}
+
+      {!feedback && job.status === 'DONE' && !error && !isFeedbackUnavailable && (
         <FeedbackMessageState
           eyebrow="No Feedback"
           title="The review completed without displayable content"

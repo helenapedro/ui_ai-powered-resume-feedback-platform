@@ -121,7 +121,7 @@ export interface AiFeedbackDTO {
   feedbackVersion: number;
   mongoDocId: string;
   model: string;
-  promptVersion: string;
+  promptVersion: string | null;
   createdAt: string;
   summary: string;
   strengths: string[];
@@ -138,11 +138,12 @@ export interface AiProgressDTO {
   progressVersion: number;
   mongoDocId: string;
   model: string;
-  promptVersion: string;
+  promptVersion: string | null;
   createdAt: string;
   summary: string;
   progressStatus: AiProgressStatus;
-  progressScore: number;
+  progressScore: number | null;
+  score?: number | null;
   improvedAreas: string[];
   unchangedIssues: string[];
   newIssues: string[];

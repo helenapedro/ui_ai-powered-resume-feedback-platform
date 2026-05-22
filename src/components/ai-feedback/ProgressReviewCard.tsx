@@ -1,6 +1,7 @@
 import { ArrowRight, Loader2, Minus, TrendingDown, TrendingUp } from 'lucide-react';
 import type { AiProgressDTO, AiProgressStatus } from '@/types';
 import { Badge } from '@/components/ui/badge';
+import { sanitizeFeedbackItems, toSentenceCase } from '@/components/ai-feedback/utils';
 
 interface ProgressReviewCardProps {
   baselineVersionNumber?: number;
@@ -34,7 +35,7 @@ const progressStatusStyles: Record<string, { label: string; badgeClassName: stri
 };
 
 const fallbackProgressStatus = {
-  label: 'Updated',
+  label: 'Unknown',
   badgeClassName:
     'border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-300',
   icon: Minus,
@@ -111,6 +112,9 @@ export function ProgressReviewCard({
   const statusPresentation = getProgressStatusPresentation(progress.progressStatus);
   const StatusIcon = statusPresentation.icon;
   const progressScore = getProgressScore(progress);
+  const improvedAreas = sanitizeFeedbackItems(progress.improvedAreas);
+  const unchangedIssues = sanitizeFeedbackItems(progress.unchangedIssues);
+  const newIssues = sanitizeFeedbackItems(progress.newIssues);
 
   return (
     <section className="rounded-[1.75rem] border border-primary/10 bg-[linear-gradient(145deg,hsl(var(--primary)/0.09),transparent_48%),linear-gradient(180deg,hsl(var(--background)),hsl(var(--background)))] p-6 shadow-sm sm:p-8">
@@ -146,21 +150,21 @@ export function ProgressReviewCard({
         <ProgressList
           title="What improved"
           description="Signals that got stronger in this version."
-          items={progress.improvedAreas}
+          items={improvedAreas}
           emptyText="No improvements detected for this comparison."
           tone="emerald"
         />
         <ProgressList
           title="Still needs work"
           description="Issues that remain unresolved from the previous version."
-          items={progress.unchangedIssues}
+          items={unchangedIssues}
           emptyText="No items in this category for the current comparison."
           tone="slate"
         />
         <ProgressList
           title="New issues"
           description="Problems introduced or made more visible in this version."
-          items={progress.newIssues}
+          items={newIssues}
           emptyText="No items in this category for the current comparison."
           tone="amber"
         />
@@ -203,7 +207,7 @@ function ProgressList({
           {items.map((item, index) => (
             <li key={`${item}-${index}`} className="flex gap-3 text-sm leading-6 text-foreground/86">
               <ArrowRight className={`mt-1 h-4 w-4 shrink-0 ${bulletClasses[tone]}`} />
-              <span>{item}</span>
+              <span className="whitespace-normal [overflow-wrap:anywhere]">{item}</span>
             </li>
           ))}
         </ul>
@@ -241,7 +245,10 @@ function getProgressStatusPresentation(status: AiProgressStatus) {
     return progressStatusStyles.IMPROVED;
   }
 
-  return fallbackProgressStatus;
+  return {
+    ...fallbackProgressStatus,
+    label: toSentenceCase(status),
+  };
 }
 
 function getProgressScore(progress: AiProgressDTO) {

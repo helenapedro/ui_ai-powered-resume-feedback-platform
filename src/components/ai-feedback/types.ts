@@ -1,11 +1,6 @@
 import type { ReactNode } from 'react';
 import type { AiJobStatus } from '@/types';
 
-export interface ParsedFeedbackItem {
-  label: string | null;
-  content: string;
-}
-
 export interface StatusPresentation {
   icon: ReactNode;
   label: string;

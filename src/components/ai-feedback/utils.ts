@@ -1,18 +1,20 @@
-import type { ParsedFeedbackItem } from '@/components/ai-feedback/types';
+const PLACEHOLDER_PATTERN = /^(none identified|no issues|n\/a|na|none|not applicable)$/i;
 
-export function parseFeedbackItem(item: string): ParsedFeedbackItem {
-  const separatorIndex = item.indexOf(':');
+export function sanitizeFeedbackItems(items: string[] | null | undefined) {
+  return (items ?? [])
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0)
+    .filter((item) => !PLACEHOLDER_PATTERN.test(item));
+}
 
-  if (separatorIndex <= 0) {
-    return { label: null, content: item.trim() };
+export function toSentenceCase(value: string) {
+  const trimmed = value.trim();
+
+  if (!trimmed) {
+    return 'Unknown';
   }
 
-  const label = item.slice(0, separatorIndex).trim();
-  const content = item.slice(separatorIndex + 1).trim();
+  const normalized = trimmed.toLowerCase().replace(/[_-]+/g, ' ');
 
-  if (!content || label.length > 28 || !/^[A-Za-z][A-Za-z\s/&-]*$/.test(label)) {
-    return { label: null, content: item.trim() };
-  }
-
-  return { label, content };
+  return normalized.charAt(0).toUpperCase() + normalized.slice(1);
 }

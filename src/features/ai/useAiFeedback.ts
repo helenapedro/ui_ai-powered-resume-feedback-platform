@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ApiError } from '@/services/api';
 import {
   useAiFeedbackQuery,
   useLatestAiJobQuery,
@@ -13,6 +14,7 @@ export function useAiFeedback(resumeId: string, versionId: string) {
   const job = jobQuery.data ?? null;
   const feedbackQuery = useAiFeedbackQuery(resumeId, versionId, job?.status === 'DONE');
   const regenerateMutation = useRegenerateAiFeedbackMutation(resumeId, versionId);
+  const isFeedbackUnavailable = feedbackQuery.error instanceof ApiError && feedbackQuery.error.status === 404;
 
   useEffect(() => {
     setTimeoutError(null);
@@ -44,7 +46,7 @@ export function useAiFeedback(resumeId: string, versionId: string) {
       return job.errorDetail || 'The AI review failed.';
     }
 
-    if (feedbackQuery.error) {
+    if (feedbackQuery.error && !isFeedbackUnavailable) {
       return 'Unable to load AI feedback.';
     }
 
@@ -57,11 +59,12 @@ export function useAiFeedback(resumeId: string, versionId: string) {
     }
 
     return null;
-  }, [feedbackQuery.error, job, jobQuery.error, regenerateMutation.error, timeoutError]);
+  }, [feedbackQuery.error, isFeedbackUnavailable, job, jobQuery.error, regenerateMutation.error, timeoutError]);
 
   return {
     job,
     feedback: feedbackQuery.data ?? null,
+    isFeedbackUnavailable,
     isLoading: jobQuery.isLoading && !job,
     error,
     isRegenerating: regenerateMutation.isPending,
