@@ -1,5 +1,4 @@
-import { useAiFeedback } from '@/features/ai/useAiFeedback';
-import { useAiProgress } from '@/features/ai/useAiProgress';
+import { useAiReviewState } from '@/features/ai/useAiReviewState';
 import { feedbackStatusConfig } from '@/components/ai-feedback/constants';
 import { FeedbackCardShell } from '@/components/ai-feedback/FeedbackCardShell';
 import { FeedbackCompletedView } from '@/components/ai-feedback/FeedbackCompletedView';
@@ -19,13 +18,14 @@ interface AiFeedbackProps {
 }
 
 export function AiFeedback({ resumeId, versionId, versionNumber, versions }: AiFeedbackProps) {
-  const { job, feedback, isFeedbackUnavailable, isLoading, error, isRegenerating, handleRegenerate } = useAiFeedback(
+  const reviewState = useAiReviewState(
     resumeId,
-    versionId
+    versionId,
+    versionNumber > 1
   );
-  const progressState = useAiProgress(resumeId, versionId, versionNumber > 1);
+  const { job, feedback, isFeedbackUnavailable, isLoading, feedbackError, isRegenerating, handleRegenerate } = reviewState;
   const baselineVersionNumber = versions.find(
-    (version) => version.id === progressState.progress?.baselineResumeVersionId
+    (version) => version.id === reviewState.progress?.baselineResumeVersionId
   )?.versionNumber;
 
   if (isLoading) {
@@ -83,20 +83,20 @@ export function AiFeedback({ resumeId, versionId, versionNumber, versions }: AiF
       <ProgressReviewCard
         baselineVersionNumber={baselineVersionNumber}
         currentVersionNumber={versionNumber}
-        error={progressState.error}
-        hasPreviousVersion={progressState.hasPreviousVersion}
-        isPending={progressState.isPending}
-        isUnavailable={progressState.isUnavailable}
-        progress={progressState.progress}
+        error={reviewState.progressError}
+        hasPreviousVersion={reviewState.hasPreviousVersion}
+        isPending={reviewState.isProgressPending}
+        isUnavailable={reviewState.isProgressUnavailable}
+        progress={reviewState.progress}
       />
 
       {(job.status === 'PENDING' || job.status === 'PROCESSING') && <FeedbackProcessingState />}
 
-      {error && job.status === 'FAILED' && (
+      {feedbackError && job.status === 'FAILED' && (
         <FeedbackMessageState
           eyebrow="Review Failed"
           title="The feedback run did not complete"
-          description={error}
+          description={feedbackError}
           tone="destructive"
           action={{
             label: 'Try Again',
@@ -107,11 +107,11 @@ export function AiFeedback({ resumeId, versionId, versionNumber, versions }: AiF
         />
       )}
 
-      {error && job.status !== 'FAILED' && (
+      {feedbackError && job.status !== 'FAILED' && (
         <FeedbackMessageState
           eyebrow="Review Interrupted"
           title="The latest feedback could not be loaded"
-          description={error}
+          description={feedbackError}
           action={{
             label: 'Reload Review',
             onClick: handleRegenerate,
@@ -134,7 +134,7 @@ export function AiFeedback({ resumeId, versionId, versionNumber, versions }: AiF
         />
       )}
 
-      {!feedback && job.status === 'DONE' && !error && !isFeedbackUnavailable && (
+      {!feedback && job.status === 'DONE' && !feedbackError && !isFeedbackUnavailable && (
         <FeedbackMessageState
           eyebrow="No Feedback"
           title="The review completed without displayable content"

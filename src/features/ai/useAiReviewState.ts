@@ -2,19 +2,28 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ApiError } from '@/services/api';
 import {
   useAiFeedbackQuery,
+  useAiProgressQuery,
   useLatestAiJobQuery,
   useRegenerateAiFeedbackMutation,
 } from '@/features/ai/queries';
 
 const POLL_TIMEOUT = 120000;
 
-export function useAiFeedback(resumeId: string, versionId: string) {
+export function useAiReviewState(resumeId: string, versionId: string, hasPreviousVersion: boolean) {
   const [timeoutError, setTimeoutError] = useState<string | null>(null);
   const jobQuery = useLatestAiJobQuery(resumeId, versionId);
   const job = jobQuery.data ?? null;
   const feedbackQuery = useAiFeedbackQuery(resumeId, versionId, job?.status === 'DONE');
+  const progressQuery = useAiProgressQuery(
+    resumeId,
+    versionId,
+    hasPreviousVersion && job?.status === 'DONE'
+  );
   const regenerateMutation = useRegenerateAiFeedbackMutation(resumeId, versionId);
+
   const isFeedbackUnavailable = feedbackQuery.error instanceof ApiError && feedbackQuery.error.status === 404;
+  const isProgressUnavailable = progressQuery.error instanceof ApiError && progressQuery.error.status === 404;
+  const isProgressPending = hasPreviousVersion && (job?.status === 'PENDING' || job?.status === 'PROCESSING');
 
   useEffect(() => {
     setTimeoutError(null);
@@ -37,7 +46,7 @@ export function useAiFeedback(resumeId: string, versionId: string) {
     await regenerateMutation.mutateAsync();
   }, [regenerateMutation]);
 
-  const error = useMemo(() => {
+  const feedbackError = useMemo(() => {
     if (timeoutError) {
       return timeoutError;
     }
@@ -61,12 +70,29 @@ export function useAiFeedback(resumeId: string, versionId: string) {
     return null;
   }, [feedbackQuery.error, isFeedbackUnavailable, job, jobQuery.error, regenerateMutation.error, timeoutError]);
 
+  const progressError = useMemo(() => {
+    if (!hasPreviousVersion || isProgressUnavailable) {
+      return null;
+    }
+
+    if (progressQuery.error) {
+      return 'Progress comparison is not available right now.';
+    }
+
+    return null;
+  }, [hasPreviousVersion, isProgressUnavailable, progressQuery.error]);
+
   return {
     job,
     feedback: feedbackQuery.data ?? null,
+    progress: progressQuery.data ?? null,
     isFeedbackUnavailable,
+    isProgressUnavailable,
+    isProgressPending,
     isLoading: jobQuery.isLoading && !job,
-    error,
+    feedbackError,
+    progressError,
+    hasPreviousVersion,
     isRegenerating: regenerateMutation.isPending,
     handleRegenerate,
   };

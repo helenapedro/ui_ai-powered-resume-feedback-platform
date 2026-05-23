@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 import { GOOGLE_BUTTON_OPTIONS, GOOGLE_GSI_SCRIPT } from './constants';
 import './types';
@@ -27,9 +27,10 @@ function loadGoogleScript(onLoad: () => void): () => void {
 
 type UseGoogleGsiButtonParams = {
   clientId?: string;
-  containerRef: RefObject<HTMLDivElement>;
+  containerRef?: RefObject<HTMLDivElement>;
   onCredential: (idToken: string) => void;
   onMissingCredential: () => void;
+  renderButton?: boolean;
 };
 
 export function useGoogleGsiButton({
@@ -37,33 +38,49 @@ export function useGoogleGsiButton({
   containerRef,
   onCredential,
   onMissingCredential,
-}: UseGoogleGsiButtonParams): void {
+  renderButton = true,
+}: UseGoogleGsiButtonParams) {
+  const [isReady, setIsReady] = useState(false);
+  const credentialHandlerRef = useRef<(credential: string | undefined) => void>(() => {});
+
+  credentialHandlerRef.current = (credential) => {
+    if (!credential) {
+      onMissingCredential();
+      return;
+    }
+    onCredential(credential);
+  };
+
   useEffect(() => {
-    const container = containerRef.current;
-    if (!clientId || !container) {
+    const container = containerRef?.current;
+    if (!clientId || (renderButton && !container)) {
       return;
     }
 
-    const initializeButton = () => {
-      if (!window.google || !container) {
+    const initializeGoogle = () => {
+      if (!window.google) {
         return;
       }
 
       window.google.accounts.id.initialize({
         client_id: clientId,
-        callback: ({ credential }) => {
-          if (!credential) {
-            onMissingCredential();
-            return;
-          }
-          onCredential(credential);
-        },
+        callback: ({ credential }) => credentialHandlerRef.current(credential),
       });
 
-      container.innerHTML = '';
-      window.google.accounts.id.renderButton(container, GOOGLE_BUTTON_OPTIONS);
+      if (renderButton && container) {
+        container.innerHTML = '';
+        window.google.accounts.id.renderButton(container, GOOGLE_BUTTON_OPTIONS);
+      }
+
+      setIsReady(true);
     };
 
-    return loadGoogleScript(initializeButton);
-  }, [clientId, containerRef, onCredential, onMissingCredential]);
+    return loadGoogleScript(initializeGoogle);
+  }, [clientId, containerRef, renderButton]);
+
+  const prompt = useCallback(() => {
+    window.google?.accounts.id.prompt();
+  }, []);
+
+  return { isReady, prompt };
 }

@@ -1,23 +1,19 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { FileText, Mail, ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/Header';
 import { AuthFormTabs } from '@/pages/auth/AuthFormTabs';
-import { DEFAULT_REDIRECT, GOOGLE_GSI_SCRIPT } from '@/pages/auth/constants';
+import { DEFAULT_REDIRECT } from '@/pages/auth/constants';
 import { useAuthPageActions } from '@/pages/auth/useAuthPageActions';
-import '@/pages/auth/types';
-
-let initializedGoogleClientId: string | null = null;
-let googleCredentialHandler: ((credential: string | undefined) => void) | null = null;
+import { useGoogleGsiButton } from '@/pages/auth/useGoogleGsiButton';
 
 export default function Auth() {
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get('redirect') || DEFAULT_REDIRECT;
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
   const [showEmailForm, setShowEmailForm] = useState(false);
-  const [googleReady, setGoogleReady] = useState(false);
 
   const {
     isLoading,
@@ -29,59 +25,12 @@ export default function Auth() {
     showMissingGoogleCredentialError,
   } = useAuthPageActions({ redirectTo });
 
-  useEffect(() => {
-    if (!googleClientId) return;
-
-    googleCredentialHandler = (credential) => {
-      if (!credential) {
-        showMissingGoogleCredentialError();
-        return;
-      }
-      handleGoogleCredential(credential);
-    };
-
-    const init = () => {
-      if (!window.google) return;
-
-      if (initializedGoogleClientId !== googleClientId) {
-        window.google.accounts.id.initialize({
-          client_id: googleClientId,
-          callback: ({ credential }) => googleCredentialHandler?.(credential),
-        });
-        initializedGoogleClientId = googleClientId;
-      }
-
-      setGoogleReady(true);
-    };
-
-    if (window.google) {
-      init();
-      return;
-    }
-
-    const existing = document.querySelector<HTMLScriptElement>(`script[src="${GOOGLE_GSI_SCRIPT}"]`);
-    if (existing) {
-      existing.addEventListener('load', init);
-      return () => existing.removeEventListener('load', init);
-    }
-
-    const script = document.createElement('script');
-    script.src = GOOGLE_GSI_SCRIPT;
-    script.async = true;
-    script.defer = true;
-    script.addEventListener('load', init);
-    document.head.appendChild(script);
-    return () => {
-      script.removeEventListener('load', init);
-      googleCredentialHandler = null;
-    };
-  }, [googleClientId, handleGoogleCredential, showMissingGoogleCredentialError]);
-
-  const handleGoogleClick = useCallback(() => {
-    if (window.google) {
-      window.google.accounts.id.prompt();
-    }
-  }, []);
+  const googleAuth = useGoogleGsiButton({
+    clientId: googleClientId,
+    onCredential: handleGoogleCredential,
+    onMissingCredential: showMissingGoogleCredentialError,
+    renderButton: false,
+  });
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -104,8 +53,8 @@ export default function Auth() {
                   <Button
                     variant="outline"
                     className="w-full h-12 text-base gap-3 border-2"
-                    onClick={handleGoogleClick}
-                    disabled={!googleReady || isGoogleLoading}
+                    onClick={googleAuth.prompt}
+                    disabled={!googleAuth.isReady || isGoogleLoading}
                   >
                     <svg className="h-5 w-5" viewBox="0 0 24 24">
                       <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
