@@ -1,8 +1,9 @@
 import { buildApiUrl } from './api-config';
 import { parseApiError, throwApiError } from './api-errors';
+import { sessionService } from './session';
 
 function getAuthToken(): string | null {
-  return localStorage.getItem('token');
+  return sessionService.getToken();
 }
 
 function buildHeaders(options: RequestInit, token: string | null): HeadersInit {

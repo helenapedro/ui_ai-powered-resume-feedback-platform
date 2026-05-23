@@ -1,4 +1,5 @@
 import { apiClient } from './api';
+import { normalizeComment, normalizeComments } from './comment-normalizer';
 import type { Comment } from '@/types';
 
 export interface CreateCommentRequest {
@@ -9,11 +10,13 @@ export interface CreateCommentRequest {
 
 export const commentService = {
   async getComments(resumeId: string, versionId: string): Promise<Comment[]> {
-    return apiClient.get<Comment[]>(`/resumes/${resumeId}/versions/${versionId}/comments`);
+    const comments = await apiClient.get<Comment[]>(`/resumes/${resumeId}/versions/${versionId}/comments`);
+    return normalizeComments(comments);
   },
 
   async addComment(resumeId: string, versionId: string, request: CreateCommentRequest): Promise<Comment> {
-    return apiClient.post<Comment>(`/resumes/${resumeId}/versions/${versionId}/comments`, request);
+    const comment = await apiClient.post<Comment>(`/resumes/${resumeId}/versions/${versionId}/comments`, request);
+    return normalizeComment(comment);
   },
 
   async deleteComment(resumeId: string, versionId: string, commentId: string): Promise<void> {

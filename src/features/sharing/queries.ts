@@ -1,6 +1,7 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { sharingService, type UpdateSharedCommentRequest } from '@/services/sharing';
 import { queryKeys } from '@/features/queries/keys';
+import { useInvalidatingMutation } from '@/features/queries/useInvalidatingMutation';
 
 export function useSharedResumeQuery(token: string | undefined) {
   return useQuery({
@@ -19,53 +20,23 @@ export function useSharedCommentsQuery(token: string | undefined, enabled: boole
 }
 
 export function useAddSharedCommentMutation(token: string | undefined) {
-  const queryClient = useQueryClient();
-
-  return useMutation({
+  return useInvalidatingMutation({
     mutationFn: (body: string) => sharingService.postSharedComment(token!, { body }),
-    onSuccess: () => {
-      if (!token) {
-        return;
-      }
-
-      void queryClient.invalidateQueries({
-        queryKey: queryKeys.sharedResume.comments(token),
-      });
-    },
+    getQueryKeys: () => (token ? [queryKeys.sharedResume.comments(token)] : []),
   });
 }
 
 export function useUpdateSharedCommentMutation(token: string | undefined) {
-  const queryClient = useQueryClient();
-
-  return useMutation({
+  return useInvalidatingMutation({
     mutationFn: ({ commentId, data }: { commentId: string; data: UpdateSharedCommentRequest }) =>
       sharingService.updateSharedComment(token!, commentId, data),
-    onSuccess: () => {
-      if (!token) {
-        return;
-      }
-
-      void queryClient.invalidateQueries({
-        queryKey: queryKeys.sharedResume.comments(token),
-      });
-    },
+    getQueryKeys: () => (token ? [queryKeys.sharedResume.comments(token)] : []),
   });
 }
 
 export function useDeleteSharedCommentMutation(token: string | undefined) {
-  const queryClient = useQueryClient();
-
-  return useMutation({
+  return useInvalidatingMutation({
     mutationFn: (commentId: string) => sharingService.deleteSharedComment(token!, commentId),
-    onSuccess: () => {
-      if (!token) {
-        return;
-      }
-
-      void queryClient.invalidateQueries({
-        queryKey: queryKeys.sharedResume.comments(token),
-      });
-    },
+    getQueryKeys: () => (token ? [queryKeys.sharedResume.comments(token)] : []),
   });
 }

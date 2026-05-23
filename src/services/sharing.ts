@@ -1,5 +1,6 @@
 import { apiClient } from './api';
 import { API_BASE_URL, API_PREFIX } from './api';
+import { normalizeComment, normalizeComments } from './comment-normalizer';
 import type { SharedLink, SharePermission, Comment, SharedResumeData } from '@/types';
 
 export interface CreateShareLinkRequest {
@@ -39,15 +40,18 @@ export const sharingService = {
   },
 
   async getSharedComments(token: string): Promise<Comment[]> {
-    return apiClient.get<Comment[]>(`/share/${token}/comments`);
+    const comments = await apiClient.get<Comment[]>(`/share/${token}/comments`);
+    return normalizeComments(comments);
   },
 
   async postSharedComment(token: string, request: CreateSharedCommentRequest): Promise<Comment> {
-    return apiClient.post<Comment>(`/share/${token}/comments`, request);
+    const comment = await apiClient.post<Comment>(`/share/${token}/comments`, request);
+    return normalizeComment(comment);
   },
 
   async updateSharedComment(token: string, commentId: string, request: UpdateSharedCommentRequest): Promise<Comment> {
-    return apiClient.patch<Comment>(`/share/${token}/comments/${commentId}`, request);
+    const comment = await apiClient.patch<Comment>(`/share/${token}/comments/${commentId}`, request);
+    return normalizeComment(comment);
   },
 
   async deleteSharedComment(token: string, commentId: string): Promise<void> {

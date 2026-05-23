@@ -23,7 +23,7 @@ The result is noisy iteration. A candidate may get feedback on version 1, change
 
 ## The problem we solve
 
-This project turns resume review into a version-aware product workflow instead of a one-off file upload.
+This project turns resume review into a **_version-aware product workflow_** instead of a one-off file upload.
 
 It solves three practical problems:
 

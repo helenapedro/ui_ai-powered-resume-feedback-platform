@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { initializeAuth, login, loginWithGoogle, logout, register } from '@/store/slices/authSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { sessionService } from '@/services/session';
 import type { User } from '@/types';
 
 interface AuthContextType {
@@ -22,6 +23,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       void dispatch(initializeAuth());
     }
   }, [dispatch, isInitialized]);
+
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      dispatch(logout());
+    };
+
+    window.addEventListener(sessionService.expiredEventName, handleSessionExpired);
+    return () => window.removeEventListener(sessionService.expiredEventName, handleSessionExpired);
+  }, [dispatch]);
 
   return <>{children}</>;
 }

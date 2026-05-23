@@ -1,8 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { commentService } from '@/services/comments';
 import { resumeService } from '@/services/resumes';
 import { sharingService, type CreateShareLinkRequest } from '@/services/sharing';
 import { queryKeys } from '@/features/queries/keys';
+import { useInvalidatingMutation } from '@/features/queries/useInvalidatingMutation';
 
 export function useResumesQuery() {
   return useQuery({
@@ -36,108 +37,51 @@ export function useShareLinksQuery(resumeId: string | undefined) {
 }
 
 export function useAddCommentMutation(resumeId: string | undefined, versionId: string | null) {
-  const queryClient = useQueryClient();
-
-  return useMutation({
+  return useInvalidatingMutation({
     mutationFn: (body: string) => commentService.addComment(resumeId!, versionId!, { body }),
-    onSuccess: () => {
-      if (!resumeId || !versionId) {
-        return;
-      }
-
-      void queryClient.invalidateQueries({
-        queryKey: queryKeys.resumes.comments(resumeId, versionId),
-      });
-    },
+    getQueryKeys: () => (resumeId && versionId ? [queryKeys.resumes.comments(resumeId, versionId)] : []),
   });
 }
 
 export function useDeleteCommentMutation(resumeId: string | undefined, versionId: string | null) {
-  const queryClient = useQueryClient();
-
-  return useMutation({
+  return useInvalidatingMutation({
     mutationFn: (commentId: string) => commentService.deleteComment(resumeId!, versionId!, commentId),
-    onSuccess: () => {
-      if (!resumeId || !versionId) {
-        return;
-      }
-
-      void queryClient.invalidateQueries({
-        queryKey: queryKeys.resumes.comments(resumeId, versionId),
-      });
-    },
+    getQueryKeys: () => (resumeId && versionId ? [queryKeys.resumes.comments(resumeId, versionId)] : []),
   });
 }
 
 export function useCreateShareLinkMutation(resumeId: string | undefined) {
-  const queryClient = useQueryClient();
-
-  return useMutation({
+  return useInvalidatingMutation({
     mutationFn: (data: CreateShareLinkRequest) => sharingService.createShareLink(resumeId!, data),
-    onSuccess: () => {
-      if (!resumeId) {
-        return;
-      }
-
-      void queryClient.invalidateQueries({
-        queryKey: queryKeys.resumes.shareLinks(resumeId),
-      });
-    },
+    getQueryKeys: () => (resumeId ? [queryKeys.resumes.shareLinks(resumeId)] : []),
   });
 }
 
 export function useRevokeShareLinkMutation(resumeId: string | undefined) {
-  const queryClient = useQueryClient();
-
-  return useMutation({
+  return useInvalidatingMutation({
     mutationFn: (linkId: string) => sharingService.revokeShareLink(resumeId!, linkId),
-    onSuccess: () => {
-      if (!resumeId) {
-        return;
-      }
-
-      void queryClient.invalidateQueries({
-        queryKey: queryKeys.resumes.shareLinks(resumeId),
-      });
-    },
+    getQueryKeys: () => (resumeId ? [queryKeys.resumes.shareLinks(resumeId)] : []),
   });
 }
 
 export function useDeleteResumeMutation() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
+  return useInvalidatingMutation({
     mutationFn: (resumeId: string) => resumeService.deleteResume(resumeId),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: queryKeys.resumes.all });
-    },
+    getQueryKeys: () => [queryKeys.resumes.all],
   });
 }
 
 export function useCreateResumeMutation() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
+  return useInvalidatingMutation({
     mutationFn: ({ file, title }: { file: File; title?: string }) =>
       resumeService.createResume(file, title),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: queryKeys.resumes.all });
-    },
+    getQueryKeys: () => [queryKeys.resumes.all],
   });
 }
 
 export function useAddResumeVersionMutation(resumeId: string | null) {
-  const queryClient = useQueryClient();
-
-  return useMutation({
+  return useInvalidatingMutation({
     mutationFn: (file: File) => resumeService.addVersion(resumeId!, file),
-    onSuccess: () => {
-      if (!resumeId) {
-        return;
-      }
-
-      void queryClient.invalidateQueries({ queryKey: queryKeys.resumes.all });
-      void queryClient.invalidateQueries({ queryKey: queryKeys.resumes.detail(resumeId) });
-    },
+    getQueryKeys: () => (resumeId ? [queryKeys.resumes.all, queryKeys.resumes.detail(resumeId)] : []),
   });
 }

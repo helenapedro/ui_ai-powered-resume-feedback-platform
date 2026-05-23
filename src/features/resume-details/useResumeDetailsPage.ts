@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { resumeService } from '@/services/resumes';
+import { sessionService } from '@/services/session';
 import {
   useAddCommentMutation,
   useCreateShareLinkMutation,
@@ -21,7 +22,7 @@ export function useResumeDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const token = localStorage.getItem('token');
+  const token = sessionService.getToken();
   const [previewVersionId, setPreviewVersionId] = useState<string | null>(null);
   const resumeQuery = useResumeDetailsQuery(id);
   const shareLinksQuery = useShareLinksQuery(id);

@@ -1,4 +1,5 @@
 import { apiClient } from './api';
+import { sessionService } from './session';
 
 interface AuthResponse {
   accessToken: string;
@@ -11,69 +12,45 @@ interface AuthCredentials {
 
 export const authService = {
   async register(credentials: AuthCredentials): Promise<AuthResponse> {
-    localStorage.removeItem('token');
-
-    const response = await apiClient.post<AuthResponse>('/auth/register', credentials);
-    if (response.accessToken) {
-      localStorage.setItem('token', response.accessToken);
-    }
-    return response;
+    return authenticate('/auth/register', credentials);
   },
 
   async login(credentials: AuthCredentials): Promise<AuthResponse> {
-    localStorage.removeItem('token');
-    const response = await apiClient.post<AuthResponse>('/auth/login', credentials);
-    
-    if (response.accessToken) {
-      localStorage.setItem('token', response.accessToken);
-    }
-    return response;
+    return authenticate('/auth/login', credentials);
   },
 
   async loginWithGoogle(idToken: string): Promise<AuthResponse> {
-    localStorage.removeItem('token');
-    const response = await apiClient.post<AuthResponse>('/auth/google', { idToken });
-    if (response.accessToken) {
-      localStorage.setItem('token', response.accessToken);
-    }
-    return response;
+    return authenticate('/auth/google', { idToken });
   },
 
   async reactivate(credentials: AuthCredentials): Promise<AuthResponse> {
-    localStorage.removeItem('token');
-    const response = await apiClient.post<AuthResponse>('/auth/reactivate', credentials);
-    if (response.accessToken) {
-      localStorage.setItem('token', response.accessToken);
-    }
-    return response;
+    return authenticate('/auth/reactivate', credentials);
   },
 
   logout(): void {
-    localStorage.removeItem('token');
+    sessionService.clearToken();
   },
 
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return sessionService.getToken();
   },
 
   isAuthenticated(): boolean {
-    return !!this.getToken();
+    return sessionService.isAuthenticated();
   },
 
-  getUser(): { id: string; email: string; role: string } | null {
-    const token = this.getToken();
-
-    if (!token) return null;
-
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return {
-        id: payload.sub,
-        email: payload.email,
-        role: payload.role,
-      };
-    } catch {
-      return null;
-    }
+  getUser() {
+    return sessionService.getCurrentUser();
   },
 };
+
+async function authenticate(endpoint: string, data: unknown): Promise<AuthResponse> {
+  sessionService.clearToken();
+  const response = await apiClient.post<AuthResponse>(endpoint, data);
+
+  if (response.accessToken) {
+    sessionService.setToken(response.accessToken);
+  }
+
+  return response;
+}

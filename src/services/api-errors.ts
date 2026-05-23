@@ -57,8 +57,7 @@ export function throwApiError(
   errorData: ApiErrorResponse
 ): never {
   if (response.status === 401 || response.status === 403) {
-    localStorage.removeItem('token');
-    window.location.href = '/auth';
+    sessionService.clearToken({ notify: true });
     throw new ApiError(errorData.code, errorData.message, response.status, errorData.details);
   }
 
@@ -78,3 +77,4 @@ export function throwApiError(
     errorData.details
   );
 }
+import { sessionService } from './session';
