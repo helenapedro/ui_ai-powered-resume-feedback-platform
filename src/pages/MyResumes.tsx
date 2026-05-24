@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/useAuth';
 import { getPinnedResumeIds, togglePinnedResumeId } from '@/lib/pinned-resumes';
 import { useResumesQuery } from '@/features/resumes/queries';
 import type { ResumeSummary } from '@/types';

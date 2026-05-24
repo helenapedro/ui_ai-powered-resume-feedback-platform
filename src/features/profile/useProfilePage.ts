@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { userService, type UpdateProfileRequest, type UserProfile } from '@/services/users';
 import { optimizeAvatarFile } from '@/features/profile/avatar-utils';

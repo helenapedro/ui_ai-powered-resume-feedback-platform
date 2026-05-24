@@ -18,7 +18,7 @@ import {
 import { Edit, Trash2, Send } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import type { Comment } from '@/types';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/useAuth';
 
 interface CommentListProps {
   comments: Comment[];

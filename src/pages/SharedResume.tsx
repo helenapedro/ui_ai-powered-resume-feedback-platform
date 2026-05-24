@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { sharingService } from '@/services/sharing';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/useAuth';
 import { CommentList } from '@/components/CommentList';
 import { PdfViewer } from '@/components/PdfViewer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
