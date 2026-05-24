@@ -1,21 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { useAddResumeVersionMutation, useCreateResumeMutation } from '@/features/resumes/queries';
-import {
-  resetUploadState,
-  setIsDragging,
-  setIsUploading,
-  setProgress,
-  setTitle,
-} from '@/store/slices/uploadSlice';
 
 const ACCEPTED_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 export function useUploadPage() {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
@@ -24,11 +15,11 @@ export function useUploadPage() {
   const createResumeMutation = useCreateResumeMutation();
   const addVersionMutation = useAddResumeVersionMutation(resumeId);
   const [file, setFile] = useState<File | null>(null);
+  const [title, setTitle] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
   const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const { title, isUploading, progress, isDragging } = useAppSelector(
-    (state) => state.upload
-  );
 
   const clearProgressInterval = useCallback(() => {
     if (progressIntervalRef.current) {
@@ -41,9 +32,12 @@ export function useUploadPage() {
     return () => {
       clearProgressInterval();
       setFile(null);
-      dispatch(resetUploadState());
+      setTitle('');
+      setIsUploading(false);
+      setProgress(0);
+      setIsDragging(false);
     };
-  }, [clearProgressInterval, dispatch]);
+  }, [clearProgressInterval]);
 
   const validateAndSetFile = useCallback(
     (nextFile: File) => {
@@ -73,30 +67,30 @@ export function useUploadPage() {
   const handleDrop = useCallback(
     (event: React.DragEvent) => {
       event.preventDefault();
-      dispatch(setIsDragging(false));
+      setIsDragging(false);
 
       const droppedFile = event.dataTransfer.files[0];
       if (droppedFile) {
         validateAndSetFile(droppedFile);
       }
     },
-    [dispatch, validateAndSetFile]
+    [validateAndSetFile]
   );
 
   const handleDragOver = useCallback(
     (event: React.DragEvent) => {
       event.preventDefault();
-      dispatch(setIsDragging(true));
+      setIsDragging(true);
     },
-    [dispatch]
+    []
   );
 
   const handleDragLeave = useCallback(
     (event: React.DragEvent) => {
       event.preventDefault();
-      dispatch(setIsDragging(false));
+      setIsDragging(false);
     },
-    [dispatch]
+    []
   );
 
   const handleFileChange = useCallback(
@@ -116,14 +110,14 @@ export function useUploadPage() {
         return;
       }
 
-      dispatch(setIsUploading(true));
-      dispatch(setProgress(0));
+      setIsUploading(true);
+      setProgress(0);
       clearProgressInterval();
 
       let nextProgress = 0;
       progressIntervalRef.current = setInterval(() => {
         nextProgress = Math.min(nextProgress + 10, 90);
-        dispatch(setProgress(nextProgress));
+        setProgress(nextProgress);
       }, 200);
 
       try {
@@ -144,8 +138,10 @@ export function useUploadPage() {
         }
 
         clearProgressInterval();
-        dispatch(setProgress(100));
-        dispatch(resetUploadState());
+        setProgress(100);
+        setTitle('');
+        setFile(null);
+        setIsDragging(false);
       } catch (error) {
         clearProgressInterval();
         toast({
@@ -154,14 +150,13 @@ export function useUploadPage() {
           description: error instanceof Error ? error.message : 'Please try again.',
         });
       } finally {
-        dispatch(setIsUploading(false));
+        setIsUploading(false);
       }
     },
     [
       addVersionMutation,
       clearProgressInterval,
       createResumeMutation,
-      dispatch,
       file,
       isAddingVersion,
       navigate,
@@ -178,7 +173,7 @@ export function useUploadPage() {
     progress,
     isDragging,
     isAddingVersion,
-    setTitle: (value: string) => dispatch(setTitle(value)),
+    setTitle,
     clearFile: () => setFile(null),
     handleDrop,
     handleDragOver,
