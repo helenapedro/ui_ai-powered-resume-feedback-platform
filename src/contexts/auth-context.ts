@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import type { User } from '@/types';
+import type { DemoSessionResponse, User } from '@/types';
 
 export interface AuthContextType {
   user: User | null;
@@ -8,6 +8,7 @@ export interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
   loginWithGoogle: (idToken: string) => Promise<void>;
+  startDemo: () => Promise<DemoSessionResponse>;
   logout: () => void;
 }
 

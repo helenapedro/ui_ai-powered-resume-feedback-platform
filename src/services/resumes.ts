@@ -1,5 +1,5 @@
 import { apiClient } from './api';
-import { API_BASE_URL, API_PREFIX } from './api';
+import { API_BASE_URL, API_PREFIX, buildApiUrl } from './api';
 import type { ResumeSummary, ResumeVersion, ResumeWithVersions } from '@/types';
 
 export const resumeService = {
@@ -36,6 +36,54 @@ export const resumeService = {
 
   getVersionPreviewUrl(resumeId: string, versionId: string): string {
     return `${API_BASE_URL}${API_PREFIX}/resumes/${resumeId}/versions/${versionId}/preview`;
+  },
+
+  async resolveVersionPreviewUrl(resumeId: string, versionId: string, token: string): Promise<string> {
+    const response = await fetch(buildApiUrl(`/resumes/${resumeId}/versions/${versionId}/preview`), {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      redirect: 'follow',
+    });
+
+    if (!response.ok) {
+      throw new Error(`Unable to load PDF preview: ${response.status}`);
+    }
+
+    const blob = await response.blob();
+
+    if (!blob.type.includes('pdf') && blob.size === 0) {
+      throw new Error('Preview response was empty or not a PDF.');
+    }
+
+    return URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }));
+  },
+
+  async downloadVersion(resumeId: string, versionId: string, token: string, filename = 'resume.pdf'): Promise<void> {
+    const response = await fetch(buildApiUrl(`/resumes/${resumeId}/versions/${versionId}/download`), {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      redirect: 'follow',
+    });
+
+    if (!response.ok) {
+      throw new Error(`Unable to download PDF: ${response.status}`);
+    }
+
+    const blob = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = objectUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    URL.revokeObjectURL(objectUrl);
   },
 
   async ping(): Promise<string> {

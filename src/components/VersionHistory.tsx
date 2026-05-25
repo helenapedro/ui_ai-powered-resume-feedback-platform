@@ -8,24 +8,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { History, FileText, Eye, Download, ChevronDown } from 'lucide-react';
 import { format } from 'date-fns';
 import type { ResumeVersion } from '@/types';
-import { resumeService } from '@/services/resumes';
 
 const RECENT_VERSION_LIMIT = 3;
 
 interface VersionHistoryProps {
-  resumeId: string;
   versions: ResumeVersion[];
   currentVersionId: string | null;
   selectedVersionId?: string | null;
+  onDownloadVersion?: (versionId: string, filename?: string) => Promise<void>;
   onPreview?: (versionId: string) => void;
   isLoading: boolean;
 }
 
 export function VersionHistory({
-  resumeId,
   versions,
   currentVersionId,
   selectedVersionId,
+  onDownloadVersion,
   onPreview,
   isLoading,
 }: VersionHistoryProps) {
@@ -109,10 +108,10 @@ export function VersionHistory({
         {recentVersions.map((version) => (
           <VersionRow
             key={version.id}
-            resumeId={resumeId}
             version={version}
             isCurrent={version.id === currentVersionId}
             isSelected={selectedVersionId === version.id}
+            onDownloadVersion={onDownloadVersion}
             onPreview={onPreview}
           />
         ))}
@@ -132,10 +131,10 @@ export function VersionHistory({
                 {olderVersions.map((version) => (
                   <VersionRow
                     key={version.id}
-                    resumeId={resumeId}
                     version={version}
                     isCurrent={version.id === currentVersionId}
                     isSelected={selectedVersionId === version.id}
+                    onDownloadVersion={onDownloadVersion}
                     onPreview={onPreview}
                   />
                 ))}
@@ -149,14 +148,14 @@ export function VersionHistory({
 }
 
 interface VersionRowProps {
-  resumeId: string;
   version: ResumeVersion;
   isCurrent: boolean;
   isSelected: boolean;
+  onDownloadVersion?: (versionId: string, filename?: string) => Promise<void>;
   onPreview?: (versionId: string) => void;
 }
 
-function VersionRow({ resumeId, version, isCurrent, isSelected, onPreview }: VersionRowProps) {
+function VersionRow({ version, isCurrent, isSelected, onDownloadVersion, onPreview }: VersionRowProps) {
   return (
     <div
       className={`flex flex-col gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/50 sm:flex-row sm:items-center sm:justify-between ${
@@ -185,11 +184,9 @@ function VersionRow({ resumeId, version, isCurrent, isSelected, onPreview }: Ver
           <Eye className="mr-1 h-3.5 w-3.5" />
           Preview
         </Button>
-        <Button asChild variant="outline" size="sm">
-          <a href={resumeService.getVersionDownloadUrl(resumeId, version.id)} target="_blank" rel="noreferrer">
-            <Download className="mr-1 h-3.5 w-3.5" />
-            Download
-          </a>
+        <Button variant="outline" size="sm" onClick={() => onDownloadVersion?.(version.id, version.originalFilename)}>
+          <Download className="mr-1 h-3.5 w-3.5" />
+          Download
         </Button>
         <Badge variant="outline" className="text-xs">
           {version.contentType.split('/')[1]?.toUpperCase() || 'FILE'}

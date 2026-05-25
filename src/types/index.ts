@@ -13,6 +13,15 @@ export interface AuthResponse {
   user: User;
 }
 
+export interface DemoSessionResponse {
+  token: string;
+  email: string;
+  userId: string;
+  resumeId: string;
+  currentVersionId: string;
+  baselineVersionId: string;
+}
+
 export interface ResumeSummary {
   id: string;
   title: string;

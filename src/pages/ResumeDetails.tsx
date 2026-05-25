@@ -26,12 +26,13 @@ export default function ResumeDetails() {
     currentVersion,
     activePreviewId,
     previewUrl,
-    authHeaders,
+    isPreviewLoading,
     setPreviewVersion,
     handleAddComment,
     handleDeleteComment,
     handleCreateShareLink,
     handleRevokeLink,
+    handleDownloadVersion,
     handleDeleteResume,
   } = useResumeDetailsPage();
 
@@ -76,10 +77,10 @@ export default function ResumeDetails() {
           <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
             <div className="min-w-0 space-y-6">
               <ResumePreviewCard
-                authHeaders={authHeaders}
                 isPreviewCurrent={isPreviewCurrent}
+                isPreviewLoading={isPreviewLoading}
+                onDownloadVersion={handleDownloadVersion}
                 previewUrl={previewUrl}
-                resumeId={resume.id}
                 selectedVersionId={activePreviewId}
                 version={activePreviewVersion}
               />
@@ -95,6 +96,7 @@ export default function ResumeDetails() {
                 isLoadingLinks={isLoadingLinks}
                 onAddComment={handleAddComment}
                 onDeleteComment={handleDeleteComment}
+                onDownloadVersion={handleDownloadVersion}
                 onOpenShareModal={() => setIsShareModalOpen(true)}
                 onPreviewVersion={setPreviewVersion}
                 onRevokeLink={handleRevokeLink}

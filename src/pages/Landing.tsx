@@ -1,9 +1,16 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { FileText, MessageSquare, History, Sparkles, ArrowRight, Eye, Share2, BrainCircuit } from 'lucide-react';
+import { FileText, MessageSquare, History, Sparkles, ArrowRight, Eye, Share2, BrainCircuit, Loader2 } from 'lucide-react';
+import { useAuth } from '@/contexts/useAuth';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Landing() {
+  const { startDemo } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isStartingDemo, setIsStartingDemo] = useState(false);
   const pillars = [
     {
       icon: Sparkles,
@@ -31,6 +38,23 @@ export default function Landing() {
     },
   ];
 
+  const handleStartDemo = async () => {
+    setIsStartingDemo(true);
+
+    try {
+      const demo = await startDemo();
+      navigate(`/resume/${demo.resumeId}?versionId=${demo.currentVersionId}`);
+    } catch (error) {
+      toast({
+        title: 'Unable to start demo',
+        description: error instanceof Error ? error.message : 'Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsStartingDemo(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -56,7 +80,7 @@ export default function Landing() {
             <div className="space-y-8">
               <div className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
                 <BrainCircuit className="h-4 w-4" />
-                AI Resume Review with Version Tracking
+                Resume Feedback Platform
               </div>
 
               <div className="space-y-5">
@@ -76,6 +100,16 @@ export default function Landing() {
                     Start Reviewing
                     <ArrowRight className="h-4 w-4" />
                   </Link>
+                </Button>
+                <Button variant="outline" size="lg" className="gap-2" onClick={handleStartDemo} disabled={isStartingDemo}>
+                  {isStartingDemo ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Opening Demo
+                    </>
+                  ) : (
+                    'Try Demo'
+                  )}
                 </Button>
                 <Button asChild variant="outline" size="lg">
                   <Link to="/about">See How It Works</Link>

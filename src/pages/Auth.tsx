@@ -1,19 +1,25 @@
 import { useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { FileText, Mail, ArrowLeft } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { FileText, Mail, ArrowLeft, Loader2, PlayCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/Header';
+import { useAuth } from '@/contexts/useAuth';
+import { useToast } from '@/hooks/use-toast';
 import { AuthFormTabs } from '@/pages/auth/AuthFormTabs';
 import { DEFAULT_REDIRECT } from '@/pages/auth/constants';
 import { useAuthPageActions } from '@/pages/auth/useAuthPageActions';
 import { useGoogleGsiButton } from '@/pages/auth/useGoogleGsiButton';
 
 export default function Auth() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get('redirect') || DEFAULT_REDIRECT;
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
   const [showEmailForm, setShowEmailForm] = useState(false);
+  const [isStartingDemo, setIsStartingDemo] = useState(false);
+  const { startDemo } = useAuth();
+  const { toast } = useToast();
 
   const {
     isLoading,
@@ -32,6 +38,23 @@ export default function Auth() {
     renderButton: false,
   });
 
+  const handleStartDemo = async () => {
+    setIsStartingDemo(true);
+
+    try {
+      const demo = await startDemo();
+      navigate(`/resume/${demo.resumeId}?versionId=${demo.currentVersionId}`);
+    } catch (error) {
+      toast({
+        title: 'Unable to start demo',
+        description: error instanceof Error ? error.message : 'Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsStartingDemo(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-muted/30">
       <Header />
@@ -49,6 +72,25 @@ export default function Auth() {
           <CardContent>
             {!showEmailForm ? (
               <div className="space-y-3">
+                <Button
+                  variant="secondary"
+                  className="w-full h-12 text-base gap-3"
+                  onClick={handleStartDemo}
+                  disabled={isStartingDemo}
+                >
+                  {isStartingDemo ? (
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      Opening Demo
+                    </>
+                  ) : (
+                    <>
+                      <PlayCircle className="h-5 w-5" />
+                      Try Demo
+                    </>
+                  )}
+                </Button>
+
                 {googleClientId && (
                   <Button
                     variant="outline"

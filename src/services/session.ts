@@ -1,6 +1,7 @@
 import type { User } from '@/types';
 
 const TOKEN_KEY = 'token';
+const USER_KEY = 'session-user';
 const SESSION_EXPIRED_EVENT = 'session:expired';
 
 type JwtPayload = {
@@ -29,12 +30,20 @@ export const sessionService = {
     return localStorage.getItem(TOKEN_KEY);
   },
 
-  setToken(token: string): void {
+  setToken(token: string, user?: Pick<User, 'id' | 'email' | 'isAdmin'> | null): void {
     localStorage.setItem(TOKEN_KEY, token);
+
+    if (user) {
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
+      return;
+    }
+
+    localStorage.removeItem(USER_KEY);
   },
 
   clearToken(options: { notify?: boolean } = {}): void {
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
 
     if (options.notify) {
       window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
@@ -45,6 +54,15 @@ export const sessionService = {
     const token = this.getToken();
     if (!token) {
       return null;
+    }
+
+    const storedUser = localStorage.getItem(USER_KEY);
+    if (storedUser) {
+      try {
+        return JSON.parse(storedUser) as User;
+      } catch {
+        localStorage.removeItem(USER_KEY);
+      }
     }
 
     const payload = decodeJwtPayload(token);

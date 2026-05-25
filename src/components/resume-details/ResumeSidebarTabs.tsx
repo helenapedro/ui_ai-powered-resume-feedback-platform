@@ -16,6 +16,7 @@ interface ResumeSidebarTabsProps {
   isLoadingLinks: boolean;
   onAddComment: (content: string) => Promise<void>;
   onDeleteComment: (commentId: string) => Promise<void>;
+  onDownloadVersion: (versionId: string, filename?: string) => Promise<void>;
   onOpenShareModal: () => void;
   onPreviewVersion: (versionId: string | null) => void;
   onRevokeLink: (linkId: string) => Promise<void>;
@@ -33,6 +34,7 @@ export function ResumeSidebarTabs({
   isLoadingLinks,
   onAddComment,
   onDeleteComment,
+  onDownloadVersion,
   onOpenShareModal,
   onPreviewVersion,
   onRevokeLink,
@@ -51,10 +53,10 @@ export function ResumeSidebarTabs({
 
       <TabsContent value="versions" className="mt-4">
         <VersionHistory
-          resumeId={resumeId}
           versions={versions}
           currentVersionId={currentVersionId}
           selectedVersionId={selectedVersionId}
+          onDownloadVersion={onDownloadVersion}
           onPreview={onPreviewVersion}
           isLoading={false}
         />

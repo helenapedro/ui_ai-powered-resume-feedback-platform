@@ -1,5 +1,4 @@
 import { format } from 'date-fns';
-import { resumeService } from '@/services/resumes';
 import type { ResumeVersion } from '@/types';
 import { PdfViewer } from '@/components/PdfViewer';
 import { Badge } from '@/components/ui/badge';
@@ -8,19 +7,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Eye } from 'lucide-react';
 
 interface ResumePreviewCardProps {
-  authHeaders?: Record<string, string>;
   isPreviewCurrent: boolean;
+  isPreviewLoading: boolean;
+  onDownloadVersion: (versionId: string, filename?: string) => Promise<void>;
   previewUrl: string | null;
-  resumeId: string;
   selectedVersionId: string | null;
   version: ResumeVersion | undefined;
 }
 
 export function ResumePreviewCard({
-  authHeaders,
   isPreviewCurrent,
+  isPreviewLoading,
+  onDownloadVersion,
   previewUrl,
-  resumeId,
   selectedVersionId,
   version,
 }: ResumePreviewCardProps) {
@@ -43,17 +42,27 @@ export function ResumePreviewCard({
         </div>
 
         {selectedVersionId && (
-          <Button asChild variant="outline" size="sm">
-            <a href={resumeService.getVersionDownloadUrl(resumeId, selectedVersionId)} target="_blank" rel="noreferrer">
-              Download Version
-            </a>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onDownloadVersion(selectedVersionId, version?.originalFilename)}
+          >
+            Download Version
           </Button>
         )}
       </CardHeader>
 
       <CardContent className="p-0">
-        {previewUrl && authHeaders ? (
-          <PdfViewer fileUrl={previewUrl} httpHeaders={authHeaders} className="min-h-[760px]" />
+        {previewUrl ? (
+          <PdfViewer fileUrl={previewUrl} className="min-h-[760px]" />
+        ) : isPreviewLoading ? (
+          <div className="flex min-h-[420px] items-center justify-center p-8 text-sm text-muted-foreground">
+            Loading PDF preview...
+          </div>
+        ) : selectedVersionId ? (
+          <div className="flex min-h-[420px] items-center justify-center p-8 text-sm text-muted-foreground">
+            Unable to load the PDF.
+          </div>
         ) : (
           <div className="flex min-h-[420px] items-center justify-center p-8 text-sm text-muted-foreground">
             Select a version to preview its resume file.
