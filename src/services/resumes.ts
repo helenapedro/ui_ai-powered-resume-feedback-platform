@@ -38,26 +38,14 @@ export const resumeService = {
     return `${API_BASE_URL}${API_PREFIX}/resumes/${resumeId}/versions/${versionId}/preview`;
   },
 
-  async resolveVersionPreviewUrl(resumeId: string, versionId: string, token: string): Promise<string> {
-    const response = await fetch(buildApiUrl(`/resumes/${resumeId}/versions/${versionId}/preview`), {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      redirect: 'follow',
-    });
+  async resolveVersionPreviewUrl(resumeId: string, versionId: string): Promise<string> {
+    const response = await apiClient.get<{ url: string }>(`/resumes/${resumeId}/versions/${versionId}/preview-url`);
 
-    if (!response.ok) {
-      throw new Error(`Unable to load PDF preview: ${response.status}`);
+    if (!response.url) {
+      throw new Error('Preview URL was not returned.');
     }
 
-    const blob = await response.blob();
-
-    if (!blob.type.includes('pdf') && blob.size === 0) {
-      throw new Error('Preview response was empty or not a PDF.');
-    }
-
-    return URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }));
+    return response.url;
   },
 
   async downloadVersion(resumeId: string, versionId: string, token: string, filename = 'resume.pdf'): Promise<void> {

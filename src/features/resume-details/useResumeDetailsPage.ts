@@ -84,7 +84,6 @@ export function useResumeDetailsPage() {
 
   useEffect(() => {
     let cancelled = false;
-    let objectUrl: string | null = null;
 
     async function loadPreview() {
       if (!resume || !activePreviewId || !token) {
@@ -96,17 +95,10 @@ export function useResumeDetailsPage() {
       setIsPreviewLoading(true);
 
       try {
-        const resolvedPreviewUrl = await resumeService.resolveVersionPreviewUrl(resume.id, activePreviewId, token);
+        const resolvedPreviewUrl = await resumeService.resolveVersionPreviewUrl(resume.id, activePreviewId);
 
         if (cancelled) {
-          if (resolvedPreviewUrl.startsWith('blob:')) {
-            URL.revokeObjectURL(resolvedPreviewUrl);
-          }
           return;
-        }
-
-        if (resolvedPreviewUrl.startsWith('blob:')) {
-          objectUrl = resolvedPreviewUrl;
         }
 
         setPreviewUrl(resolvedPreviewUrl);
@@ -126,9 +118,6 @@ export function useResumeDetailsPage() {
 
     return () => {
       cancelled = true;
-      if (objectUrl) {
-        URL.revokeObjectURL(objectUrl);
-      }
     };
   }, [activePreviewId, resume, token]);
 
