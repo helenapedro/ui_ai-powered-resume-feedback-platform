@@ -80,7 +80,7 @@ export default function Landing() {
             <div className="space-y-8">
               <div className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
                 <BrainCircuit className="h-4 w-4" />
-                Resume Feedback Platform
+                𝗔𝗜 𝗥𝗲𝘀𝘂𝗺𝗲 𝗥𝗲𝘃𝗶𝗲𝘄 𝘄𝗶𝘁𝗵 𝗩𝗲𝗿𝘀𝗶𝗼𝗻 𝗧𝗿𝗮𝗰𝗸𝗶𝗻𝗴
               </div>
 
               <div className="space-y-5">
