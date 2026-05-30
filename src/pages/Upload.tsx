@@ -85,7 +85,7 @@ export default function Upload() {
                     <p className="text-sm text-muted-foreground mb-4">or click to browse</p>
                     <input
                       type="file"
-                      accept=".pdf,.jpg,.jpeg,.png"
+                      accept="application/pdf,.pdf"
                       onChange={handleFileChange}
                       className="hidden"
                       id="file-upload"
@@ -95,7 +95,7 @@ export default function Upload() {
                         Select File
                       </label>
                     </Button>
-                    <p className="text-xs text-muted-foreground mt-4">PDF, JPEG, or PNG | Max 10MB</p>
+                    <p className="text-xs text-muted-foreground mt-4">PDF | Max 10MB</p>
                   </>
                 )}
               </div>

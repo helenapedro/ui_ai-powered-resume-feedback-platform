@@ -3,7 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useAddResumeVersionMutation, useCreateResumeMutation } from '@/features/resumes/queries';
 
-const ACCEPTED_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
+const ACCEPTED_TYPES = ['application/pdf', 'application/x-pdf'];
+const PDF_EXTENSION = '.pdf';
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 export function useUploadPage() {
@@ -41,11 +42,14 @@ export function useUploadPage() {
 
   const validateAndSetFile = useCallback(
     (nextFile: File) => {
-      if (!ACCEPTED_TYPES.includes(nextFile.type)) {
+      const hasPdfExtension = nextFile.name.toLowerCase().endsWith(PDF_EXTENSION);
+      const hasAcceptedType = ACCEPTED_TYPES.includes(nextFile.type);
+
+      if (!hasPdfExtension || (nextFile.type && !hasAcceptedType)) {
         toast({
           variant: 'destructive',
           title: 'Invalid file type',
-          description: 'Only PDF, JPEG, and PNG files are supported.',
+          description: 'Only PDF files are supported.',
         });
         return;
       }
