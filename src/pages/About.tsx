@@ -56,25 +56,6 @@ export default function About() {
     },
   ];
 
-  const technicalDesign = [
-    {
-      title: 'Fast uploads',
-      description: 'The app saves the resume and creates an AI review job right away, instead of making the user wait while the AI model processes the file.',
-    },
-    {
-      title: 'Background AI processing',
-      description: 'A separate worker handles slower AI tasks like extracting resume text, calling the AI model, retrying failures, and saving feedback.',
-    },
-    {
-      title: 'Structured data storage',
-      description: 'MySQL stores users, resumes, versions, jobs, sharing, comments, and audit records. MongoDB stores the AI-generated feedback and progress documents.',
-    },
-    {
-      title: 'Practical architecture',
-      description: 'The backend is organized into clear parts: one for user-facing API work, one for background AI work, and one shared area for common data structures.',
-    },
-  ];
-
   return (
     <div className="min-h-screen flex flex-col">
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -230,27 +211,6 @@ export default function About() {
                   <h3 className="text-lg font-semibold text-foreground">{step.title}</h3>
                   <p className="mt-2 text-sm leading-7 text-muted-foreground">{step.description}</p>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-8">
-            <div className="mb-8">
-              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-primary">Technical Design</p>
-              <h2 className="mt-4 text-3xl font-bold text-foreground">Designed to keep uploads fast and feedback reliable</h2>
-            </div>
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-              {technicalDesign.map((item, index) => (
-                <Card
-                  key={item.title}
-                  className="border bg-background shadow-sm animate-fade-in"
-                  style={{ animationDelay: `${index * 120}ms`, animationFillMode: 'both' }}
-                >
-                  <CardContent className="p-6 space-y-3">
-                    <h3 className="text-lg font-semibold text-foreground">{item.title}</h3>
-                    <p className="text-sm leading-7 text-muted-foreground">{item.description}</p>
-                  </CardContent>
-                </Card>
               ))}
             </div>
           </div>
