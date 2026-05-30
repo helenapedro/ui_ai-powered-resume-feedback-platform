@@ -15,12 +15,14 @@ interface ResumeSidebarTabsProps {
   isLoadingComments: boolean;
   isLoadingLinks: boolean;
   onAddComment: (content: string) => Promise<void>;
+  onEditComment: (commentId: string, content: string) => Promise<void>;
   onDeleteComment: (commentId: string) => Promise<void>;
   onDownloadVersion: (versionId: string, filename?: string) => Promise<void>;
   onOpenShareModal: () => void;
   onPreviewVersion: (versionId: string | null) => void;
   onRevokeLink: (linkId: string) => Promise<void>;
   resumeId: string;
+  resumeOwnerId?: string;
   selectedVersionId: string | null;
   sharedLinks: SharedLink[];
   versions: ResumeVersion[];
@@ -33,12 +35,14 @@ export function ResumeSidebarTabs({
   isLoadingComments,
   isLoadingLinks,
   onAddComment,
+  onEditComment,
   onDeleteComment,
   onDownloadVersion,
   onOpenShareModal,
   onPreviewVersion,
   onRevokeLink,
   resumeId,
+  resumeOwnerId,
   selectedVersionId,
   sharedLinks,
   versions,
@@ -75,7 +79,9 @@ export function ResumeSidebarTabs({
               comments={comments}
               isLoading={isLoadingComments}
               onAddComment={onAddComment}
+              onEditComment={onEditComment}
               onDeleteComment={onDeleteComment}
+              resumeOwnerId={resumeOwnerId}
             />
           </CardContent>
         </Card>

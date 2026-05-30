@@ -11,8 +11,10 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import {
   useAddSharedCommentMutation,
+  useDeleteSharedCommentMutation,
   useSharedCommentsQuery,
   useSharedResumeQuery,
+  useUpdateSharedCommentMutation,
 } from '@/features/sharing/queries';
 import { FileText, AlertCircle, ExternalLink, LogIn } from 'lucide-react';
 
@@ -24,6 +26,8 @@ export default function SharedResume() {
   const data = sharedResumeQuery.data ?? null;
   const commentsQuery = useSharedCommentsQuery(token, data?.permission === 'COMMENT' && isAuthenticated);
   const addCommentMutation = useAddSharedCommentMutation(token);
+  const updateCommentMutation = useUpdateSharedCommentMutation(token);
+  const deleteCommentMutation = useDeleteSharedCommentMutation(token);
   const error = sharedResumeQuery.error
     ? sharedResumeQuery.error instanceof Error
       ? sharedResumeQuery.error.message
@@ -54,6 +58,26 @@ export default function SharedResume() {
       }
     },
     [addCommentMutation, toast]
+  );
+
+  const handleEditComment = useCallback(
+    async (commentId: string, content: string) => {
+      await updateCommentMutation.mutateAsync({
+        commentId,
+        data: {
+          body: content,
+          anchorRef: null,
+        },
+      });
+    },
+    [updateCommentMutation]
+  );
+
+  const handleDeleteComment = useCallback(
+    async (commentId: string) => {
+      await deleteCommentMutation.mutateAsync(commentId);
+    },
+    [deleteCommentMutation]
   );
 
   const handleDownload = () => {
@@ -141,6 +165,8 @@ export default function SharedResume() {
                     comments={commentsQuery.data ?? []}
                     isLoading={commentsQuery.isLoading}
                     onAddComment={handleAddComment}
+                    onEditComment={handleEditComment}
+                    onDeleteComment={handleDeleteComment}
                   />
                 ) : (
                   <div className="text-center py-6">

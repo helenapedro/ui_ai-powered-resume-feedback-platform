@@ -12,6 +12,7 @@ import {
   useResumeDetailsQuery,
   useRevokeShareLinkMutation,
   useShareLinksQuery,
+  useUpdateCommentMutation,
 } from '@/features/resumes/queries';
 import type { ShareLinkFormData } from '@/components/ShareLinkModal';
 import type { ResumeVersion } from '@/types';
@@ -39,6 +40,7 @@ export function useResumeDetailsPage() {
   const activePreviewId = previewVersionId || requestedPreviewId || resume?.currentVersionId || null;
   const commentsQuery = useResumeCommentsQuery(id, activePreviewId);
   const addCommentMutation = useAddCommentMutation(id, activePreviewId);
+  const updateCommentMutation = useUpdateCommentMutation(id, activePreviewId);
   const deleteCommentMutation = useDeleteCommentMutation(id, activePreviewId);
   const createShareLinkMutation = useCreateShareLinkMutation(id);
   const revokeShareLinkMutation = useRevokeShareLinkMutation(id);
@@ -143,6 +145,23 @@ export function useResumeDetailsPage() {
     [activePreviewId, deleteCommentMutation, id]
   );
 
+  const handleEditComment = useCallback(
+    async (commentId: string, content: string) => {
+      if (!id || !activePreviewId) {
+        return;
+      }
+
+      await updateCommentMutation.mutateAsync({
+        commentId,
+        data: {
+          body: content,
+          anchorRef: null,
+        },
+      });
+    },
+    [activePreviewId, id, updateCommentMutation]
+  );
+
   const handleCreateShareLink = useCallback(
     async (data: ShareLinkFormData) => {
       if (!id) {
@@ -232,6 +251,7 @@ export function useResumeDetailsPage() {
     isPreviewLoading,
     setPreviewVersion: handleSetPreviewVersion,
     handleAddComment,
+    handleEditComment,
     handleDeleteComment,
     handleCreateShareLink,
     handleRevokeLink,

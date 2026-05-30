@@ -8,10 +8,12 @@ import { ResumeFeedbackSection } from '@/components/resume-details/ResumeFeedbac
 import { ResumePreviewCard } from '@/components/resume-details/ResumePreviewCard';
 import { ResumeSidebarTabs } from '@/components/resume-details/ResumeSidebarTabs';
 import { ResumeWorkflowCard } from '@/components/resume-details/ResumeWorkflowCard';
+import { useAuth } from '@/contexts/useAuth';
 import { useResumeDetailsPage } from '@/features/resume-details/useResumeDetailsPage';
 
 export default function ResumeDetails() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const {
     resume,
@@ -29,6 +31,7 @@ export default function ResumeDetails() {
     isPreviewLoading,
     setPreviewVersion,
     handleAddComment,
+    handleEditComment,
     handleDeleteComment,
     handleCreateShareLink,
     handleRevokeLink,
@@ -95,12 +98,14 @@ export default function ResumeDetails() {
                 isLoadingComments={isLoadingComments}
                 isLoadingLinks={isLoadingLinks}
                 onAddComment={handleAddComment}
+                onEditComment={handleEditComment}
                 onDeleteComment={handleDeleteComment}
                 onDownloadVersion={handleDownloadVersion}
                 onOpenShareModal={() => setIsShareModalOpen(true)}
                 onPreviewVersion={setPreviewVersion}
                 onRevokeLink={handleRevokeLink}
                 resumeId={resume.id}
+                resumeOwnerId={user?.id}
                 selectedVersionId={activePreviewId}
                 sharedLinks={sharedLinks}
                 versions={versions}

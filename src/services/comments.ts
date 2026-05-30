@@ -8,6 +8,11 @@ export interface CreateCommentRequest {
   parentCommentId?: string | null;
 }
 
+export interface UpdateCommentRequest {
+  body: string;
+  anchorRef?: string | null;
+}
+
 export const commentService = {
   async getComments(resumeId: string, versionId: string): Promise<Comment[]> {
     const comments = await apiClient.get<Comment[]>(`/resumes/${resumeId}/versions/${versionId}/comments`);
@@ -16,6 +21,19 @@ export const commentService = {
 
   async addComment(resumeId: string, versionId: string, request: CreateCommentRequest): Promise<Comment> {
     const comment = await apiClient.post<Comment>(`/resumes/${resumeId}/versions/${versionId}/comments`, request);
+    return normalizeComment(comment);
+  },
+
+  async updateComment(
+    resumeId: string,
+    versionId: string,
+    commentId: string,
+    request: UpdateCommentRequest
+  ): Promise<Comment> {
+    const comment = await apiClient.patch<Comment>(
+      `/resumes/${resumeId}/versions/${versionId}/comments/${commentId}`,
+      request
+    );
     return normalizeComment(comment);
   },
 

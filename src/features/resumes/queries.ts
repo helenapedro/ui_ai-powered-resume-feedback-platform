@@ -1,9 +1,10 @@
-import { useQuery } from '@tanstack/react-query';
-import { commentService } from '@/services/comments';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { commentService, type UpdateCommentRequest } from '@/services/comments';
 import { resumeService } from '@/services/resumes';
 import { sharingService, type CreateShareLinkRequest } from '@/services/sharing';
 import { queryKeys } from '@/features/queries/keys';
 import { useInvalidatingMutation } from '@/features/queries/useInvalidatingMutation';
+import type { Comment } from '@/types';
 
 export function useResumesQuery() {
   return useQuery({
@@ -43,10 +44,41 @@ export function useAddCommentMutation(resumeId: string | undefined, versionId: s
   });
 }
 
+export function useUpdateCommentMutation(resumeId: string | undefined, versionId: string | null) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ commentId, data }: { commentId: string; data: UpdateCommentRequest }) =>
+      commentService.updateComment(resumeId!, versionId!, commentId, data),
+    onSuccess: (updatedComment) => {
+      if (!resumeId || !versionId) {
+        return;
+      }
+
+      queryClient.setQueryData<Comment[]>(
+        queryKeys.resumes.comments(resumeId, versionId),
+        (comments = []) =>
+          comments.map((comment) => (comment.id === updatedComment.id ? updatedComment : comment))
+      );
+    },
+  });
+}
+
 export function useDeleteCommentMutation(resumeId: string | undefined, versionId: string | null) {
-  return useInvalidatingMutation({
+  const queryClient = useQueryClient();
+
+  return useMutation({
     mutationFn: (commentId: string) => commentService.deleteComment(resumeId!, versionId!, commentId),
-    getQueryKeys: () => (resumeId && versionId ? [queryKeys.resumes.comments(resumeId, versionId)] : []),
+    onSuccess: (_data, commentId) => {
+      if (!resumeId || !versionId) {
+        return;
+      }
+
+      queryClient.setQueryData<Comment[]>(
+        queryKeys.resumes.comments(resumeId, versionId),
+        (comments = []) => comments.filter((comment) => comment.id !== commentId)
+      );
+    },
   });
 }
 
