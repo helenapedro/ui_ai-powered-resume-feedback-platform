@@ -67,17 +67,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [runAuthTask]
   );
 
-  const startDemo = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const demo = await authService.startDemoSession();
-      setUser(getStoredUser());
-      return demo;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
   const logout = useCallback(() => {
     authService.logout();
     setUser(null);
@@ -92,10 +81,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       login,
       register,
       loginWithGoogle,
-      startDemo,
       logout,
     }),
-    [isLoading, login, loginWithGoogle, logout, register, startDemo, user]
+    [isLoading, login, loginWithGoogle, logout, register, user]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

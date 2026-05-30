@@ -8,12 +8,10 @@ import { ResumeFeedbackSection } from '@/components/resume-details/ResumeFeedbac
 import { ResumePreviewCard } from '@/components/resume-details/ResumePreviewCard';
 import { ResumeSidebarTabs } from '@/components/resume-details/ResumeSidebarTabs';
 import { ResumeWorkflowCard } from '@/components/resume-details/ResumeWorkflowCard';
-import { useAuth } from '@/contexts/useAuth';
 import { useResumeDetailsPage } from '@/features/resume-details/useResumeDetailsPage';
 
 export default function ResumeDetails() {
   const navigate = useNavigate();
-  const { user } = useAuth();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const {
     resume,
@@ -105,7 +103,6 @@ export default function ResumeDetails() {
                 onPreviewVersion={setPreviewVersion}
                 onRevokeLink={handleRevokeLink}
                 resumeId={resume.id}
-                resumeOwnerId={user?.id}
                 selectedVersionId={activePreviewId}
                 sharedLinks={sharedLinks}
                 versions={versions}

@@ -177,7 +177,10 @@ export function CommentList({
           {actionError && <p className="text-sm text-destructive">{actionError}</p>}
           {comments.map((comment) => {
             const commentId = comment.id;
-            const canEdit = Boolean(onEditComment) && canEditComment(comment, user) && !deniedEditIds.includes(commentId);
+            const canEdit =
+              Boolean(onEditComment) &&
+              canEditComment(comment, user) &&
+              !deniedEditIds.includes(commentId);
             const canDelete =
               Boolean(onDeleteComment) &&
               canDeleteComment(comment, user, resumeOwnerId) &&
