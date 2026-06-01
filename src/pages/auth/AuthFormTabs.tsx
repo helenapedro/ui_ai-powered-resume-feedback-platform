@@ -15,10 +15,16 @@ type AuthFormTabsProps = {
 export function AuthFormTabs({ isLoading, onLogin, onRegister, onReactivate }: AuthFormTabsProps) {
   return (
     <Tabs defaultValue="login" className="w-full">
-      <TabsList className="grid w-full grid-cols-3">
-        <TabsTrigger value="login">Sign In</TabsTrigger>
-        <TabsTrigger value="register">Create Account</TabsTrigger>
-        <TabsTrigger value="reactivate">Reactivate</TabsTrigger>
+      <TabsList className="grid h-auto w-full grid-cols-1 gap-1 p-1 sm:grid-cols-3">
+        <TabsTrigger value="login" className="h-10 whitespace-normal px-2 text-sm">
+          Sign In
+        </TabsTrigger>
+        <TabsTrigger value="register" className="h-10 whitespace-normal px-2 text-sm">
+          Create Account
+        </TabsTrigger>
+        <TabsTrigger value="reactivate" className="h-10 whitespace-normal px-2 text-sm">
+          Reactivate
+        </TabsTrigger>
       </TabsList>
 
       <TabsContent value="login">
