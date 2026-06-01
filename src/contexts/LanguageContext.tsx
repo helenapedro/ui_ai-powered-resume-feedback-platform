@@ -23,6 +23,9 @@ type TranslationKey =
   | 'feedback.legacy'
   | 'feedback.failedEyebrow'
   | 'feedback.failedTitle'
+  | 'feedback.unsupportedDocumentTitle'
+  | 'feedback.unsupportedDocumentDescription'
+  | 'feedback.unreadableDocumentDescription'
   | 'feedback.tryAgain'
   | 'feedback.interruptedEyebrow'
   | 'feedback.interruptedTitle'
@@ -57,6 +60,7 @@ type TranslationKey =
   | 'feedback.statusAnalyzing'
   | 'feedback.statusReady'
   | 'feedback.statusRetry'
+  | 'feedback.statusUnsupported'
   | 'progress.titleFallback'
   | 'progress.startsAfterSecond'
   | 'progress.buildingTitle'
@@ -164,6 +168,9 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     'feedback.legacy': 'This review uses an older feedback format. Regenerate to get the latest review.',
     'feedback.failedEyebrow': 'Review Failed',
     'feedback.failedTitle': 'The feedback run did not complete',
+    'feedback.unsupportedDocumentTitle': 'This file is not a resume',
+    'feedback.unsupportedDocumentDescription': 'This PDF looks like a book, article, or long document, so AI feedback was not generated. Please upload a resume/CV PDF instead.',
+    'feedback.unreadableDocumentDescription': 'We could not read enough text from this PDF to generate feedback. Please upload a text-based resume/CV PDF.',
     'feedback.tryAgain': 'Try Again',
     'feedback.interruptedEyebrow': 'Review Interrupted',
     'feedback.interruptedTitle': 'The latest feedback could not be loaded',
@@ -198,6 +205,7 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     'feedback.statusAnalyzing': 'Analyzing',
     'feedback.statusReady': 'Ready',
     'feedback.statusRetry': 'Needs retry',
+    'feedback.statusUnsupported': 'Unsupported file',
     'progress.titleFallback': 'Progress Since Previous Version',
     'progress.startsAfterSecond': 'Progress comparison starts after you upload a second version.',
     'progress.buildingTitle': 'Building version-to-version comparison',
@@ -304,6 +312,9 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     'feedback.legacy': 'Esta revisao usa um formato antigo. Gere novamente para receber a versao mais recente.',
     'feedback.failedEyebrow': 'Revisao falhou',
     'feedback.failedTitle': 'A execucao do feedback nao terminou',
+    'feedback.unsupportedDocumentTitle': 'Este ficheiro nao e um CV',
+    'feedback.unsupportedDocumentDescription': 'Este PDF parece ser um livro, artigo ou documento longo, por isso o feedback da IA nao foi gerado. Carregue um CV em PDF.',
+    'feedback.unreadableDocumentDescription': 'Nao foi possivel ler texto suficiente deste PDF para gerar feedback. Carregue um CV em PDF com texto selecionavel.',
     'feedback.tryAgain': 'Tentar novamente',
     'feedback.interruptedEyebrow': 'Revisao interrompida',
     'feedback.interruptedTitle': 'Nao foi possivel carregar o feedback mais recente',
@@ -338,6 +349,7 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     'feedback.statusAnalyzing': 'A analisar',
     'feedback.statusReady': 'Pronto',
     'feedback.statusRetry': 'Precisa repetir',
+    'feedback.statusUnsupported': 'Ficheiro nao suportado',
     'progress.titleFallback': 'Progresso desde a versao anterior',
     'progress.startsAfterSecond': 'A comparacao de progresso comeca depois de carregar uma segunda versao.',
     'progress.buildingTitle': 'A criar comparacao entre versoes',

@@ -54,6 +54,12 @@ export function useAiReviewState(resumeId: string, versionId: string, hasPreviou
     }
 
     if (job?.status === 'FAILED') {
+      if (job.errorCode === 'RESUME_DOCUMENT_NOT_DETECTED') {
+        return t('feedback.unsupportedDocumentDescription');
+      }
+      if (job.errorCode === 'RESUME_TEXT_NOT_EXTRACTED') {
+        return t('feedback.unreadableDocumentDescription');
+      }
       return job.errorDetail || t('feedback.failedDefault');
     }
 

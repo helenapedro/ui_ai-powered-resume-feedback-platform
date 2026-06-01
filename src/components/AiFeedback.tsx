@@ -58,8 +58,13 @@ export function AiFeedback({ resumeId, versionId, versionNumber, versions }: AiF
     );
   }
 
-  const status = feedbackStatusConfig[job.status] ?? feedbackStatusConfig.PENDING;
-  const canRegenerate = job.status === 'DONE' || job.status === 'FAILED';
+  const isUnsupportedDocument =
+    job.status === 'FAILED' &&
+    (job.errorCode === 'RESUME_DOCUMENT_NOT_DETECTED' || job.errorCode === 'RESUME_TEXT_NOT_EXTRACTED');
+  const status = isUnsupportedDocument
+    ? { ...feedbackStatusConfig.FAILED, label: t('feedback.statusUnsupported') }
+    : feedbackStatusConfig[job.status] ?? feedbackStatusConfig.PENDING;
+  const canRegenerate = job.status === 'DONE' || (job.status === 'FAILED' && !isUnsupportedDocument);
   const isLegacyFeedback = Boolean(feedback && (!feedback.promptVersion || feedback.promptVersion < 'v3'));
 
   return (
@@ -98,15 +103,19 @@ export function AiFeedback({ resumeId, versionId, versionNumber, versions }: AiF
       {feedbackError && job.status === 'FAILED' && (
         <FeedbackMessageState
           eyebrow={t('feedback.failedEyebrow')}
-          title={t('feedback.failedTitle')}
+          title={isUnsupportedDocument ? t('feedback.unsupportedDocumentTitle') : t('feedback.failedTitle')}
           description={feedbackError}
           tone="destructive"
-          action={{
-            label: t('feedback.tryAgain'),
-            onClick: handleRegenerate,
-            disabled: isRegenerating,
-            loading: isRegenerating,
-          }}
+          action={
+            isUnsupportedDocument
+              ? undefined
+              : {
+                  label: t('feedback.tryAgain'),
+                  onClick: handleRegenerate,
+                  disabled: isRegenerating,
+                  loading: isRegenerating,
+                }
+          }
         />
       )}
 
