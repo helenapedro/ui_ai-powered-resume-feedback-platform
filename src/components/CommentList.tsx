@@ -26,8 +26,7 @@ import { MoreHorizontal, Send } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import type { Comment, User } from '@/types';
 import { useAuth } from '@/contexts/useAuth';
-
-const FORBIDDEN_ACTION_MESSAGE = 'You can only edit your own comments.';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const canEditComment = (comment: Comment, currentUser: User | null | undefined) =>
   Boolean(currentUser?.id && comment.authorUserId === currentUser.id);
@@ -64,6 +63,7 @@ export function CommentList({
   resumeOwnerId,
 }: CommentListProps) {
   const { user } = useAuth();
+  const { language } = useLanguage();
   const [newComment, setNewComment] = useState('');
   const [guestLabel, setGuestLabel] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -72,6 +72,41 @@ export function CommentList({
   const [actionError, setActionError] = useState<string | null>(null);
   const [deniedEditIds, setDeniedEditIds] = useState<string[]>([]);
   const [deniedDeleteIds, setDeniedDeleteIds] = useState<string[]>([]);
+  const copy = language === 'pt'
+    ? {
+        forbidden: 'So pode editar os seus proprios comentarios.',
+        updateError: 'Nao foi possivel atualizar o comentario.',
+        deleteError: 'Nao foi possivel eliminar o comentario.',
+        guestPlaceholder: 'O seu nome (ex.: Recruiter, Hiring Manager)',
+        commentPlaceholder: 'Adicione um comentario de revisao para esta versao',
+        addComment: 'Adicionar comentario',
+        empty: 'Ainda nao ha comentarios de revisao para esta versao.',
+        edited: 'editado',
+        actions: 'Acoes do comentario',
+        edit: 'Editar',
+        delete: 'Eliminar',
+        deleteTitle: 'Eliminar comentario?',
+        deleteDescription: 'Esta acao nao pode ser desfeita.',
+        cancel: 'Cancelar',
+        save: 'Guardar',
+      }
+    : {
+        forbidden: 'You can only edit your own comments.',
+        updateError: 'Unable to update comment.',
+        deleteError: 'Unable to delete comment.',
+        guestPlaceholder: 'Your name (e.g. Recruiter, Hiring Manager)',
+        commentPlaceholder: 'Add a review comment for this version',
+        addComment: 'Add Comment',
+        empty: 'No review comments yet for this version.',
+        edited: 'edited',
+        actions: 'Comment actions',
+        edit: 'Edit',
+        delete: 'Delete',
+        deleteTitle: 'Delete comment?',
+        deleteDescription: 'This action cannot be undone.',
+        cancel: 'Cancel',
+        save: 'Save',
+      };
 
   const handleSubmit = async () => {
     if (!newComment.trim()) return;
@@ -98,11 +133,11 @@ export function CommentList({
         setDeniedEditIds((ids) => [...new Set([...ids, commentId])]);
         setEditingId(null);
         setEditText('');
-        setActionError(FORBIDDEN_ACTION_MESSAGE);
+        setActionError(copy.forbidden);
         return;
       }
 
-      setActionError(error instanceof Error ? error.message : 'Unable to update comment.');
+      setActionError(error instanceof Error ? error.message : copy.updateError);
     } finally {
       setIsSubmitting(false);
     }
@@ -116,11 +151,11 @@ export function CommentList({
     } catch (error) {
       if (isForbiddenError(error)) {
         setDeniedDeleteIds((ids) => [...new Set([...ids, commentId])]);
-        setActionError(FORBIDDEN_ACTION_MESSAGE);
+        setActionError(copy.forbidden);
         return;
       }
 
-      setActionError(error instanceof Error ? error.message : 'Unable to delete comment.');
+      setActionError(error instanceof Error ? error.message : copy.deleteError);
     }
   };
 
@@ -151,27 +186,27 @@ export function CommentList({
         <div className="flex-1 space-y-2">
           {!user && (
             <Input
-              placeholder="Your name (e.g. Recruiter, Hiring Manager)"
+              placeholder={copy.guestPlaceholder}
               value={guestLabel}
               onChange={(event) => setGuestLabel(event.target.value)}
               className="mb-2"
             />
           )}
           <Textarea
-            placeholder="Add a review comment for this version"
+            placeholder={copy.commentPlaceholder}
             value={newComment}
             onChange={(event) => setNewComment(event.target.value)}
             className="min-h-[80px]"
           />
           <Button onClick={handleSubmit} disabled={!newComment.trim() || isSubmitting} size="sm">
             <Send className="h-4 w-4 mr-2" />
-            Add Comment
+            {copy.addComment}
           </Button>
         </div>
       </div>
 
       {comments.length === 0 ? (
-        <p className="text-center text-muted-foreground py-8">No review comments yet for this version.</p>
+        <p className="text-center text-muted-foreground py-8">{copy.empty}</p>
       ) : (
         <div className="space-y-4">
           {actionError && <p className="text-sm text-destructive">{actionError}</p>}
@@ -202,7 +237,7 @@ export function CommentList({
                       </span>
                       {comment.updatedAt && (
                         <span className="text-xs text-muted-foreground">
-                          edited {formatDistanceToNow(new Date(comment.updatedAt), { addSuffix: true })}
+                          {copy.edited} {formatDistanceToNow(new Date(comment.updatedAt), { addSuffix: true })}
                         </span>
                       )}
                     </div>
@@ -212,7 +247,7 @@ export function CommentList({
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon" className="h-8 w-8">
                               <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Comment actions</span>
+                              <span className="sr-only">{copy.actions}</span>
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
@@ -224,7 +259,7 @@ export function CommentList({
                                   setEditText(comment.body);
                                 }}
                               >
-                                Edit
+                                {copy.edit}
                               </DropdownMenuItem>
                             )}
                             {canDelete && (
@@ -233,7 +268,7 @@ export function CommentList({
                                   className="text-destructive focus:text-destructive"
                                   onSelect={(event) => event.preventDefault()}
                                 >
-                                  Delete
+                                  {copy.delete}
                                 </DropdownMenuItem>
                               </AlertDialogTrigger>
                             )}
@@ -241,16 +276,16 @@ export function CommentList({
                         </DropdownMenu>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Delete comment?</AlertDialogTitle>
-                            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+                            <AlertDialogTitle>{copy.deleteTitle}</AlertDialogTitle>
+                            <AlertDialogDescription>{copy.deleteDescription}</AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogCancel>{copy.cancel}</AlertDialogCancel>
                             <AlertDialogAction
                               onClick={() => handleDelete(commentId)}
                               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             >
-                              Delete
+                              {copy.delete}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
@@ -266,7 +301,7 @@ export function CommentList({
                       />
                       <div className="flex gap-2">
                         <Button size="sm" onClick={() => handleEdit(commentId)} disabled={isSubmitting}>
-                          Save
+                          {copy.save}
                         </Button>
                         <Button
                           size="sm"
@@ -276,7 +311,7 @@ export function CommentList({
                             setEditText('');
                           }}
                         >
-                          Cancel
+                          {copy.cancel}
                         </Button>
                       </div>
                     </div>

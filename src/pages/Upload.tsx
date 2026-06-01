@@ -7,8 +7,10 @@ import { Progress } from '@/components/ui/progress';
 import { Upload as UploadIcon, FileText, X, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUploadPage } from '@/features/upload/useUploadPage';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Upload() {
+  const { t } = useLanguage();
   const {
     file,
     title,
@@ -34,22 +36,22 @@ export default function Upload() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <UploadIcon className="h-6 w-6 text-primary" />
-              {isAddingVersion ? 'Add New Version' : 'Upload Resume'}
+              {isAddingVersion ? t('upload.addNewVersion') : t('upload.uploadResume')}
             </CardTitle>
             <CardDescription>
               {isAddingVersion
-                ? 'Add a new version to an existing resume'
-                : 'Upload your resume and receive AI feedback in minutes'}
+                ? t('upload.addVersionDescription')
+                : t('upload.uploadDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               {!isAddingVersion && (
                 <div className="space-y-2">
-                  <Label htmlFor="title">Title (optional)</Label>
+                  <Label htmlFor="title">{t('upload.titleOptional')}</Label>
                   <Input
                     id="title"
-                    placeholder="Example: Backend Developer Resume"
+                    placeholder={t('upload.titlePlaceholder')}
                     value={title}
                     onChange={(event) => setTitle(event.target.value)}
                     disabled={isUploading}
@@ -81,8 +83,8 @@ export default function Upload() {
                 ) : (
                   <>
                     <UploadIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-lg font-medium mb-2">Drag and drop your resume here</p>
-                    <p className="text-sm text-muted-foreground mb-4">or click to browse</p>
+                    <p className="text-lg font-medium mb-2">{t('upload.dropResume')}</p>
+                    <p className="text-sm text-muted-foreground mb-4">{t('upload.browse')}</p>
                     <input
                       type="file"
                       accept="application/pdf,.pdf"
@@ -92,10 +94,10 @@ export default function Upload() {
                     />
                     <Button type="button" variant="outline" asChild>
                       <label htmlFor="file-upload" className="cursor-pointer">
-                        Select File
+                        {t('upload.selectFile')}
                       </label>
                     </Button>
-                    <p className="text-xs text-muted-foreground mt-4">PDF | Max 10MB</p>
+                    <p className="text-xs text-muted-foreground mt-4">{t('upload.pdfLimit')}</p>
                   </>
                 )}
               </div>
@@ -103,7 +105,7 @@ export default function Upload() {
               {isUploading && (
                 <div className="space-y-2">
                   <Progress value={progress} />
-                  <p className="text-sm text-muted-foreground text-center">Uploading resume...</p>
+                  <p className="text-sm text-muted-foreground text-center">{t('upload.uploadingResume')}</p>
                 </div>
               )}
 
@@ -111,12 +113,12 @@ export default function Upload() {
                 {isUploading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Uploading...
+                    {t('upload.uploading')}
                   </>
                 ) : (
                   <>
                     <UploadIcon className="mr-2 h-4 w-4" />
-                    {isAddingVersion ? 'Add Version' : 'Upload Resume'}
+                    {isAddingVersion ? t('upload.addVersion') : t('upload.uploadResume')}
                   </>
                 )}
               </Button>

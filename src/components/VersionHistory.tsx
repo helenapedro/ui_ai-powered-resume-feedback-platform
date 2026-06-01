@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { History, FileText, Eye, Download, ChevronDown } from 'lucide-react';
 import { format } from 'date-fns';
 import type { ResumeVersion } from '@/types';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const RECENT_VERSION_LIMIT = 3;
 
@@ -28,6 +29,7 @@ export function VersionHistory({
   onPreview,
   isLoading,
 }: VersionHistoryProps) {
+  const { t } = useLanguage();
   const sortedVersions = useMemo(
     () => [...versions].sort((a, b) => b.versionNumber - a.versionNumber),
     [versions],
@@ -51,7 +53,7 @@ export function VersionHistory({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <History className="h-5 w-5" />
-            Version History
+            {t('history.title')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -72,11 +74,11 @@ export function VersionHistory({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <History className="h-5 w-5" />
-            Version History
+            {t('history.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground text-sm text-center py-4">No versions available.</p>
+          <p className="text-muted-foreground text-sm text-center py-4">{t('history.empty')}</p>
         </CardContent>
       </Card>
     );
@@ -87,19 +89,19 @@ export function VersionHistory({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <History className="h-5 w-5" />
-          Version History ({versions.length})
+          {t('history.title')} ({versions.length})
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         <Select value={selectedVersionId ?? ''} onValueChange={(versionId) => onPreview?.(versionId)}>
-          <SelectTrigger aria-label="Jump to version">
-            <SelectValue placeholder="Jump to version" />
+          <SelectTrigger aria-label={t('history.jump')}>
+            <SelectValue placeholder={t('history.jump')} />
           </SelectTrigger>
           <SelectContent>
             {sortedVersions.map((version) => (
               <SelectItem key={version.id} value={version.id}>
-                Version {version.versionNumber}
-                {version.id === currentVersionId ? ' - Current' : ''}
+                {t('preview.version')} {version.versionNumber}
+                {version.id === currentVersionId ? ` - ${t('history.currentSuffix')}` : ''}
               </SelectItem>
             ))}
           </SelectContent>
@@ -113,6 +115,10 @@ export function VersionHistory({
             isSelected={selectedVersionId === version.id}
             onDownloadVersion={onDownloadVersion}
             onPreview={onPreview}
+            currentLabel={t('history.currentSuffix')}
+            downloadLabel={t('history.download')}
+            previewLabel={t('history.preview')}
+            versionLabel={t('preview.version')}
           />
         ))}
 
@@ -121,7 +127,7 @@ export function VersionHistory({
             <CollapsibleTrigger asChild>
               <Button variant="outline" className="w-full justify-between">
                 <span>
-                  Older versions ({olderVersions.length})
+                  {t('history.older')} ({olderVersions.length})
                 </span>
                 <ChevronDown className={`h-4 w-4 transition-transform ${isOlderOpen ? 'rotate-180' : ''}`} />
               </Button>
@@ -136,6 +142,10 @@ export function VersionHistory({
                     isSelected={selectedVersionId === version.id}
                     onDownloadVersion={onDownloadVersion}
                     onPreview={onPreview}
+                    currentLabel={t('history.currentSuffix')}
+                    downloadLabel={t('history.download')}
+                    previewLabel={t('history.preview')}
+                    versionLabel={t('preview.version')}
                   />
                 ))}
               </div>
@@ -153,9 +163,23 @@ interface VersionRowProps {
   isSelected: boolean;
   onDownloadVersion?: (versionId: string, filename?: string) => Promise<void>;
   onPreview?: (versionId: string) => void;
+  currentLabel: string;
+  downloadLabel: string;
+  previewLabel: string;
+  versionLabel: string;
 }
 
-function VersionRow({ version, isCurrent, isSelected, onDownloadVersion, onPreview }: VersionRowProps) {
+function VersionRow({
+  version,
+  isCurrent,
+  isSelected,
+  onDownloadVersion,
+  onPreview,
+  currentLabel,
+  downloadLabel,
+  previewLabel,
+  versionLabel,
+}: VersionRowProps) {
   return (
     <div
       className={`flex flex-col gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/50 sm:flex-row sm:items-center sm:justify-between ${
@@ -168,10 +192,10 @@ function VersionRow({ version, isCurrent, isSelected, onDownloadVersion, onPrevi
         </div>
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-sm font-medium">Version {version.versionNumber}</p>
+            <p className="text-sm font-medium">{versionLabel} {version.versionNumber}</p>
             {isCurrent && (
               <Badge variant="secondary" className="text-xs">
-                Current
+                {currentLabel}
               </Badge>
             )}
           </div>
@@ -182,11 +206,11 @@ function VersionRow({ version, isCurrent, isSelected, onDownloadVersion, onPrevi
       <div className="flex flex-wrap items-center gap-2 sm:justify-end">
         <Button variant={isSelected ? 'default' : 'outline'} size="sm" onClick={() => onPreview?.(version.id)}>
           <Eye className="mr-1 h-3.5 w-3.5" />
-          Preview
+          {previewLabel}
         </Button>
         <Button variant="outline" size="sm" onClick={() => onDownloadVersion?.(version.id, version.originalFilename)}>
           <Download className="mr-1 h-3.5 w-3.5" />
-          Download
+          {downloadLabel}
         </Button>
         <Badge variant="outline" className="text-xs">
           {version.contentType.split('/')[1]?.toUpperCase() || 'FILE'}

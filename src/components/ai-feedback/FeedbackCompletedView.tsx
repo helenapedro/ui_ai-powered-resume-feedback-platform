@@ -4,6 +4,7 @@ import { FeedbackEmptyList } from '@/components/ai-feedback/FeedbackEmptyList';
 import { FeedbackItem } from '@/components/ai-feedback/FeedbackItem';
 import { FeedbackSection } from '@/components/ai-feedback/FeedbackSection';
 import { sanitizeFeedbackItems } from '@/components/ai-feedback/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface FeedbackCompletedViewProps {
   feedback: AiFeedbackDTO;
@@ -11,7 +12,8 @@ interface FeedbackCompletedViewProps {
 }
 
 export function FeedbackCompletedView({ feedback, versionNumber }: FeedbackCompletedViewProps) {
-  const summary = feedback.summary?.trim() || 'No AI summary is available for this version.';
+  const { t } = useLanguage();
+  const summary = feedback.summary?.trim() || t('feedback.summaryFallback');
   const strengths = sanitizeFeedbackItems(feedback.strengths);
   const improvements = sanitizeFeedbackItems(feedback.improvements);
 
@@ -21,10 +23,10 @@ export function FeedbackCompletedView({ feedback, versionNumber }: FeedbackCompl
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-3xl space-y-4">
             <p className="text-xs font-semibold uppercase tracking-[0.26em] text-primary/75">
-              Feedback for v{versionNumber}
+              {t('feedback.forVersion', { version: versionNumber })}
             </p>
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-              Overall Assessment
+              {t('feedback.overallAssessment')}
             </p>
             <p className="text-base leading-8 text-foreground/80 sm:text-lg">{summary}</p>
           </div>
@@ -32,13 +34,13 @@ export function FeedbackCompletedView({ feedback, versionNumber }: FeedbackCompl
           <div className="grid gap-3 sm:min-w-[220px]">
             <div className="rounded-2xl border border-border/70 bg-background/80 px-4 py-3">
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-                Strength signals
+                {t('feedback.strengthSignals')}
               </p>
               <p className="mt-2 text-2xl font-semibold text-foreground">{strengths.length}</p>
             </div>
             <div className="rounded-2xl border border-border/70 bg-background/80 px-4 py-3">
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-                Gaps to close
+                {t('feedback.gapsToClose')}
               </p>
               <p className="mt-2 text-2xl font-semibold text-foreground">{improvements.length}</p>
             </div>
@@ -48,9 +50,9 @@ export function FeedbackCompletedView({ feedback, versionNumber }: FeedbackCompl
 
       <div className="grid gap-6 xl:grid-cols-[0.96fr_1.04fr]">
         <FeedbackSection
-          eyebrow="AI Feedback"
-          title="Strength Signals"
-          description="These are the parts already helping the current version read clearly and credibly."
+          eyebrow={t('feedback.aiFeedback')}
+          title={t('feedback.strengthSignals')}
+          description={t('feedback.strengthDescription')}
           icon={<ThumbsUp className="h-5 w-5 text-emerald-700 dark:text-emerald-300" />}
           accentClassName="border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/70 dark:bg-emerald-950/40"
         >
@@ -66,14 +68,14 @@ export function FeedbackCompletedView({ feedback, versionNumber }: FeedbackCompl
               ))}
             </ul>
           ) : (
-            <FeedbackEmptyList message="No strength signals were returned." />
+            <FeedbackEmptyList message={t('feedback.noStrengths')} />
           )}
         </FeedbackSection>
 
         <FeedbackSection
-          eyebrow="AI Feedback"
-          title="Gaps to Close"
-          description="Treat these as the highest-leverage changes for the current version."
+          eyebrow={t('feedback.aiFeedback')}
+          title={t('feedback.gapsToClose')}
+          description={t('feedback.gapsDescription')}
           icon={<ArrowUpRight className="h-5 w-5 text-amber-700 dark:text-amber-300" />}
           accentClassName="border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/70 dark:bg-amber-950/40"
         >
@@ -96,7 +98,7 @@ export function FeedbackCompletedView({ feedback, versionNumber }: FeedbackCompl
               ))}
             </ul>
           ) : (
-            <FeedbackEmptyList message="No gaps were returned." />
+            <FeedbackEmptyList message={t('feedback.noGaps')} />
           )}
         </FeedbackSection>
       </div>

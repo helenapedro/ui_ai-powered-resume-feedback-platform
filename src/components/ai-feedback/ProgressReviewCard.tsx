@@ -2,6 +2,7 @@ import { ArrowRight, Loader2, Minus, TrendingDown, TrendingUp } from 'lucide-rea
 import type { AiProgressDTO, AiProgressStatus } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { sanitizeFeedbackItems, toSentenceCase } from '@/components/ai-feedback/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ProgressReviewCardProps {
   baselineVersionNumber?: number;
@@ -13,34 +14,6 @@ interface ProgressReviewCardProps {
   progress: AiProgressDTO | null;
 }
 
-const progressStatusStyles: Record<string, { label: string; badgeClassName: string; icon: typeof TrendingUp }> = {
-  IMPROVED: {
-    label: 'Updated',
-    badgeClassName:
-      'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/70 dark:bg-emerald-950/40 dark:text-emerald-300',
-    icon: TrendingUp,
-  },
-  UNCHANGED: {
-    label: 'No major change',
-    badgeClassName:
-      'border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-300',
-    icon: Minus,
-  },
-  DECLINED: {
-    label: 'Needs review',
-    badgeClassName:
-      'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900/70 dark:bg-rose-950/40 dark:text-rose-300',
-    icon: TrendingDown,
-  },
-};
-
-const fallbackProgressStatus = {
-  label: 'Unknown',
-  badgeClassName:
-    'border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-300',
-  icon: Minus,
-} as const;
-
 export function ProgressReviewCard({
   baselineVersionNumber,
   currentVersionNumber,
@@ -50,14 +23,18 @@ export function ProgressReviewCard({
   isUnavailable,
   progress,
 }: ProgressReviewCardProps) {
+  const { language, t } = useLanguage();
+  const progressStatusStyles = getProgressStatusStyles(language);
+  const fallbackProgressStatus = getFallbackProgressStatus(language);
+
   if (!hasPreviousVersion) {
     return (
       <div className="rounded-[1.5rem] border border-dashed border-border/80 bg-background/70 p-5">
         <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-          Progress Since Previous Version
+          {t('progress.titleFallback')}
         </p>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          Progress comparison starts after you upload a second version.
+          {t('progress.startsAfterSecond')}
         </p>
       </div>
     );
@@ -69,16 +46,16 @@ export function ProgressReviewCard({
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2">
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary/75">
-              {getProgressTitle(baselineVersionNumber, currentVersionNumber)}
+              {getProgressTitle(baselineVersionNumber, currentVersionNumber, t('progress.titleFallback'))}
             </p>
-            <h3 className="text-lg font-semibold text-foreground">Building version-to-version comparison</h3>
+            <h3 className="text-lg font-semibold text-foreground">{t('progress.buildingTitle')}</h3>
             <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-              The AI review is still processing. Progress insights will appear once this version finishes analysis.
+              {t('progress.buildingDescription')}
             </p>
           </div>
           <div className="flex items-center gap-3 rounded-2xl border border-primary/15 bg-background/80 px-4 py-3">
             <Loader2 className="h-4 w-4 animate-spin text-primary" />
-            <span className="text-sm font-medium text-foreground">Pending</span>
+            <span className="text-sm font-medium text-foreground">{t('progress.pending')}</span>
           </div>
         </div>
       </div>
@@ -89,7 +66,7 @@ export function ProgressReviewCard({
     return (
       <div className="rounded-[1.5rem] border border-border/80 bg-background/70 p-5">
         <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-          {getProgressTitle(baselineVersionNumber, currentVersionNumber)}
+          {getProgressTitle(baselineVersionNumber, currentVersionNumber, t('progress.titleFallback'))}
         </p>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">{error}</p>
       </div>
@@ -100,16 +77,16 @@ export function ProgressReviewCard({
     return (
       <div className="rounded-[1.5rem] border border-dashed border-border/80 bg-background/70 p-5">
         <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-          {getProgressTitle(baselineVersionNumber, currentVersionNumber)}
+          {getProgressTitle(baselineVersionNumber, currentVersionNumber, t('progress.titleFallback'))}
         </p>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          Progress comparison is not available yet for this version.
+          {t('progress.unavailable')}
         </p>
       </div>
     );
   }
 
-  const statusPresentation = getProgressStatusPresentation(progress.progressStatus);
+  const statusPresentation = getProgressStatusPresentation(progress.progressStatus, progressStatusStyles, fallbackProgressStatus);
   const StatusIcon = statusPresentation.icon;
   const progressScore = getProgressScore(progress);
   const improvedAreas = sanitizeFeedbackItems(progress.improvedAreas);
@@ -121,26 +98,30 @@ export function ProgressReviewCard({
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div className="max-w-3xl space-y-4">
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-primary/75">
-            {getProgressTitle(baselineVersionNumber, currentVersionNumber)}
+            {getProgressTitle(baselineVersionNumber, currentVersionNumber, t('progress.titleFallback'))}
           </p>
           <h3 className="text-2xl font-semibold leading-tight text-foreground sm:text-3xl">
-            How this version changed compared with the previous resume
+            {t('progress.changedTitle')}
           </h3>
           <p className="text-base leading-8 text-foreground/80">{progress.summary}</p>
         </div>
 
         <div className="grid gap-3 sm:min-w-[240px]">
           <div className="rounded-2xl border border-border/70 bg-background/85 px-4 py-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Status</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+              {t('progress.status')}
+            </p>
             <Badge className={`mt-3 rounded-full border px-3 py-1 text-xs font-medium ${statusPresentation.badgeClassName}`}>
               <StatusIcon className="mr-2 h-3.5 w-3.5" />
               {statusPresentation.label}
             </Badge>
           </div>
           <div className="rounded-2xl border border-border/70 bg-background/85 px-4 py-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Score</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+              {t('progress.score')}
+            </p>
             <p className="mt-2 text-2xl font-semibold text-foreground">
-              {progressScore === null ? 'Not scored' : `${progressScore}/100`}
+              {progressScore === null ? t('progress.notScored') : `${progressScore}/100`}
             </p>
           </div>
         </div>
@@ -148,24 +129,24 @@ export function ProgressReviewCard({
 
       <div className="mt-6 grid gap-4 xl:grid-cols-3">
         <ProgressList
-          title="What improved"
-          description="Signals that got stronger in this version."
+          title={t('progress.whatImproved')}
+          description={t('progress.whatImprovedDescription')}
           items={improvedAreas}
-          emptyText="No improvements detected for this comparison."
+          emptyText={t('progress.noImprovements')}
           tone="emerald"
         />
         <ProgressList
-          title="Still needs work"
-          description="Issues that remain unresolved from the previous version."
+          title={t('progress.stillNeedsWork')}
+          description={t('progress.stillNeedsWorkDescription')}
           items={unchangedIssues}
-          emptyText="No items in this category for the current comparison."
+          emptyText={t('progress.noUnchanged')}
           tone="slate"
         />
         <ProgressList
-          title="New issues"
-          description="Problems introduced or made more visible in this version."
+          title={t('progress.newIssues')}
+          description={t('progress.newIssuesDescription')}
           items={newIssues}
-          emptyText="No items in this category for the current comparison."
+          emptyText={t('progress.noNewIssues')}
           tone="amber"
         />
       </div>
@@ -218,15 +199,19 @@ function ProgressList({
   );
 }
 
-function getProgressTitle(baselineVersionNumber: number | undefined, currentVersionNumber: number) {
+function getProgressTitle(baselineVersionNumber: number | undefined, currentVersionNumber: number, fallback: string) {
   if (baselineVersionNumber) {
     return `Progress from v${baselineVersionNumber} to v${currentVersionNumber}`;
   }
 
-  return 'Progress Since Previous Version';
+  return fallback;
 }
 
-function getProgressStatusPresentation(status: AiProgressStatus) {
+function getProgressStatusPresentation(
+  status: AiProgressStatus,
+  progressStatusStyles: Record<string, { label: string; badgeClassName: string; icon: typeof TrendingUp }>,
+  fallbackProgressStatus: { label: string; badgeClassName: string; icon: typeof Minus },
+) {
   const normalizedStatus = status.trim().toUpperCase();
 
   if (normalizedStatus in progressStatusStyles) {
@@ -260,4 +245,36 @@ function getProgressScore(progress: AiProgressDTO) {
   }
 
   return Math.max(0, Math.min(100, Math.round(rawProgressScore)));
+}
+
+function getProgressStatusStyles(language: 'en' | 'pt') {
+  return {
+    IMPROVED: {
+      label: language === 'pt' ? 'Atualizado' : 'Updated',
+      badgeClassName:
+        'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/70 dark:bg-emerald-950/40 dark:text-emerald-300',
+      icon: TrendingUp,
+    },
+    UNCHANGED: {
+      label: language === 'pt' ? 'Sem grande mudanca' : 'No major change',
+      badgeClassName:
+        'border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-300',
+      icon: Minus,
+    },
+    DECLINED: {
+      label: language === 'pt' ? 'Precisa de revisao' : 'Needs review',
+      badgeClassName:
+        'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900/70 dark:bg-rose-950/40 dark:text-rose-300',
+      icon: TrendingDown,
+    },
+  };
+}
+
+function getFallbackProgressStatus(language: 'en' | 'pt') {
+  return {
+    label: language === 'pt' ? 'Desconhecido' : 'Unknown',
+    badgeClassName:
+      'border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-300',
+    icon: Minus,
+  } as const;
 }

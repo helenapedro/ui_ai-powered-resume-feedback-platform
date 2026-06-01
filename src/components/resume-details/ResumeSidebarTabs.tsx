@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { Comment, ResumeVersion, SharedLink } from '@/types';
 import { Link2, MessageSquare, Share2 } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ResumeSidebarTabsProps {
   activeShareLinksCount: number;
@@ -47,12 +48,31 @@ export function ResumeSidebarTabs({
   sharedLinks,
   versions,
 }: ResumeSidebarTabsProps) {
+  const { language } = useLanguage();
+  const copy = language === 'pt'
+    ? {
+        versions: 'Versoes',
+        comments: 'Comentarios',
+        share: 'Partilhar',
+        activeShareLinks: 'Links ativos de partilha',
+        activeLinks: 'links ativos',
+        newLink: 'Novo link',
+      }
+    : {
+        versions: 'Versions',
+        comments: 'Comments',
+        share: 'Share',
+        activeShareLinks: 'Active share links',
+        activeLinks: 'active links',
+        newLink: 'New Link',
+      };
+
   return (
     <Tabs defaultValue="versions" className="w-full">
       <TabsList className="grid h-auto w-full grid-cols-3">
-        <TabsTrigger value="versions">Versions</TabsTrigger>
-        <TabsTrigger value="comments">Comments</TabsTrigger>
-        <TabsTrigger value="share">Share</TabsTrigger>
+        <TabsTrigger value="versions">{copy.versions}</TabsTrigger>
+        <TabsTrigger value="comments">{copy.comments}</TabsTrigger>
+        <TabsTrigger value="share">{copy.share}</TabsTrigger>
       </TabsList>
 
       <TabsContent value="versions" className="mt-4">
@@ -71,7 +91,7 @@ export function ResumeSidebarTabs({
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <MessageSquare className="h-5 w-5" />
-              Comments
+              {copy.comments}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -93,13 +113,13 @@ export function ResumeSidebarTabs({
             <div>
               <p className="flex items-center gap-2 text-sm font-medium">
                 <Link2 className="h-4 w-4" />
-                Active share links
+                {copy.activeShareLinks}
               </p>
-              <p className="mt-1 text-sm text-muted-foreground">{activeShareLinksCount} active links</p>
+              <p className="mt-1 text-sm text-muted-foreground">{activeShareLinksCount} {copy.activeLinks}</p>
             </div>
             <Button size="sm" onClick={onOpenShareModal}>
               <Share2 className="mr-2 h-4 w-4" />
-              New Link
+              {copy.newLink}
             </Button>
           </div>
         </div>

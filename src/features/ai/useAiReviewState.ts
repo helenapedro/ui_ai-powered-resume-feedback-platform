@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ApiError } from '@/services/api';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
   useAiFeedbackQuery,
   useAiProgressQuery,
@@ -10,6 +11,7 @@ import {
 const POLL_TIMEOUT = 120000;
 
 export function useAiReviewState(resumeId: string, versionId: string, hasPreviousVersion: boolean) {
+  const { t } = useLanguage();
   const [timeoutError, setTimeoutError] = useState<string | null>(null);
   const jobQuery = useLatestAiJobQuery(resumeId, versionId);
   const job = jobQuery.data ?? null;
@@ -35,11 +37,11 @@ export function useAiReviewState(resumeId: string, versionId: string, hasPreviou
     }
 
     const timeoutId = window.setTimeout(() => {
-      setTimeoutError('The AI review timed out. Try regenerating the review.');
+      setTimeoutError(t('feedback.timeout'));
     }, POLL_TIMEOUT);
 
     return () => window.clearTimeout(timeoutId);
-  }, [job?.id, job?.status]);
+  }, [job?.id, job?.status, t]);
 
   const handleRegenerate = useCallback(async () => {
     setTimeoutError(null);
@@ -52,11 +54,11 @@ export function useAiReviewState(resumeId: string, versionId: string, hasPreviou
     }
 
     if (job?.status === 'FAILED') {
-      return job.errorDetail || 'The AI review failed.';
+      return job.errorDetail || t('feedback.failedDefault');
     }
 
     if (feedbackQuery.error && !isFeedbackUnavailable) {
-      return 'Unable to load AI feedback.';
+      return t('feedback.loadError');
     }
 
     if (jobQuery.error && !job) {
@@ -64,11 +66,11 @@ export function useAiReviewState(resumeId: string, versionId: string, hasPreviou
     }
 
     if (regenerateMutation.error) {
-      return 'Unable to regenerate AI feedback.';
+      return t('feedback.regenerateError');
     }
 
     return null;
-  }, [feedbackQuery.error, isFeedbackUnavailable, job, jobQuery.error, regenerateMutation.error, timeoutError]);
+  }, [feedbackQuery.error, isFeedbackUnavailable, job, jobQuery.error, regenerateMutation.error, t, timeoutError]);
 
   const progressError = useMemo(() => {
     if (!hasPreviousVersion || isProgressUnavailable) {
@@ -76,11 +78,11 @@ export function useAiReviewState(resumeId: string, versionId: string, hasPreviou
     }
 
     if (progressQuery.error) {
-      return 'Progress comparison is not available right now.';
+      return t('feedback.progressUnavailable');
     }
 
     return null;
-  }, [hasPreviousVersion, isProgressUnavailable, progressQuery.error]);
+  }, [hasPreviousVersion, isProgressUnavailable, progressQuery.error, t]);
 
   return {
     job,

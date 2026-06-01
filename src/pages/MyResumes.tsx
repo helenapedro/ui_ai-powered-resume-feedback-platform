@@ -13,23 +13,25 @@ import { useResumesQuery } from '@/features/resumes/queries';
 import type { ResumeSummary } from '@/types';
 import { Calendar, FileText, Pin, Plus, Search, Upload } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function MyResumes() {
   const [pinnedResumeIds, setPinnedResumeIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const { toast } = useToast();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const { data: resumes = [], isLoading, error } = useResumesQuery();
 
   useEffect(() => {
     if (error) {
       toast({
         variant: 'destructive',
-        title: 'Unable to load resumes',
-        description: error instanceof Error ? error.message : 'Please try again.',
+        title: t('resumes.loadErrorTitle'),
+        description: error instanceof Error ? error.message : t('resumes.loadErrorDescription'),
       });
     }
-  }, [error, toast]);
+  }, [error, t, toast]);
 
   useEffect(() => {
     if (!user?.id) {
@@ -90,11 +92,11 @@ export default function MyResumes() {
               <div className="max-w-3xl">
                 <Badge variant="outline" className="mb-3 gap-2">
                   <FileText className="h-3.5 w-3.5" />
-                  Resume workflows
+                  {t('resumes.workflowBadge')}
                 </Badge>
-                <h1 className="text-3xl font-bold tracking-tight md:text-4xl">My Resume Workflow</h1>
+                <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{t('resumes.title')}</h1>
                 <p className="mt-2 text-muted-foreground">
-                  Reopen active drafts, add new versions, and keep important review workflows pinned for quick access.
+                  {t('resumes.description')}
                 </p>
               </div>
 
@@ -104,25 +106,25 @@ export default function MyResumes() {
                   <Input
                     value={searchQuery}
                     onChange={(event) => setSearchQuery(event.target.value)}
-                    placeholder="Search workflows"
+                    placeholder={t('resumes.searchPlaceholder')}
                     className="pl-9"
                   />
                 </div>
                 <Button asChild>
                   <Link to="/upload">
                     <Plus className="mr-2 h-4 w-4" />
-                    New Resume
+                    {t('resumes.newResume')}
                   </Link>
                 </Button>
               </div>
             </div>
 
             <div className="mt-6 grid gap-3 md:grid-cols-3">
-              <DashboardStat label="Total workflows" value={resumes.length.toString()} icon={FileText} />
-              <DashboardStat label="Active workflows" value={activeResumeCount.toString()} icon={Upload} />
+              <DashboardStat label={t('resumes.totalWorkflows')} value={resumes.length.toString()} icon={FileText} />
+              <DashboardStat label={t('resumes.activeWorkflows')} value={activeResumeCount.toString()} icon={Upload} />
               <DashboardStat
-                label="Newest workflow"
-                value={latestResume ? formatDistanceToNow(new Date(latestResume.createdAt), { addSuffix: true }) : 'None yet'}
+                label={t('resumes.newestWorkflow')}
+                value={latestResume ? formatDistanceToNow(new Date(latestResume.createdAt), { addSuffix: true }) : t('resumes.noneYet')}
                 icon={Calendar}
               />
             </div>
@@ -139,23 +141,23 @@ export default function MyResumes() {
           ) : resumes.length === 0 ? (
             <EmptyState
               icon={FileText}
-              title="You do not have any resume workflows yet"
-              description="Upload your first resume to start a version-aware feedback workflow."
-              actionLabel="Upload Resume"
+              title={t('resumes.emptyTitle')}
+              description={t('resumes.emptyDescription')}
+              actionLabel={t('resumes.emptyAction')}
               actionHref="/upload"
             />
           ) : filteredResumes.length === 0 ? (
             <EmptyState
               icon={Search}
-              title="No resume workflows found"
-              description="Try searching with a different title."
+              title={t('resumes.noResultsTitle')}
+              description={t('resumes.noResultsDescription')}
             />
           ) : (
             <div className="space-y-10">
               {pinnedResumes.length > 0 && !isSearching && (
                 <WorkflowSection
-                  title="Pinned"
-                  description="High-priority workflows stay at the top of your dashboard."
+                  title={t('resumes.pinned')}
+                  description={t('resumes.pinnedDescription')}
                   icon={Pin}
                 >
                   <ResumeGrid
@@ -168,11 +170,11 @@ export default function MyResumes() {
 
               {mainSectionResumes.length > 0 && (
                 <WorkflowSection
-                  title={isSearching ? 'Search Results' : pinnedResumes.length > 0 ? 'All Workflows' : 'Recent Workflows'}
+                  title={isSearching ? t('resumes.searchResults') : pinnedResumes.length > 0 ? t('resumes.allWorkflows') : t('resumes.recentWorkflows')}
                   description={
                     isSearching
                       ? `${filteredResumes.length} matching workflow${filteredResumes.length === 1 ? '' : 's'}`
-                      : 'Sorted by pinned status first, then newest created date.'
+                      : t('resumes.sortedDescription')
                   }
                   icon={FileText}
                 >

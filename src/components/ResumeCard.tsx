@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { FileText, Calendar, Eye, Pin, Upload, ArrowRight } from 'lucide-react';
 import type { ResumeSummary } from '@/types';
 import { format } from 'date-fns';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ResumeCardProps {
   resume: ResumeSummary;
@@ -15,6 +16,29 @@ interface ResumeCardProps {
 }
 
 export function ResumeCard({ resume, showActions, isPinned = false, onTogglePin }: ResumeCardProps) {
+  const { language } = useLanguage();
+  const copy = language === 'pt'
+    ? {
+        untitled: 'CV sem titulo',
+        pinned: 'Fixado',
+        activeWorkflow: 'Fluxo ativo',
+        noActiveVersion: 'Sem versao ativa',
+        unpin: 'Desafixar do topo',
+        pin: 'Fixar no topo',
+        open: 'Abrir',
+        addVersion: 'Adicionar versao',
+      }
+    : {
+        untitled: 'Untitled resume',
+        pinned: 'Pinned',
+        activeWorkflow: 'Active workflow',
+        noActiveVersion: 'No active version',
+        unpin: 'Unpin from top',
+        pin: 'Pin to top',
+        open: 'Open',
+        addVersion: 'Add version',
+      };
+
   return (
     <Card className="group h-full overflow-hidden border-border/80 bg-background shadow-sm transition-shadow hover:shadow-md">
       <CardContent className="p-5">
@@ -24,10 +48,10 @@ export function ResumeCard({ resume, showActions, isPinned = false, onTogglePin 
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h3 className="truncate text-lg font-semibold">{resume.title || 'Untitled resume'}</h3>
+              <h3 className="truncate text-lg font-semibold">{resume.title || copy.untitled}</h3>
               {isPinned && (
                 <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-700">
-                  Pinned
+                  {copy.pinned}
                 </Badge>
               )}
             </div>
@@ -37,7 +61,7 @@ export function ResumeCard({ resume, showActions, isPinned = false, onTogglePin 
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
               <Badge variant={resume.currentVersionId ? 'secondary' : 'outline'} className="text-xs">
-                {resume.currentVersionId ? 'Active workflow' : 'No active version'}
+                {resume.currentVersionId ? copy.activeWorkflow : copy.noActiveVersion}
               </Badge>
             </div>
           </div>
@@ -48,7 +72,7 @@ export function ResumeCard({ resume, showActions, isPinned = false, onTogglePin 
               size="icon"
               className={isPinned ? 'shrink-0 text-amber-600 hover:text-amber-700' : 'shrink-0 text-muted-foreground'}
               onClick={() => onTogglePin(resume.id)}
-              title={isPinned ? 'Unpin from top' : 'Pin to top'}
+              title={isPinned ? copy.unpin : copy.pin}
             >
               <Pin className={`h-4 w-4 ${isPinned ? 'fill-current' : ''}`} />
             </Button>
@@ -60,13 +84,13 @@ export function ResumeCard({ resume, showActions, isPinned = false, onTogglePin 
           <Link to={`/resume/${resume.id}`}>
             <span className="flex items-center">
               <Eye className="mr-2 h-4 w-4" />
-              Open
+              {copy.open}
             </span>
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
         </Button>
         {showActions && (
-          <Button asChild variant="default" size="icon" title="Add version">
+          <Button asChild variant="default" size="icon" title={copy.addVersion}>
             <Link to={`/upload?resumeId=${resume.id}`}>
               <Upload className="h-4 w-4" />
             </Link>

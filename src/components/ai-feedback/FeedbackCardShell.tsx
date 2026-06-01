@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import type { FeedbackViewAction, StatusPresentation } from '@/components/ai-feedback/types';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface FeedbackCardShellProps {
   children: ReactNode;
@@ -14,6 +15,8 @@ interface FeedbackCardShellProps {
 }
 
 export function FeedbackCardShell({ children, action, description, status }: FeedbackCardShellProps) {
+  const { t } = useLanguage();
+
   return (
     <Card className="overflow-hidden border-border/60 bg-[radial-gradient(circle_at_top_left,_hsl(var(--primary)/0.08),_transparent_32%),linear-gradient(180deg,hsl(var(--background)),hsl(var(--muted)/0.28))] shadow-lg">
       <CardHeader className="gap-5 border-b border-border/60 bg-background/80 pb-6 backdrop-blur-sm">
@@ -24,12 +27,12 @@ export function FeedbackCardShell({ children, action, description, status }: Fee
                 <Brain className="h-5 w-5 text-primary" />
               </div>
               <div className="space-y-1">
-                <CardTitle className="text-xl sm:text-2xl">AI Review</CardTitle>
+                <CardTitle className="text-xl sm:text-2xl">{t('feedback.cardTitle')}</CardTitle>
               </div>
             </div>
             <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
               {description ??
-                'Review for the selected resume version, including version-to-version progress when available.'}
+                t('feedback.cardDescription')}
             </p>
           </div>
 

@@ -7,7 +7,7 @@ export const aiService = {
   },
 
   async regenerate(resumeId: string, versionId: string): Promise<AiJobDTO> {
-    return apiClient.post<AiJobDTO>(`/resumes/${resumeId}/versions/${versionId}/ai-jobs/regenerate`);
+    return apiClient.post<AiJobDTO>(`/resumes/${resumeId}/versions/${versionId}/ai-jobs/regenerate?language=AUTO`);
   },
 
   async getFeedback(resumeId: string, versionId: string): Promise<AiFeedbackDTO> {

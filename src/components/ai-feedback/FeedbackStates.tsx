@@ -1,6 +1,7 @@
 import { Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface FeedbackMessageStateProps {
   eyebrow: string;
@@ -68,17 +69,20 @@ export function FeedbackMessageState({
 }
 
 export function FeedbackProcessingState() {
+  const { t } = useLanguage();
+
   return (
     <div className="rounded-[1.75rem] border border-border/70 bg-background/85 p-6 shadow-sm sm:p-8">
       <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
         <div className="max-w-2xl space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">In Progress</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+            {t('feedback.processingEyebrow')}
+          </p>
           <h3 className="text-2xl font-semibold text-foreground sm:text-3xl">
-            Reviewing this resume like a recruiter would
+            {t('feedback.processingTitle')}
           </h3>
           <p className="text-sm leading-6 text-muted-foreground">
-            The model is evaluating positioning, evidence quality, skills coverage, and whether the resume reads at
-            the level it is aiming for.
+            {t('feedback.processingDescription')}
           </p>
         </div>
 
@@ -87,8 +91,8 @@ export function FeedbackProcessingState() {
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
           </div>
           <div className="space-y-1">
-            <p className="text-sm font-semibold text-foreground">Building feedback</p>
-            <p className="text-xs leading-5 text-muted-foreground">Usually finishes in a few seconds.</p>
+            <p className="text-sm font-semibold text-foreground">{t('feedback.buildingFeedback')}</p>
+            <p className="text-xs leading-5 text-muted-foreground">{t('feedback.usuallyFinishes')}</p>
           </div>
         </div>
       </div>
