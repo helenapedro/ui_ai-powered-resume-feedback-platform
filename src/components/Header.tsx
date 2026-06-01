@@ -61,7 +61,7 @@ export function Header() {
           ) : (
             <>
               <Link
-                to="/about"
+                to="/#about"
                 className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                 title={t('nav.about')}
               >
@@ -118,7 +118,7 @@ export function Header() {
                 ) : (
                   <>
                     <Link
-                      to="/about"
+                      to="/#about"
                       className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
                       onClick={() => setMobileOpen(false)}
                     >
