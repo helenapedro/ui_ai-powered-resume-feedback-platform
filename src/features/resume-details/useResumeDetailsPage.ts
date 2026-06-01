@@ -86,6 +86,7 @@ export function useResumeDetailsPage() {
 
   useEffect(() => {
     let cancelled = false;
+    let objectUrl: string | null = null;
 
     async function loadPreview() {
       if (!resume || !activePreviewId || !token) {
@@ -95,11 +96,22 @@ export function useResumeDetailsPage() {
       }
 
       setIsPreviewLoading(true);
+      setPreviewUrl(null);
 
       try {
-        const resolvedPreviewUrl = await resumeService.resolveVersionPreviewUrl(resume.id, activePreviewId);
+        let resolvedPreviewUrl: string;
+        try {
+          resolvedPreviewUrl = await resumeService.createVersionPreviewObjectUrl(resume.id, activePreviewId, token);
+          objectUrl = resolvedPreviewUrl;
+        } catch (blobError) {
+          console.warn('Authenticated preview blob failed, falling back to preview URL:', blobError);
+          resolvedPreviewUrl = await resumeService.resolveVersionPreviewUrl(resume.id, activePreviewId);
+        }
 
         if (cancelled) {
+          if (objectUrl) {
+            URL.revokeObjectURL(objectUrl);
+          }
           return;
         }
 
@@ -120,6 +132,9 @@ export function useResumeDetailsPage() {
 
     return () => {
       cancelled = true;
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
     };
   }, [activePreviewId, resume, token]);
 

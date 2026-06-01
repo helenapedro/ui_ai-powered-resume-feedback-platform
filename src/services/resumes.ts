@@ -48,6 +48,32 @@ export const resumeService = {
     return response.url;
   },
 
+  async createVersionPreviewObjectUrl(resumeId: string, versionId: string, token: string): Promise<string> {
+    const response = await fetch(buildApiUrl(`/resumes/${resumeId}/versions/${versionId}/preview`), {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      redirect: 'follow',
+    });
+
+    if (!response.ok) {
+      throw new Error(`Unable to load PDF preview: ${response.status}`);
+    }
+
+    const responseBlob = await response.blob();
+
+    if (responseBlob.size === 0) {
+      throw new Error('PDF preview response was empty.');
+    }
+
+    const pdfBlob = responseBlob.type === 'application/pdf'
+      ? responseBlob
+      : new Blob([responseBlob], { type: 'application/pdf' });
+
+    return URL.createObjectURL(pdfBlob);
+  },
+
   async downloadVersion(resumeId: string, versionId: string, token: string, filename = 'resume.pdf'): Promise<void> {
     const response = await fetch(buildApiUrl(`/resumes/${resumeId}/versions/${versionId}/download`), {
       method: 'GET',
