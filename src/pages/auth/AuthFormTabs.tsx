@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 type AuthFormTabsProps = {
   isLoading: boolean;
@@ -13,17 +14,46 @@ type AuthFormTabsProps = {
 };
 
 export function AuthFormTabs({ isLoading, onLogin, onRegister, onReactivate }: AuthFormTabsProps) {
+  const { language } = useLanguage();
+  const copy = language === 'pt'
+    ? {
+        signIn: 'Entrar',
+        createAccount: 'Criar conta',
+        reactivate: 'Reativar',
+        password: 'Palavra-passe',
+        confirmPassword: 'Confirmar palavra-passe',
+        enteringWorkspace: 'A entrar no workspace...',
+        enterWorkspace: 'Entrar no workspace',
+        creatingWorkspace: 'A criar workspace...',
+        createWorkspace: 'Criar workspace',
+        restoringWorkspace: 'A restaurar workspace...',
+        restoreAccess: 'Restaurar acesso',
+      }
+    : {
+        signIn: 'Sign In',
+        createAccount: 'Create Account',
+        reactivate: 'Reactivate',
+        password: 'Password',
+        confirmPassword: 'Confirm Password',
+        enteringWorkspace: 'Entering workspace...',
+        enterWorkspace: 'Enter Workspace',
+        creatingWorkspace: 'Creating workspace...',
+        createWorkspace: 'Create Workspace',
+        restoringWorkspace: 'Restoring workspace...',
+        restoreAccess: 'Restore Access',
+      };
+
   return (
     <Tabs defaultValue="login" className="w-full">
       <TabsList className="grid h-auto w-full grid-cols-1 gap-1 p-1 sm:grid-cols-3">
         <TabsTrigger value="login" className="h-10 whitespace-normal px-2 text-sm">
-          Sign In
+          {copy.signIn}
         </TabsTrigger>
         <TabsTrigger value="register" className="h-10 whitespace-normal px-2 text-sm">
-          Create Account
+          {copy.createAccount}
         </TabsTrigger>
         <TabsTrigger value="reactivate" className="h-10 whitespace-normal px-2 text-sm">
-          Reactivate
+          {copy.reactivate}
         </TabsTrigger>
       </TabsList>
 
@@ -34,17 +64,17 @@ export function AuthFormTabs({ isLoading, onLogin, onRegister, onReactivate }: A
             <Input id="login-email" name="email" type="email" placeholder="you@email.com" required disabled={isLoading} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="login-password">Password</Label>
+            <Label htmlFor="login-password">{copy.password}</Label>
             <Input id="login-password" name="password" type="password" placeholder="******" required disabled={isLoading} />
           </div>
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Entering workspace...
+                {copy.enteringWorkspace}
               </>
             ) : (
-              'Enter Workspace'
+              copy.enterWorkspace
             )}
           </Button>
         </form>
@@ -57,21 +87,21 @@ export function AuthFormTabs({ isLoading, onLogin, onRegister, onReactivate }: A
             <Input id="register-email" name="email" type="email" placeholder="you@email.com" required disabled={isLoading} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="register-password">Password</Label>
+            <Label htmlFor="register-password">{copy.password}</Label>
             <Input id="register-password" name="password" type="password" placeholder="******" required disabled={isLoading} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="register-confirm">Confirm Password</Label>
+            <Label htmlFor="register-confirm">{copy.confirmPassword}</Label>
             <Input id="register-confirm" name="confirmPassword" type="password" placeholder="******" required disabled={isLoading} />
           </div>
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating workspace...
+                {copy.creatingWorkspace}
               </>
             ) : (
-              'Create Workspace'
+              copy.createWorkspace
             )}
           </Button>
         </form>
@@ -84,17 +114,17 @@ export function AuthFormTabs({ isLoading, onLogin, onRegister, onReactivate }: A
             <Input id="reactivate-email" name="email" type="email" placeholder="you@email.com" required disabled={isLoading} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="reactivate-password">Password</Label>
+            <Label htmlFor="reactivate-password">{copy.password}</Label>
             <Input id="reactivate-password" name="password" type="password" placeholder="******" required disabled={isLoading} />
           </div>
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Restoring workspace...
+                {copy.restoringWorkspace}
               </>
             ) : (
-              'Restore Access'
+              copy.restoreAccess
             )}
           </Button>
         </form>
