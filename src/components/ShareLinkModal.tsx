@@ -11,12 +11,14 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Loader2, Link as LinkIcon } from 'lucide-react';
 import type { SharePermission } from '@/types';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export interface ShareLinkFormData {
   permission: SharePermission;
+  allowDownload: boolean;
   expiresAt?: string | null;
   maxUses?: number | null;
 }
@@ -36,6 +38,7 @@ export function ShareLinkModal({
 }: ShareLinkModalProps) {
   const { language } = useLanguage();
   const [permission, setPermission] = useState<SharePermission>('VIEW');
+  const [allowDownload, setAllowDownload] = useState<boolean>(true);
   const [maxUses, setMaxUses] = useState<string>('');
   const [expiresAt, setExpiresAt] = useState<string>('');
 
@@ -46,6 +49,8 @@ export function ShareLinkModal({
         permissions: 'Permissoes',
         viewOnly: 'Apenas visualizar',
         viewAndComment: 'Visualizar e comentar',
+        allowDownload: 'Permitir download',
+        allowDownloadHelp: 'Quando desativado, pessoas com o link podem visualizar mas nao baixar pelo botao oficial.',
         expiration: 'Data de expiracao (opcional)',
         expirationHelp: 'Deixe em branco para um link sem expiracao.',
         maxUses: 'Numero maximo de usos (opcional)',
@@ -61,6 +66,8 @@ export function ShareLinkModal({
         permissions: 'Permissions',
         viewOnly: 'View only',
         viewAndComment: 'View and comment',
+        allowDownload: 'Allow download',
+        allowDownloadHelp: 'When disabled, people with the link can preview but cannot use the official download action.',
         expiration: 'Expiration date (optional)',
         expirationHelp: 'Leave blank for a link with no expiration.',
         maxUses: 'Maximum uses (optional)',
@@ -74,10 +81,12 @@ export function ShareLinkModal({
   const handleSubmit = async () => {
     await onSubmit({
       permission,
+      allowDownload,
       expiresAt: expiresAt ? new Date(expiresAt).toISOString() : null,
       maxUses: maxUses ? parseInt(maxUses, 10) : null,
     });
     setPermission('VIEW');
+    setAllowDownload(true);
     setMaxUses('');
     setExpiresAt('');
   };
@@ -112,6 +121,20 @@ export function ShareLinkModal({
                 </Label>
               </div>
             </RadioGroup>
+          </div>
+
+          <div className="flex items-start space-x-3">
+            <Checkbox
+              id="allowDownload"
+              checked={allowDownload}
+              onCheckedChange={(checked) => setAllowDownload(checked === true)}
+            />
+            <div className="space-y-1">
+              <Label htmlFor="allowDownload" className="font-normal cursor-pointer">
+                {copy.allowDownload}
+              </Label>
+              <p className="text-xs text-muted-foreground">{copy.allowDownloadHelp}</p>
+            </div>
           </div>
 
           <div className="space-y-3">

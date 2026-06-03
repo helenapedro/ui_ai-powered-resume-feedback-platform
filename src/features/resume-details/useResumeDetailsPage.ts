@@ -185,6 +185,7 @@ export function useResumeDetailsPage() {
 
       const newLink = await createShareLinkMutation.mutateAsync({
         permission: data.permission,
+        allowDownload: data.allowDownload,
         expiresAt: data.expiresAt,
         maxUses: data.maxUses,
       });

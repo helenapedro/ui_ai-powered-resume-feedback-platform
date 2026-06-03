@@ -5,6 +5,7 @@ import type { SharedLink, SharePermission, Comment, SharedResumeData } from '@/t
 
 export interface CreateShareLinkRequest {
   permission: SharePermission;
+  allowDownload: boolean;
   expiresAt?: string | null;
   maxUses?: number | null;
 }

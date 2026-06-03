@@ -14,7 +14,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Link2, Copy, Trash2, Check, Clock, Eye, MessageSquare } from 'lucide-react';
+import { Link2, Copy, Trash2, Check, Clock, Eye, MessageSquare, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import type { SharedLink } from '@/types';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -54,6 +54,8 @@ export function SharedLinksList({ links, isLoading, onRevoke, baseUrl }: SharedL
         empty: 'Nenhum link ativo de partilha para este CV.',
         view: 'Ver',
         comment: 'Comentar',
+        download: 'Download',
+        downloadBlocked: 'Sem download',
         expired: 'Expirado',
         created: 'Criado',
         unknownDate: 'Data desconhecida',
@@ -69,6 +71,8 @@ export function SharedLinksList({ links, isLoading, onRevoke, baseUrl }: SharedL
         empty: 'No active share links for this resume.',
         view: 'View',
         comment: 'Comment',
+        download: 'Download',
+        downloadBlocked: 'No download',
         expired: 'Expired',
         created: 'Created',
         unknownDate: 'Unknown date',
@@ -135,6 +139,10 @@ export function SharedLinksList({ links, isLoading, onRevoke, baseUrl }: SharedL
                             {copy.comment}
                           </Badge>
                         )}
+                        <Badge variant={link.allowDownload ? 'outline' : 'secondary'} className="gap-1">
+                          <Download className="h-3 w-3" />
+                          {link.allowDownload ? copy.download : copy.downloadBlocked}
+                        </Badge>
                         {isExpired && <Badge variant="destructive">{copy.expired}</Badge>}
                       </div>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">

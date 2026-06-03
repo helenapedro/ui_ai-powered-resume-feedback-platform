@@ -83,6 +83,7 @@ export interface SharedLink {
   id: string;
   token?: string;
   permission: SharePermission;
+  allowDownload: boolean;
   expiresAt: string | null;
   revokedAt?: string | null;
   maxUses: number | null;
@@ -95,6 +96,7 @@ export interface SharedResumeData {
   resumeId: string;
   currentVersionId: string;
   permission: SharePermission;
+  allowDownload: boolean;
   expiresAt: string | null;
 }
 

@@ -150,12 +150,14 @@ export default function SharedResume() {
           <CardContent className="space-y-6">
             <PdfViewer fileUrl={sharingService.getSharedResumePreviewUrl(token!)} className="min-h-[600px]" />
 
-            <div className="flex justify-center">
-              <Button variant="outline" onClick={handleDownload}>
-                <ExternalLink className="h-4 w-4 mr-2" />
-                Open in New Tab
-              </Button>
-            </div>
+            {data.allowDownload && (
+              <div className="flex justify-center">
+                <Button variant="outline" onClick={handleDownload}>
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Open in New Tab
+                </Button>
+              </div>
+            )}
 
             {data.permission === 'COMMENT' && (
               <div className="border-t pt-6">
