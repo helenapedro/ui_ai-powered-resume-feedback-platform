@@ -19,6 +19,7 @@ import { useAuthPageActions } from '@/pages/auth/useAuthPageActions';
 import { useGoogleGsiButton } from '@/pages/auth/useGoogleGsiButton';
 import { userService, type UserProfile } from '@/services/users';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { LegalLinks } from '@/components/LegalLinks';
 import handshakeFeaturedImage from '../../docs/project-images/handshake_featured.png';
 
 export default function Auth() {
@@ -305,6 +306,33 @@ export default function Auth() {
                     />
                   </>
                 )}
+                <p className="mt-5 text-center text-xs leading-5 text-muted-foreground">
+                  {language === 'pt' ? (
+                    <>
+                      Ao continuar, voce concorda com os{' '}
+                      <Link to="/terms" className="font-medium text-primary hover:underline">
+                        Termos de Servico
+                      </Link>{' '}
+                      e confirma que leu a{' '}
+                      <Link to="/privacy" className="font-medium text-primary hover:underline">
+                        Politica de Privacidade
+                      </Link>
+                      .
+                    </>
+                  ) : (
+                    <>
+                      By continuing, you agree to the{' '}
+                      <Link to="/terms" className="font-medium text-primary hover:underline">
+                        Terms of Service
+                      </Link>{' '}
+                      and confirm that you have read the{' '}
+                      <Link to="/privacy" className="font-medium text-primary hover:underline">
+                        Privacy Policy
+                      </Link>
+                      .
+                    </>
+                  )}
+                </p>
               </CardContent>
             </Card>
 
@@ -331,6 +359,7 @@ export default function Auth() {
               </span>
             ))}
           </div>
+          <LegalLinks className="mt-3" />
         </footer>
       </div>
     </main>

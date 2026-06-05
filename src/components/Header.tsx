@@ -4,6 +4,7 @@ import { FileText, Menu, User, LogOut, ChevronRight, Info, LogIn } from 'lucide-
 import { useAuth } from '@/contexts/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
+import { LegalLinks } from '@/components/LegalLinks';
 import {
   Sheet,
   SheetContent,
@@ -135,6 +136,9 @@ export function Header() {
                     </Link>
                   </>
                 )}
+                <div className="border-t pt-4">
+                  <LegalLinks className="justify-start" />
+                </div>
               </nav>
             </SheetContent>
           </Sheet>

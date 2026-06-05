@@ -17,6 +17,7 @@ import {
   useUpdateSharedCommentMutation,
 } from '@/features/sharing/queries';
 import { FileText, AlertCircle, ExternalLink, LogIn } from 'lucide-react';
+import { LegalLinks } from '@/components/LegalLinks';
 
 export default function SharedResume() {
   const { token } = useParams<{ token: string }>();
@@ -188,6 +189,9 @@ export default function SharedResume() {
           </CardContent>
         </Card>
       </main>
+      <footer className="border-t bg-background px-4 py-5">
+        <LegalLinks />
+      </footer>
     </div>
   );
 }

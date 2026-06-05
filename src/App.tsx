@@ -15,6 +15,7 @@ import SharedResume from "./pages/SharedResume";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import LegalPage from "./pages/Legal";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,8 @@ function App() {
                   <Route path="/about" element={<Navigate to="/#about" replace />} />
                   <Route path="/featured" element={<FeaturedPost />} />
                   <Route path="/auth" element={<Auth />} />
+                  <Route path="/privacy" element={<LegalPage type="privacy" />} />
+                  <Route path="/terms" element={<LegalPage type="terms" />} />
                   <Route path="/share/:token" element={<SharedResume />} />
                   <Route
                     path="/my-resumes"
