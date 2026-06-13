@@ -8,16 +8,16 @@ Frontend application for a version-aware resume review workflow.
 
 ## Why this project exists
 
-Most resume review workflows are fragmented.
+Resume Feedback Platform came from conversations with talented, qualified people who asked for help planning their careers. Their experience, technical ability, and potential were real, but their resumes often did not communicate that value clearly enough to recruiters.
 
-People usually end up with:
+Writing a strong resume is its own skill. The product helps candidates make their professional value more visible through a structured improvement loop:
 
-- multiple renamed PDF files with no clear progression
-- isolated feedback that does not stay attached to the version being reviewed
-- generic AI suggestions that do not explain whether a new version actually improved
-- comments and collaboration spread across chat, email, and separate documents
+- upload a resume in Portuguese or English
+- receive structured AI feedback tied to that exact version
+- upload revised versions and compare progress over time
+- keep feedback, comments, and shared review links attached to the resume workflow
 
-The result is noisy iteration. A candidate may get feedback on version 1, change the file, upload version 2, and still have no clear answer to the most important question:
+The central product question is:
 
 **Did this new version actually get better?**
 
@@ -33,7 +33,7 @@ It solves three practical problems:
 
 ## The impact this creates
 
-The platform changes the user experience from “upload and get generic feedback” to “iterate with evidence.”
+The platform changes the user experience from one-off resume review to evidence-based iteration.
 
 That creates product impact in a few ways:
 
@@ -61,6 +61,7 @@ The current app supports:
 - resume creation and version uploads
 - version-aware preview and download
 - AI feedback generation with async job polling
+- language-aware AI feedback for Portuguese and English resume workflows
 - AI progress comparison between resume versions
 - recruiter-style feedback display with summary, strengths, and improvements
 - share link creation, revocation, expiration, and usage limits
@@ -260,6 +261,7 @@ Important feature hooks:
 - non-`FormData` requests are sent as JSON
 - preview and file endpoints may use direct URLs instead of standard JSON fetch flows
 - API failures are mapped into a normalized frontend error shape
+- AI provider selection, Azure OpenAI support, and Microsoft IQ / Foundry IQ grounding are backend concerns; the frontend continues to call `resume-api` through the stable REST contract.
 
 ## Authentication Notes
 
