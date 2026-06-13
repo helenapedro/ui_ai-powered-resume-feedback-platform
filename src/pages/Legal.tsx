@@ -16,7 +16,7 @@ type LegalSection = {
   body: string[];
 };
 
-const updatedAt = 'June 5, 2026';
+const updatedAt = 'June 13, 2026';
 
 const content: Record<LegalPageType, Record<'en' | 'pt', {
   eyebrow: string;
@@ -51,7 +51,7 @@ const content: Record<LegalPageType, Record<'en' | 'pt', {
         {
           title: 'Service providers',
           body: [
-            'The platform may use infrastructure and service providers such as hosting platforms, database providers, AWS S3 for file storage, Google Identity Services for Google sign-in, and AI providers such as OpenAI or Google Gemini.',
+            'The platform may use infrastructure and service providers such as hosting platforms, database providers, AWS S3 for file storage, Google Identity Services for Google sign-in, AI providers such as OpenAI, Azure OpenAI, or Google Gemini, and grounding/search services such as Azure AI Search when enabled.',
             'Shared resume previews or downloads may use time-limited storage URLs when files are stored in S3.',
           ],
         },
@@ -103,7 +103,7 @@ const content: Record<LegalPageType, Record<'en' | 'pt', {
         {
           title: 'Fornecedores de servico',
           body: [
-            'A plataforma pode usar fornecedores de infraestrutura e servicos, como hospedagem, bases de dados, AWS S3 para armazenamento de ficheiros, Google Identity Services para login com Google e provedores de IA como OpenAI ou Google Gemini.',
+            'A plataforma pode usar fornecedores de infraestrutura e servicos, como hospedagem, bases de dados, AWS S3 para armazenamento de ficheiros, Google Identity Services para login com Google, provedores de IA como OpenAI, Azure OpenAI ou Google Gemini, e servicos de grounding/pesquisa como Azure AI Search quando ativados.',
             'Pre-visualizacoes ou downloads de CVs partilhados podem usar URLs temporarias de armazenamento quando os ficheiros estao no S3.',
           ],
         },

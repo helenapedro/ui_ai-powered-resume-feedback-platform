@@ -258,7 +258,7 @@ Status values:
 ### Regenerate
 - `POST /api/resumes/{resumeId}/versions/{versionId}/ai-jobs/regenerate`
 - Optional query param:
-  - `language=EN|PT`
+  - `language=AUTO|EN|PT` (`AUTO` is the backend default and lets the API resolve Portuguese or English from the resume content.)
 
 ### Fetch feedback
 - `GET /api/resumes/{resumeId}/versions/{versionId}/ai-feedback`

@@ -14,14 +14,14 @@ Current frontend problems visible in production:
 
 Backend changes are in place for new generations:
 
-- New AI feedback is English-only.
+- New AI feedback is language-aware: Portuguese resumes can receive Portuguese feedback, and English resumes can receive English feedback.
 - New feedback targets 4 to 5 strengths and 4 to 5 gaps.
 - New backend validation rejects short generic labels such as `Backend development expertise`, `System architecture design`, or `Leadership potential`.
 - New backend normalization filters placeholder list items such as `None identified`.
 - New progress analysis returns a meaningful version-to-version improvement score.
 - The progress API now returns both `progressScore` and `score` for compatibility.
 
-Existing stored records are not automatically rewritten. Users must regenerate a review to replace old Portuguese, short, or zero-score AI output.
+Existing stored records are not automatically rewritten. Users must regenerate a review to replace old short, generic, placeholder, or zero-score AI output.
 
 ## API Contracts
 
@@ -116,7 +116,7 @@ Use this endpoint when the user clicks `Regenerate`:
 
 `POST /api/resumes/{resumeId}/versions/{versionId}/ai-jobs/regenerate`
 
-Do not send `language=PT` or any language query parameter. The backend now forces English-only output.
+The frontend may omit the `language` query parameter; the backend defaults to `AUTO` and resolves the feedback language from the resume content. Existing `language=AUTO` calls remain compatible.
 
 After regeneration:
 
@@ -285,7 +285,7 @@ For legacy feedback:
 
 Suggested copy:
 
-`This review uses an older feedback format. Regenerate to get the latest English-only review.`
+`This review uses an older feedback format. Regenerate to get the latest language-aware review.`
 
 Do not try to translate old feedback in the frontend.
 
@@ -382,7 +382,7 @@ function ProgressPanel({ progress, loading, hasPreviousVersion }: Props) {
 
 The implementation is done when all of the following are true:
 
-- A new regenerated review displays English-only text across summary, strengths, gaps, and progress.
+- A new regenerated review displays language-aware text across summary, strengths, gaps, and progress.
 - `Strength Signals` count equals `feedback.strengths.length`.
 - `Gaps to Close` count equals `feedback.improvements.length`.
 - All returned strength and improvement items are visible.
@@ -411,8 +411,8 @@ Regenerate a review for any resume version. Verify:
 
 Upload or regenerate a resume whose source text is Portuguese. Verify:
 
-- The AI output is English.
-- The UI does not display Portuguese phrases copied from the model output.
+- The AI output follows the resolved language for the resume workflow.
+- The UI displays the backend response as returned and does not translate or rewrite AI output in the frontend.
 - Role and evidence names are translated or described naturally.
 
 3. Variable item counts
@@ -464,6 +464,6 @@ Switch quickly between v1 and v2. Verify:
 ## Known Backend Notes
 
 - Backend stores AI feedback documents in MongoDB. Old documents remain old until regeneration.
-- `promptVersion: v3` means the backend used the English-only, richer feedback prompt.
+- `promptVersion: v3` means the backend used the richer feedback prompt. Newer backend versions also support Portuguese and English resume workflows.
 - Progress scoring is generated only for versions that have a previous version and baseline feedback.
 - The frontend should not compute its own AI score from list counts.
