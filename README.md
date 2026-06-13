@@ -21,7 +21,7 @@ The central product question is:
 
 **Did this new version actually get better?**
 
-## The problem we solve
+## The problem I solve
 
 This project turns resume review into a **_version-aware product workflow_** instead of a one-off file upload.
 
