@@ -182,6 +182,7 @@ Create a `.env` file in the project root:
 ```bash
 VITE_API_URL=https://your-api-host.com
 VITE_GOOGLE_CLIENT_ID=your_google_client_id
+VITE_EMBED_ALLOWED_PARENT_ORIGINS=https://your-personal-site.com
 ```
 
 Notes:
@@ -189,6 +190,8 @@ Notes:
 - `VITE_API_URL` is optional. If omitted, the app defaults to `https://resumefeedback-api.hmpedro.com`
 - if `VITE_API_URL` ends with `/api`, the frontend normalizes it automatically
 - `VITE_GOOGLE_CLIENT_ID` is required for Google sign in
+- `VITE_EMBED_ALLOWED_PARENT_ORIGINS` is optional, but recommended when this app is embedded in an iframe and Google sign in should work from that parent site
+- see [docs/embedding.md](docs/embedding.md) for iframe hosting headers and embed examples
 
 ## Local Development
 

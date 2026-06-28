@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { RefObject } from 'react';
+import { getAllowedEmbedParentOrigins, isEmbedded } from '@/lib/embed';
 import { GOOGLE_BUTTON_OPTIONS, GOOGLE_GSI_SCRIPT } from './constants';
 import './types';
 
@@ -62,9 +63,15 @@ export function useGoogleGsiButton({
         return;
       }
 
+      const allowedParentOrigins = getAllowedEmbedParentOrigins();
+
       window.google.accounts.id.initialize({
         client_id: clientId,
         callback: ({ credential }) => credentialHandlerRef.current(credential),
+        ...(isEmbedded() && allowedParentOrigins.length > 0
+          ? { allowed_parent_origin: allowedParentOrigins }
+          : {}),
+        itp_support: true,
       });
 
       if (renderButton && container) {
