@@ -30,6 +30,19 @@ async function parseResponseBody<T>(response: Response): Promise<T> {
   return JSON.parse(text);
 }
 
+const QUIET_ERROR_CODES = new Set([
+  'AI_FEEDBACK_NOT_FOUND',
+  'AI_PROGRESS_NOT_FOUND',
+  'TARGETED_REVIEW_NOT_FOUND',
+  'TARGETED_REVIEW_JOB_NOT_FOUND',
+  'TARGETED_COMPARISON_NOT_FOUND',
+  'TARGETED_COMPARISON_JOB_NOT_FOUND',
+]);
+
+function shouldLogApiError(code?: string) {
+  return !code || !QUIET_ERROR_CODES.has(code);
+}
+
 class ApiClient {
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const token = getAuthToken();
@@ -39,7 +52,7 @@ class ApiClient {
     if (!response.ok) {
       const errorData = await parseApiError(response, endpoint);
 
-      if (errorData.traceId) {
+      if (errorData.traceId && shouldLogApiError(errorData.code)) {
         console.error(`[API Error] traceId: ${errorData.traceId} | ${errorData.code} | ${endpoint}`);
       }
 
