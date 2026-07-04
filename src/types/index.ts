@@ -150,3 +150,100 @@ export interface AiProgressDTO {
   unchangedIssues: string[];
   newIssues: string[];
 }
+
+export type TargetOpportunityType =
+  | 'JOB'
+  | 'PUBLIC_EXAM'
+  | 'SCHOLARSHIP'
+  | 'INTERNSHIP'
+  | 'PROMOTION'
+  | 'CAREER_CHANGE'
+  | 'OTHER';
+
+export interface TargetOpportunity {
+  id: string;
+  resumeId: string;
+  sourceResumeVersionId: string | null;
+  opportunityType: TargetOpportunityType;
+  organization: string | null;
+  roleTitle: string | null;
+  description: string;
+  requirements: string[];
+  notes: string | null;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
+export interface CreateTargetOpportunityRequest {
+  sourceResumeVersionId?: string | null;
+  opportunityType?: TargetOpportunityType;
+  organization?: string | null;
+  roleTitle?: string | null;
+  description: string;
+  requirements?: string[];
+  notes?: string | null;
+}
+
+export type UpdateTargetOpportunityRequest = Partial<CreateTargetOpportunityRequest>;
+
+export type TargetedReviewJobStatus = 'PENDING' | 'PROCESSING' | 'DONE' | 'FAILED';
+
+export interface TargetedReviewJobDTO {
+  id: string;
+  targetOpportunityId: string;
+  sourceResumeVersionId: string;
+  status: TargetedReviewJobStatus;
+  attemptCount: number;
+  createdAt: string;
+  updatedAt: string | null;
+  startedAt: string | null;
+  finishedAt: string | null;
+  errorCode: string | null;
+  errorDetail: string | null;
+  nextRetryAt: string | null;
+  language: string | null;
+}
+
+export interface TargetedRequirementMatch {
+  requirement: string;
+  evidence: string[];
+  confidence: string;
+}
+
+export interface TargetedWeakRequirement {
+  requirement: string;
+  currentEvidence: string;
+  recommendedFix: string;
+}
+
+export interface TargetedMissingRequirement {
+  requirement: string;
+  candidateAction: string;
+}
+
+export interface TargetedRecommendedChange {
+  section: string;
+  change: string;
+  rationale: string;
+}
+
+export interface TargetedReviewDTO {
+  resumeId: string;
+  sourceResumeVersionId: string;
+  targetOpportunityId: string;
+  jobId: string;
+  reviewVersion: number;
+  mongoDocId: string;
+  model: string | null;
+  promptVersion: string | null;
+  createdAt: string;
+  summary: string;
+  fitScore: number | null;
+  matchedRequirements: TargetedRequirementMatch[];
+  weakRequirements: TargetedWeakRequirement[];
+  missingRequirements: TargetedMissingRequirement[];
+  recommendedChanges: TargetedRecommendedChange[];
+  positioningAdvice: string[];
+  integrityWarnings: string[];
+}

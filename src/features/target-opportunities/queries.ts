@@ -1,0 +1,96 @@
+import { useQuery } from '@tanstack/react-query';
+import { queryKeys } from '@/features/queries/keys';
+import { useInvalidatingMutation } from '@/features/queries/useInvalidatingMutation';
+import { ApiError } from '@/services/api';
+import { targetOpportunityService } from '@/services/target-opportunities';
+import type { CreateTargetOpportunityRequest, UpdateTargetOpportunityRequest } from '@/types';
+
+const POLL_INTERVAL = 3000;
+
+export function useTargetOpportunitiesQuery(resumeId: string | undefined) {
+  return useQuery({
+    queryKey: queryKeys.resumes.targetOpportunities(resumeId ?? ''),
+    queryFn: () => targetOpportunityService.getTargetOpportunities(resumeId!),
+    enabled: Boolean(resumeId),
+  });
+}
+
+export function useCreateTargetOpportunityMutation(resumeId: string | undefined) {
+  return useInvalidatingMutation({
+    mutationFn: (request: CreateTargetOpportunityRequest) =>
+      targetOpportunityService.createTargetOpportunity(resumeId!, request),
+    getQueryKeys: () => (resumeId ? [queryKeys.resumes.targetOpportunities(resumeId)] : []),
+  });
+}
+
+export function useUpdateTargetOpportunityMutation(resumeId: string | undefined) {
+  return useInvalidatingMutation({
+    mutationFn: ({ opportunityId, request }: { opportunityId: string; request: UpdateTargetOpportunityRequest }) =>
+      targetOpportunityService.updateTargetOpportunity(resumeId!, opportunityId, request),
+    getQueryKeys: (_data, variables) =>
+      resumeId
+        ? [
+            queryKeys.resumes.targetOpportunities(resumeId),
+            queryKeys.resumes.targetedReviewJob(resumeId, variables.opportunityId),
+            queryKeys.resumes.targetedReview(resumeId, variables.opportunityId),
+          ]
+        : [],
+  });
+}
+
+export function useDeleteTargetOpportunityMutation(resumeId: string | undefined) {
+  return useInvalidatingMutation({
+    mutationFn: (opportunityId: string) => targetOpportunityService.deleteTargetOpportunity(resumeId!, opportunityId),
+    getQueryKeys: (_data, opportunityId) =>
+      resumeId
+        ? [
+            queryKeys.resumes.targetOpportunities(resumeId),
+            queryKeys.resumes.targetedReviewJob(resumeId, opportunityId),
+            queryKeys.resumes.targetedReview(resumeId, opportunityId),
+          ]
+        : [],
+  });
+}
+
+export function useLatestTargetedReviewJobQuery(resumeId: string | undefined, opportunityId: string | undefined) {
+  return useQuery({
+    queryKey: queryKeys.resumes.targetedReviewJob(resumeId ?? '', opportunityId ?? ''),
+    queryFn: () => targetOpportunityService.getLatestTargetedReviewJob(resumeId!, opportunityId!),
+    enabled: Boolean(resumeId && opportunityId),
+    retry: (failureCount, error) => {
+      if (error instanceof ApiError && error.status === 404) {
+        return false;
+      }
+      return failureCount < 2;
+    },
+    refetchInterval: (query) => {
+      const status = query.state.data?.status;
+      return status === 'PENDING' || status === 'PROCESSING' ? POLL_INTERVAL : false;
+    },
+  });
+}
+
+export function useLatestTargetedReviewQuery(
+  resumeId: string | undefined,
+  opportunityId: string | undefined,
+  enabled: boolean
+) {
+  return useQuery({
+    queryKey: queryKeys.resumes.targetedReview(resumeId ?? '', opportunityId ?? ''),
+    queryFn: () => targetOpportunityService.getLatestTargetedReview(resumeId!, opportunityId!),
+    enabled: Boolean(resumeId && opportunityId && enabled),
+  });
+}
+
+export function useCreateTargetedReviewJobMutation(resumeId: string | undefined, opportunityId: string | undefined) {
+  return useInvalidatingMutation({
+    mutationFn: () => targetOpportunityService.createTargetedReviewJob(resumeId!, opportunityId!),
+    getQueryKeys: () =>
+      resumeId && opportunityId
+        ? [
+            queryKeys.resumes.targetedReviewJob(resumeId, opportunityId),
+            queryKeys.resumes.targetedReview(resumeId, opportunityId),
+          ]
+        : [],
+  });
+}
