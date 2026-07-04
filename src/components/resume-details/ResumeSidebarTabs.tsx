@@ -1,3 +1,4 @@
+import { AiFeedback } from '@/components/AiFeedback';
 import { CommentList } from '@/components/CommentList';
 import { SharedLinksList } from '@/components/SharedLinksList';
 import { TargetOpportunitiesPanel } from '@/components/TargetOpportunitiesPanel';
@@ -7,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { Comment, ResumeVersion, SharedLink } from '@/types';
-import { Link2, MessageSquare, Share2 } from 'lucide-react';
+import { Brain, GitCompareArrows, Link2, MessageSquare, Share2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ResumeSidebarTabsProps {
@@ -25,6 +26,7 @@ interface ResumeSidebarTabsProps {
   onRevokeLink: (linkId: string) => Promise<void>;
   resumeId: string;
   resumeOwnerId?: string;
+  reviewVersion: ResumeVersion | undefined;
   selectedVersionId: string | null;
   sharedLinks: SharedLink[];
   versions: ResumeVersion[];
@@ -45,6 +47,7 @@ export function ResumeSidebarTabs({
   onRevokeLink,
   resumeId,
   resumeOwnerId,
+  reviewVersion,
   selectedVersionId,
   sharedLinks,
   versions,
@@ -53,6 +56,8 @@ export function ResumeSidebarTabs({
   const copy = language === 'pt'
     ? {
         versions: 'Versoes',
+        review: 'Revisao',
+        progress: 'Progresso',
         comments: 'Comentarios',
         targets: 'Alvos',
         share: 'Partilhar',
@@ -62,6 +67,8 @@ export function ResumeSidebarTabs({
       }
     : {
         versions: 'Versions',
+        review: 'Review',
+        progress: 'Progress',
         comments: 'Comments',
         targets: 'Targets',
         share: 'Share',
@@ -71,15 +78,39 @@ export function ResumeSidebarTabs({
       };
 
   return (
-    <Tabs defaultValue="versions" className="w-full">
-      <TabsList className="grid h-auto w-full grid-cols-4">
-        <TabsTrigger value="versions">{copy.versions}</TabsTrigger>
-        <TabsTrigger value="comments">{copy.comments}</TabsTrigger>
-        <TabsTrigger value="targets">{copy.targets}</TabsTrigger>
-        <TabsTrigger value="share">{copy.share}</TabsTrigger>
+    <Tabs defaultValue="review" className="w-full">
+      <TabsList className="grid h-auto w-full grid-cols-5">
+        <TabsTrigger value="review" className="gap-1 px-2 text-xs sm:text-sm">
+          <Brain className="h-3.5 w-3.5" />
+          {copy.review}
+        </TabsTrigger>
+        <TabsTrigger value="progress" className="gap-1 px-2 text-xs sm:text-sm">
+          <GitCompareArrows className="h-3.5 w-3.5" />
+          {copy.progress}
+        </TabsTrigger>
+        <TabsTrigger value="comments" className="px-2 text-xs sm:text-sm">{copy.comments}</TabsTrigger>
+        <TabsTrigger value="targets" className="px-2 text-xs sm:text-sm">{copy.targets}</TabsTrigger>
+        <TabsTrigger value="share" className="px-2 text-xs sm:text-sm">{copy.share}</TabsTrigger>
       </TabsList>
 
-      <TabsContent value="versions" className="mt-4">
+      <TabsContent value="review" className="mt-4">
+        {reviewVersion ? (
+          <AiFeedback
+            resumeId={resumeId}
+            versionId={reviewVersion.id}
+            versionNumber={reviewVersion.versionNumber}
+            versions={versions}
+          />
+        ) : (
+          <Card>
+            <CardContent className="flex min-h-40 items-center justify-center text-sm text-muted-foreground">
+              Select a version to review AI feedback.
+            </CardContent>
+          </Card>
+        )}
+      </TabsContent>
+
+      <TabsContent value="progress" className="mt-4">
         <VersionHistory
           versions={versions}
           currentVersionId={currentVersionId}
