@@ -6,6 +6,7 @@ export const queryKeys = {
       ['resumes', resumeId, 'versions', versionId, 'comments'] as const,
     shareLinks: (resumeId: string) => ['resumes', resumeId, 'share-links'] as const,
     targetOpportunities: (resumeId: string) => ['resumes', resumeId, 'target-opportunities'] as const,
+    targetedVersionLinks: (resumeId: string) => ['resumes', resumeId, 'target-opportunities', 'links'] as const,
     targetedReviewJob: (resumeId: string, opportunityId: string) =>
       ['resumes', resumeId, 'target-opportunities', opportunityId, 'targeted-review-job'] as const,
     targetedReview: (resumeId: string, opportunityId: string) =>

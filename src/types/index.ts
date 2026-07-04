@@ -175,6 +175,16 @@ export interface TargetOpportunity {
   updatedAt: string | null;
 }
 
+export interface TargetedVersionLink {
+  id: string;
+  resumeId: string;
+  targetOpportunityId: string;
+  sourceResumeVersionId: string | null;
+  targetedResumeVersionId: string;
+  createdBy: string;
+  createdAt: string;
+}
+
 export interface CreateTargetOpportunityRequest {
   sourceResumeVersionId?: string | null;
   opportunityType?: TargetOpportunityType;

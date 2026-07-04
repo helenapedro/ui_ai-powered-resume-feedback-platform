@@ -2,6 +2,7 @@ import { apiClient } from '@/services/api-client';
 import type {
   CreateTargetOpportunityRequest,
   TargetOpportunity,
+  TargetedVersionLink,
   TargetedReviewDTO,
   TargetedReviewJobDTO,
   UpdateTargetOpportunityRequest,
@@ -32,6 +33,20 @@ export const targetOpportunityService = {
 
   async deleteTargetOpportunity(resumeId: string, opportunityId: string): Promise<void> {
     return apiClient.delete<void>(`/resumes/${resumeId}/target-opportunities/${opportunityId}`);
+  },
+
+  async getTargetedVersionLinks(resumeId: string): Promise<TargetedVersionLink[]> {
+    return apiClient.get<TargetedVersionLink[]>(`/resumes/${resumeId}/target-opportunities/links`);
+  },
+
+  async linkTargetedVersion(
+    resumeId: string,
+    opportunityId: string,
+    versionId: string
+  ): Promise<TargetedVersionLink> {
+    return apiClient.post<TargetedVersionLink>(
+      `/resumes/${resumeId}/target-opportunities/${opportunityId}/versions/${versionId}/link`
+    );
   },
 
   async createTargetedReviewJob(resumeId: string, opportunityId: string): Promise<TargetedReviewJobDTO> {

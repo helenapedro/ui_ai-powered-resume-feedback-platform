@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useAddResumeVersionMutation, useCreateResumeMutation } from '@/features/resumes/queries';
+import { targetOpportunityService } from '@/services/target-opportunities';
 
 const ACCEPTED_TYPES = ['application/pdf', 'application/x-pdf'];
 const PDF_EXTENSION = '.pdf';
@@ -12,7 +13,9 @@ export function useUploadPage() {
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const resumeId = searchParams.get('resumeId');
+  const targetOpportunityId = searchParams.get('targetOpportunityId');
   const isAddingVersion = !!resumeId;
+  const isTargetedVersionUpload = Boolean(resumeId && targetOpportunityId);
   const createResumeMutation = useCreateResumeMutation();
   const addVersionMutation = useAddResumeVersionMutation(resumeId);
   const [file, setFile] = useState<File | null>(null);
@@ -126,12 +129,17 @@ export function useUploadPage() {
 
       try {
         if (isAddingVersion && resumeId) {
-          await addVersionMutation.mutateAsync(file);
+          const version = await addVersionMutation.mutateAsync(file);
+          if (targetOpportunityId) {
+            await targetOpportunityService.linkTargetedVersion(resumeId, targetOpportunityId, version.id);
+          }
           toast({
-            title: 'New version added',
-            description: 'The new version was added successfully.',
+            title: targetOpportunityId ? 'Targeted version added' : 'New version added',
+            description: targetOpportunityId
+              ? 'The new version was linked to the target opportunity.'
+              : 'The new version was added successfully.',
           });
-          navigate(`/resume/${resumeId}`);
+          navigate(`/resume/${resumeId}?versionId=${version.id}`);
         } else {
           const resume = await createResumeMutation.mutateAsync({ file, title: title || undefined });
           toast({
@@ -163,6 +171,7 @@ export function useUploadPage() {
       createResumeMutation,
       file,
       isAddingVersion,
+      targetOpportunityId,
       navigate,
       resumeId,
       title,
@@ -177,6 +186,7 @@ export function useUploadPage() {
     progress,
     isDragging,
     isAddingVersion,
+    isTargetedVersionUpload,
     setTitle,
     clearFile: () => setFile(null),
     handleDrop,

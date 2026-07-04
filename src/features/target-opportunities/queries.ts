@@ -23,6 +23,29 @@ export function useCreateTargetOpportunityMutation(resumeId: string | undefined)
   });
 }
 
+export function useTargetedVersionLinksQuery(resumeId: string | undefined) {
+  return useQuery({
+    queryKey: queryKeys.resumes.targetedVersionLinks(resumeId ?? ''),
+    queryFn: () => targetOpportunityService.getTargetedVersionLinks(resumeId!),
+    enabled: Boolean(resumeId),
+  });
+}
+
+export function useLinkTargetedVersionMutation(resumeId: string | undefined) {
+  return useInvalidatingMutation({
+    mutationFn: ({ opportunityId, versionId }: { opportunityId: string; versionId: string }) =>
+      targetOpportunityService.linkTargetedVersion(resumeId!, opportunityId, versionId),
+    getQueryKeys: () =>
+      resumeId
+        ? [
+            queryKeys.resumes.detail(resumeId),
+            queryKeys.resumes.targetedVersionLinks(resumeId),
+            queryKeys.resumes.targetOpportunities(resumeId),
+          ]
+        : [],
+  });
+}
+
 export function useUpdateTargetOpportunityMutation(resumeId: string | undefined) {
   return useInvalidatingMutation({
     mutationFn: ({ opportunityId, request }: { opportunityId: string; request: UpdateTargetOpportunityRequest }) =>
@@ -45,6 +68,7 @@ export function useDeleteTargetOpportunityMutation(resumeId: string | undefined)
       resumeId
         ? [
             queryKeys.resumes.targetOpportunities(resumeId),
+            queryKeys.resumes.targetedVersionLinks(resumeId),
             queryKeys.resumes.targetedReviewJob(resumeId, opportunityId),
             queryKeys.resumes.targetedReview(resumeId, opportunityId),
           ]

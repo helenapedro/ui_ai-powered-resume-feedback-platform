@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 import { format } from 'date-fns';
-import { BriefcaseBusiness, Loader2, Pencil, Plus, Target, Trash2 } from 'lucide-react';
+import { BriefcaseBusiness, Loader2, Pencil, Plus, Target, Trash2, Upload } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
@@ -10,6 +11,7 @@ import {
   useDeleteTargetOpportunityMutation,
   useLatestTargetedReviewJobQuery,
   useLatestTargetedReviewQuery,
+  useTargetedVersionLinksQuery,
   useTargetOpportunitiesQuery,
   useUpdateTargetOpportunityMutation,
 } from '@/features/target-opportunities/queries';
@@ -49,6 +51,7 @@ import type {
   ResumeVersion,
   TargetOpportunity,
   TargetOpportunityType,
+  TargetedVersionLink,
   TargetedReviewDTO,
   TargetedReviewJobStatus,
 } from '@/types';
@@ -157,6 +160,7 @@ function validateTargetForm(values: TargetFormValues) {
 export function TargetOpportunitiesPanel({ currentVersionId, resumeId, versions }: TargetOpportunitiesPanelProps) {
   const { language } = useLanguage();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [editingOpportunity, setEditingOpportunity] = useState<TargetOpportunity | null>(null);
   const [formErrors, setFormErrors] = useState<string[]>([]);
@@ -168,6 +172,7 @@ export function TargetOpportunitiesPanel({ currentVersionId, resumeId, versions 
   const [requirementsText, setRequirementsText] = useState('');
   const [notes, setNotes] = useState('');
   const opportunitiesQuery = useTargetOpportunitiesQuery(resumeId);
+  const targetedVersionLinksQuery = useTargetedVersionLinksQuery(resumeId);
   const createMutation = useCreateTargetOpportunityMutation(resumeId);
   const updateMutation = useUpdateTargetOpportunityMutation(resumeId);
   const deleteMutation = useDeleteTargetOpportunityMutation(resumeId);
@@ -343,8 +348,14 @@ export function TargetOpportunitiesPanel({ currentVersionId, resumeId, versions 
               opportunity={opportunity}
               resumeId={resumeId}
               versions={versions}
+              links={(targetedVersionLinksQuery.data ?? []).filter(
+                (link) => link.targetOpportunityId === opportunity.id
+              )}
               onEdit={openEditDialog}
               onDelete={handleDelete}
+              onUploadTargetedVersion={(opportunityId) =>
+                navigate(`/upload?resumeId=${resumeId}&targetOpportunityId=${opportunityId}`)
+              }
               isDeleting={deleteMutation.isPending}
             />
           ))}
@@ -492,15 +503,19 @@ function TargetOpportunityItem({
   opportunity,
   resumeId,
   versions,
+  links,
   onEdit,
   onDelete,
+  onUploadTargetedVersion,
   isDeleting,
 }: {
   opportunity: TargetOpportunity;
   resumeId: string;
   versions: ResumeVersion[];
+  links: TargetedVersionLink[];
   onEdit: (opportunity: TargetOpportunity) => void;
   onDelete: (opportunityId: string) => Promise<void>;
+  onUploadTargetedVersion: (opportunityId: string) => void;
   isDeleting: boolean;
 }) {
   const { language } = useLanguage();
@@ -513,6 +528,9 @@ function TargetOpportunityItem({
   );
   const createJobMutation = useCreateTargetedReviewJobMutation(resumeId, opportunity.id);
   const sourceVersion = versions.find((version) => version.id === opportunity.sourceResumeVersionId);
+  const linkedVersions = links
+    .map((link) => versions.find((version) => version.id === link.targetedResumeVersionId))
+    .filter((version): version is ResumeVersion => Boolean(version));
   const job = jobQuery.data ?? null;
   const review = latestReviewQuery.data ?? null;
   const targetValidation = validateTargetForm({
@@ -538,6 +556,8 @@ function TargetOpportunityItem({
         queued: 'Analise direcionada na fila',
         start: 'Iniciar analise direcionada',
         retry: 'Tentar novamente',
+        uploadTargetedVersion: 'Enviar versao direcionada',
+        linkedVersions: 'Versoes direcionadas',
         completeTarget: 'Completar detalhes do alvo',
         needsBetterTarget: 'Adicione uma descricao real e requisitos especificos antes de iniciar a IA.',
         edit: 'Editar alvo',
@@ -561,6 +581,8 @@ function TargetOpportunityItem({
         queued: 'Targeted review queued',
         start: 'Start targeted review',
         retry: 'Retry targeted review',
+        uploadTargetedVersion: 'Upload targeted version',
+        linkedVersions: 'Targeted versions',
         completeTarget: 'Complete target details',
         needsBetterTarget: 'Add a real description and specific requirements before starting AI.',
         edit: 'Edit target',
@@ -649,6 +671,19 @@ function TargetOpportunityItem({
 
       {review && <TargetedReviewSummary review={review} labels={copy} />}
 
+      {linkedVersions.length > 0 && (
+        <div className="mt-3 rounded-md border bg-muted/30 p-2">
+          <p className="text-xs font-semibold uppercase text-muted-foreground">{copy.linkedVersions}</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {linkedVersions.map((version) => (
+              <Badge key={version.id} variant="outline">
+                v{version.versionNumber}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      )}
+
       {!targetValidation.isValid && (
         <p className="mt-3 rounded-md border border-amber-200 bg-amber-50 p-2 text-xs text-amber-900">
           {copy.needsBetterTarget}
@@ -679,6 +714,15 @@ function TargetOpportunityItem({
       >
         {createJobMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         {hasTerminalJob ? copy.queued : targetValidation.isValid ? (job?.status === 'FAILED' ? copy.retry : copy.start) : copy.completeTarget}
+      </Button>
+      <Button
+        className="mt-2 w-full"
+        size="sm"
+        variant="outline"
+        onClick={() => onUploadTargetedVersion(opportunity.id)}
+      >
+        <Upload className="mr-2 h-4 w-4" />
+        {copy.uploadTargetedVersion}
       </Button>
     </div>
   );
