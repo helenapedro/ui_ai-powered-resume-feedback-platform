@@ -7,10 +7,13 @@ import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
   useCreateTargetOpportunityMutation,
+  useCreateTargetedComparisonJobMutation,
   useCreateTargetedReviewJobMutation,
   useDeleteTargetOpportunityMutation,
   useLatestTargetedReviewJobQuery,
   useLatestTargetedReviewQuery,
+  useLatestTargetedComparisonJobQuery,
+  useLatestTargetedComparisonQuery,
   useTargetedVersionLinksQuery,
   useTargetOpportunitiesQuery,
   useUpdateTargetOpportunityMutation,
@@ -51,6 +54,7 @@ import type {
   ResumeVersion,
   TargetOpportunity,
   TargetOpportunityType,
+  TargetedComparisonDTO,
   TargetedVersionLink,
   TargetedReviewDTO,
   TargetedReviewJobStatus,
@@ -558,6 +562,13 @@ function TargetOpportunityItem({
         retry: 'Tentar novamente',
         uploadTargetedVersion: 'Enviar versao direcionada',
         linkedVersions: 'Versoes direcionadas',
+        compareVersion: 'Comparar com alvo',
+        comparisonQueued: 'Comparacao na fila',
+        comparisonStarted: 'Comparacao iniciada',
+        comparisonError: 'Nao foi possivel iniciar a comparacao',
+        alignmentScore: 'Aderencia da versao',
+        addressed: 'Requisitos melhorados',
+        remaining: 'Edicoes restantes',
         completeTarget: 'Completar detalhes do alvo',
         needsBetterTarget: 'Adicione uma descricao real e requisitos especificos antes de iniciar a IA.',
         edit: 'Editar alvo',
@@ -583,6 +594,13 @@ function TargetOpportunityItem({
         retry: 'Retry targeted review',
         uploadTargetedVersion: 'Upload targeted version',
         linkedVersions: 'Targeted versions',
+        compareVersion: 'Compare with target',
+        comparisonQueued: 'Comparison queued',
+        comparisonStarted: 'Comparison started',
+        comparisonError: 'Unable to start comparison',
+        alignmentScore: 'Version alignment',
+        addressed: 'Improved requirements',
+        remaining: 'Remaining edits',
         completeTarget: 'Complete target details',
         needsBetterTarget: 'Add a real description and specific requirements before starting AI.',
         edit: 'Edit target',
@@ -676,9 +694,13 @@ function TargetOpportunityItem({
           <p className="text-xs font-semibold uppercase text-muted-foreground">{copy.linkedVersions}</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {linkedVersions.map((version) => (
-              <Badge key={version.id} variant="outline">
-                v{version.versionNumber}
-              </Badge>
+              <LinkedTargetedVersion
+                key={version.id}
+                labels={copy}
+                opportunityId={opportunity.id}
+                resumeId={resumeId}
+                version={version}
+              />
             ))}
           </div>
         </div>
@@ -724,6 +746,105 @@ function TargetOpportunityItem({
         <Upload className="mr-2 h-4 w-4" />
         {copy.uploadTargetedVersion}
       </Button>
+    </div>
+  );
+}
+
+function LinkedTargetedVersion({
+  labels,
+  opportunityId,
+  resumeId,
+  version,
+}: {
+  labels: {
+    compareVersion: string;
+    comparisonQueued: string;
+    comparisonStarted: string;
+    comparisonError: string;
+    alignmentScore: string;
+    addressed: string;
+    remaining: string;
+  };
+  opportunityId: string;
+  resumeId: string;
+  version: ResumeVersion;
+}) {
+  const { toast } = useToast();
+  const jobQuery = useLatestTargetedComparisonJobQuery(resumeId, opportunityId, version.id);
+  const comparisonQuery = useLatestTargetedComparisonQuery(
+    resumeId,
+    opportunityId,
+    version.id,
+    jobQuery.data?.status === 'DONE'
+  );
+  const createMutation = useCreateTargetedComparisonJobMutation(resumeId, opportunityId, version.id);
+  const job = jobQuery.data ?? null;
+  const comparison = comparisonQuery.data ?? null;
+  const hasTerminalJob = Boolean(job && job.status !== 'FAILED');
+
+  async function handleCompare() {
+    try {
+      await createMutation.mutateAsync();
+      toast({ title: labels.comparisonStarted });
+    } catch {
+      toast({ variant: 'destructive', title: labels.comparisonError });
+    }
+  }
+
+  return (
+    <div className="w-full rounded-md border bg-background p-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <Badge variant="outline">v{version.versionNumber}</Badge>
+        {job && <Badge variant={job.status === 'FAILED' ? 'destructive' : 'secondary'}>{STATUS_LABELS[job.status]}</Badge>}
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={handleCompare}
+          disabled={createMutation.isPending || hasTerminalJob}
+        >
+          {createMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {hasTerminalJob ? labels.comparisonQueued : labels.compareVersion}
+        </Button>
+      </div>
+      {job?.status === 'FAILED' && (
+        <p className="mt-2 text-xs text-destructive">{job.errorDetail}</p>
+      )}
+      {comparison && <TargetedComparisonSummary comparison={comparison} labels={labels} />}
+    </div>
+  );
+}
+
+function TargetedComparisonSummary({
+  comparison,
+  labels,
+}: {
+  comparison: TargetedComparisonDTO;
+  labels: {
+    alignmentScore: string;
+    addressed: string;
+    remaining: string;
+  };
+}) {
+  return (
+    <div className="mt-2 space-y-2 border-t pt-2">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-xs font-medium">{labels.alignmentScore}</p>
+        <Badge>{comparison.alignmentScore ?? 'N/A'}</Badge>
+      </div>
+      <p className="text-xs text-muted-foreground">{comparison.summary}</p>
+      <TargetedReviewSection title={labels.addressed} items={comparison.addressedRequirements.map((item) => (
+        <span>
+          <span className="font-medium">{item.requirement}</span>
+          <span className="text-muted-foreground"> - {item.evidence.join('; ')}</span>
+        </span>
+      ))} />
+      <TargetedReviewSection title={labels.remaining} items={comparison.remainingChanges.map((item) => (
+        <span>
+          <span className="font-medium">{item.section}</span>
+          <span className="text-muted-foreground"> - {item.change}</span>
+        </span>
+      ))} />
     </div>
   );
 }

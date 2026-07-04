@@ -257,3 +257,43 @@ export interface TargetedReviewDTO {
   positioningAdvice: string[];
   integrityWarnings: string[];
 }
+
+export interface TargetedComparisonJobDTO {
+  id: string;
+  targetOpportunityId: string;
+  targetedVersionLinkId: string;
+  sourceResumeVersionId: string;
+  targetedResumeVersionId: string;
+  status: TargetedReviewJobStatus;
+  attemptCount: number;
+  createdAt: string;
+  updatedAt: string | null;
+  startedAt: string | null;
+  finishedAt: string | null;
+  errorCode: string | null;
+  errorDetail: string | null;
+  nextRetryAt: string | null;
+  language: string | null;
+}
+
+export interface TargetedComparisonDTO {
+  resumeId: string;
+  targetOpportunityId: string;
+  targetedVersionLinkId: string;
+  sourceResumeVersionId: string;
+  targetedResumeVersionId: string;
+  jobId: string;
+  comparisonVersion: number;
+  mongoDocId: string;
+  model: string | null;
+  promptVersion: string | null;
+  createdAt: string;
+  summary: string;
+  alignmentScore: number | null;
+  addressedRequirements: TargetedRequirementMatch[];
+  stillWeakRequirements: TargetedWeakRequirement[];
+  stillMissingRequirements: TargetedMissingRequirement[];
+  remainingChanges: TargetedRecommendedChange[];
+  evidenceGains: string[];
+  integrityWarnings: string[];
+}

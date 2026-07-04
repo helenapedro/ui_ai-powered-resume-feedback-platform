@@ -2,6 +2,8 @@ import { apiClient } from '@/services/api-client';
 import type {
   CreateTargetOpportunityRequest,
   TargetOpportunity,
+  TargetedComparisonDTO,
+  TargetedComparisonJobDTO,
   TargetedVersionLink,
   TargetedReviewDTO,
   TargetedReviewJobDTO,
@@ -64,6 +66,36 @@ export const targetOpportunityService = {
   async getLatestTargetedReview(resumeId: string, opportunityId: string): Promise<TargetedReviewDTO> {
     return apiClient.get<TargetedReviewDTO>(
       `/resumes/${resumeId}/target-opportunities/${opportunityId}/reviews/latest`
+    );
+  },
+
+  async createTargetedComparisonJob(
+    resumeId: string,
+    opportunityId: string,
+    versionId: string
+  ): Promise<TargetedComparisonJobDTO> {
+    return apiClient.post<TargetedComparisonJobDTO>(
+      `/resumes/${resumeId}/target-opportunities/${opportunityId}/versions/${versionId}/comparisons`
+    );
+  },
+
+  async getLatestTargetedComparisonJob(
+    resumeId: string,
+    opportunityId: string,
+    versionId: string
+  ): Promise<TargetedComparisonJobDTO> {
+    return apiClient.get<TargetedComparisonJobDTO>(
+      `/resumes/${resumeId}/target-opportunities/${opportunityId}/versions/${versionId}/comparisons/latest-job`
+    );
+  },
+
+  async getLatestTargetedComparison(
+    resumeId: string,
+    opportunityId: string,
+    versionId: string
+  ): Promise<TargetedComparisonDTO> {
+    return apiClient.get<TargetedComparisonDTO>(
+      `/resumes/${resumeId}/target-opportunities/${opportunityId}/versions/${versionId}/comparisons/latest`
     );
   },
 };

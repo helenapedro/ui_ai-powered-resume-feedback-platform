@@ -118,3 +118,55 @@ export function useCreateTargetedReviewJobMutation(resumeId: string | undefined,
         : [],
   });
 }
+
+export function useLatestTargetedComparisonJobQuery(
+  resumeId: string | undefined,
+  opportunityId: string | undefined,
+  versionId: string | undefined
+) {
+  return useQuery({
+    queryKey: queryKeys.resumes.targetedComparisonJob(resumeId ?? '', opportunityId ?? '', versionId ?? ''),
+    queryFn: () => targetOpportunityService.getLatestTargetedComparisonJob(resumeId!, opportunityId!, versionId!),
+    enabled: Boolean(resumeId && opportunityId && versionId),
+    retry: (failureCount, error) => {
+      if (error instanceof ApiError && error.status === 404) {
+        return false;
+      }
+      return failureCount < 2;
+    },
+    refetchInterval: (query) => {
+      const status = query.state.data?.status;
+      return status === 'PENDING' || status === 'PROCESSING' ? POLL_INTERVAL : false;
+    },
+  });
+}
+
+export function useLatestTargetedComparisonQuery(
+  resumeId: string | undefined,
+  opportunityId: string | undefined,
+  versionId: string | undefined,
+  enabled: boolean
+) {
+  return useQuery({
+    queryKey: queryKeys.resumes.targetedComparison(resumeId ?? '', opportunityId ?? '', versionId ?? ''),
+    queryFn: () => targetOpportunityService.getLatestTargetedComparison(resumeId!, opportunityId!, versionId!),
+    enabled: Boolean(resumeId && opportunityId && versionId && enabled),
+  });
+}
+
+export function useCreateTargetedComparisonJobMutation(
+  resumeId: string | undefined,
+  opportunityId: string | undefined,
+  versionId: string | undefined
+) {
+  return useInvalidatingMutation({
+    mutationFn: () => targetOpportunityService.createTargetedComparisonJob(resumeId!, opportunityId!, versionId!),
+    getQueryKeys: () =>
+      resumeId && opportunityId && versionId
+        ? [
+            queryKeys.resumes.targetedComparisonJob(resumeId, opportunityId, versionId),
+            queryKeys.resumes.targetedComparison(resumeId, opportunityId, versionId),
+          ]
+        : [],
+  });
+}
