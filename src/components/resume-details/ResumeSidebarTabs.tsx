@@ -1,5 +1,6 @@
 import { CommentList } from '@/components/CommentList';
 import { SharedLinksList } from '@/components/SharedLinksList';
+import { TargetOpportunitiesPanel } from '@/components/TargetOpportunitiesPanel';
 import { VersionHistory } from '@/components/VersionHistory';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -53,6 +54,7 @@ export function ResumeSidebarTabs({
     ? {
         versions: 'Versoes',
         comments: 'Comentarios',
+        targets: 'Alvos',
         share: 'Partilhar',
         activeShareLinks: 'Links ativos de partilha',
         activeLinks: 'links ativos',
@@ -61,6 +63,7 @@ export function ResumeSidebarTabs({
     : {
         versions: 'Versions',
         comments: 'Comments',
+        targets: 'Targets',
         share: 'Share',
         activeShareLinks: 'Active share links',
         activeLinks: 'active links',
@@ -69,9 +72,10 @@ export function ResumeSidebarTabs({
 
   return (
     <Tabs defaultValue="versions" className="w-full">
-      <TabsList className="grid h-auto w-full grid-cols-3">
+      <TabsList className="grid h-auto w-full grid-cols-4">
         <TabsTrigger value="versions">{copy.versions}</TabsTrigger>
         <TabsTrigger value="comments">{copy.comments}</TabsTrigger>
+        <TabsTrigger value="targets">{copy.targets}</TabsTrigger>
         <TabsTrigger value="share">{copy.share}</TabsTrigger>
       </TabsList>
 
@@ -105,6 +109,14 @@ export function ResumeSidebarTabs({
             />
           </CardContent>
         </Card>
+      </TabsContent>
+
+      <TabsContent value="targets" className="mt-4">
+        <TargetOpportunitiesPanel
+          currentVersionId={currentVersionId}
+          resumeId={resumeId}
+          versions={versions}
+        />
       </TabsContent>
 
       <TabsContent value="share" className="mt-4 space-y-4">
