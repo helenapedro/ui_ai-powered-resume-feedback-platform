@@ -56,6 +56,7 @@ Examples:
 - `useUploadPage.ts`
 - `useResumeDetailsPage.ts`
 - `useAiFeedback.ts`
+- `target-opportunities/queries.ts`
 
 ### `src/components`
 
@@ -124,7 +125,7 @@ The common flow in this app is:
 4. data is passed down into presentational components
 5. user actions go back up through callback props into the feature hook or Redux flow
 
-In short:
+Data-flow summary:
 
 `page -> feature hook -> store/service -> presentational components`
 
@@ -155,7 +156,8 @@ Use Redux for:
 Use TanStack Query for:
 
 - server data that benefits from cache-oriented fetching patterns
-- currently, resume list fetching
+- resume list fetching
+- target opportunity CRUD, targeted review job polling, and latest targeted review reads
 
 ## Presentational vs Orchestration Components
 
@@ -186,6 +188,17 @@ It was split into:
 - `FeedbackItem.tsx`, `FeedbackSection.tsx`, and `FeedbackEmptyList.tsx` for reusable presentation pieces
 
 That split is the preferred direction when a UI feature starts carrying multiple responsibilities.
+
+## Example: Target Opportunities
+
+The target opportunity workflow follows the same separation:
+
+- `src/services/target-opportunities.ts` owns REST calls to `resume-api`
+- `src/features/target-opportunities/queries.ts` owns TanStack Query hooks, mutation invalidation, and polling behavior
+- `src/components/TargetOpportunitiesPanel.tsx` owns the feature UI on the resume detail page
+- `src/types/index.ts` owns the shared TypeScript contracts for opportunities, jobs, and targeted review artifacts
+
+The frontend does not call the worker, databases, storage, queues, or AI providers directly. Targeted review creation and reads remain behind the `resume-api` REST boundary.
 
 ## File Placement Guidelines
 

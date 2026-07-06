@@ -18,6 +18,7 @@ export default function Upload() {
     progress,
     isDragging,
     isAddingVersion,
+    isTargetedVersionUpload,
     setTitle,
     clearFile,
     handleDrop,
@@ -36,10 +37,12 @@ export default function Upload() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <UploadIcon className="h-6 w-6 text-primary" />
-              {isAddingVersion ? t('upload.addNewVersion') : t('upload.uploadResume')}
+              {isTargetedVersionUpload ? 'Upload targeted version' : isAddingVersion ? t('upload.addNewVersion') : t('upload.uploadResume')}
             </CardTitle>
             <CardDescription>
-              {isAddingVersion
+              {isTargetedVersionUpload
+                ? 'Add a new resume version and link it to the selected target opportunity.'
+                : isAddingVersion
                 ? t('upload.addVersionDescription')
                 : t('upload.uploadDescription')}
             </CardDescription>
@@ -118,7 +121,7 @@ export default function Upload() {
                 ) : (
                   <>
                     <UploadIcon className="mr-2 h-4 w-4" />
-                    {isAddingVersion ? t('upload.addVersion') : t('upload.uploadResume')}
+                    {isTargetedVersionUpload ? 'Add targeted version' : isAddingVersion ? t('upload.addVersion') : t('upload.uploadResume')}
                   </>
                 )}
               </Button>

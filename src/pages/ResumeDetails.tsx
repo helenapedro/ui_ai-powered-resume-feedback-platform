@@ -4,7 +4,6 @@ import { Header } from '@/components/Header';
 import { ShareLinkModal, type ShareLinkFormData } from '@/components/ShareLinkModal';
 import { ResumeDetailsHeader } from '@/components/resume-details/ResumeDetailsHeader';
 import { ResumeDetailsLoading } from '@/components/resume-details/ResumeDetailsLoading';
-import { ResumeFeedbackSection } from '@/components/resume-details/ResumeFeedbackSection';
 import { ResumePreviewCard } from '@/components/resume-details/ResumePreviewCard';
 import { ResumeSidebarTabs } from '@/components/resume-details/ResumeSidebarTabs';
 import { ResumeWorkflowCard } from '@/components/resume-details/ResumeWorkflowCard';
@@ -68,14 +67,8 @@ export default function ResumeDetails() {
           versionsCount={versions.length}
         />
 
-        <div className="mx-auto max-w-[1440px] space-y-6">
-          <ResumeFeedbackSection
-            resumeId={resume.id}
-            version={activePreviewVersion}
-            versions={versions}
-          />
-
-          <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
+        <div className="mx-auto max-w-[1440px]">
+          <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_440px]">
             <div className="min-w-0 space-y-6">
               <ResumePreviewCard
                 isPreviewCurrent={isPreviewCurrent}
@@ -87,7 +80,7 @@ export default function ResumeDetails() {
               />
             </div>
 
-            <aside className="space-y-4 xl:sticky xl:top-32 xl:self-start">
+            <aside className="space-y-4 xl:sticky xl:top-28 xl:max-h-[calc(100vh-8rem)] xl:self-start xl:overflow-y-auto xl:pr-1">
               <ResumeWorkflowCard currentVersion={currentVersion} />
               <ResumeSidebarTabs
                 activeShareLinksCount={activeShareLinksCount}
@@ -103,6 +96,7 @@ export default function ResumeDetails() {
                 onPreviewVersion={setPreviewVersion}
                 onRevokeLink={handleRevokeLink}
                 resumeId={resume.id}
+                reviewVersion={activePreviewVersion}
                 selectedVersionId={activePreviewId}
                 sharedLinks={sharedLinks}
                 versions={versions}

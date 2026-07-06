@@ -1,15 +1,20 @@
 import { useMemo, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 import { format } from 'date-fns';
-import { BriefcaseBusiness, Loader2, Pencil, Plus, Target, Trash2 } from 'lucide-react';
+import { BriefcaseBusiness, CheckCircle2, Circle, Loader2, Pencil, Plus, Target, Trash2, Upload, XCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
   useCreateTargetOpportunityMutation,
+  useCreateTargetedComparisonJobMutation,
   useCreateTargetedReviewJobMutation,
   useDeleteTargetOpportunityMutation,
   useLatestTargetedReviewJobQuery,
   useLatestTargetedReviewQuery,
+  useLatestTargetedComparisonJobQuery,
+  useLatestTargetedComparisonQuery,
+  useTargetedVersionLinksQuery,
   useTargetOpportunitiesQuery,
   useUpdateTargetOpportunityMutation,
 } from '@/features/target-opportunities/queries';
@@ -49,6 +54,8 @@ import type {
   ResumeVersion,
   TargetOpportunity,
   TargetOpportunityType,
+  TargetedComparisonDTO,
+  TargetedVersionLink,
   TargetedReviewDTO,
   TargetedReviewJobStatus,
 } from '@/types';
@@ -85,6 +92,13 @@ const STATUS_LABELS: Record<TargetedReviewJobStatus, string> = {
   DONE: 'Done',
   FAILED: 'Failed',
 };
+
+type WorkflowStepState = 'complete' | 'active' | 'pending' | 'failed';
+
+interface WorkflowStep {
+  label: string;
+  state: WorkflowStepState;
+}
 
 const TARGET_LIMITS = {
   organization: 160,
@@ -157,6 +171,7 @@ function validateTargetForm(values: TargetFormValues) {
 export function TargetOpportunitiesPanel({ currentVersionId, resumeId, versions }: TargetOpportunitiesPanelProps) {
   const { language } = useLanguage();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [editingOpportunity, setEditingOpportunity] = useState<TargetOpportunity | null>(null);
   const [formErrors, setFormErrors] = useState<string[]>([]);
@@ -168,6 +183,7 @@ export function TargetOpportunitiesPanel({ currentVersionId, resumeId, versions 
   const [requirementsText, setRequirementsText] = useState('');
   const [notes, setNotes] = useState('');
   const opportunitiesQuery = useTargetOpportunitiesQuery(resumeId);
+  const targetedVersionLinksQuery = useTargetedVersionLinksQuery(resumeId);
   const createMutation = useCreateTargetOpportunityMutation(resumeId);
   const updateMutation = useUpdateTargetOpportunityMutation(resumeId);
   const deleteMutation = useDeleteTargetOpportunityMutation(resumeId);
@@ -343,8 +359,14 @@ export function TargetOpportunitiesPanel({ currentVersionId, resumeId, versions 
               opportunity={opportunity}
               resumeId={resumeId}
               versions={versions}
+              links={(targetedVersionLinksQuery.data ?? []).filter(
+                (link) => link.targetOpportunityId === opportunity.id
+              )}
               onEdit={openEditDialog}
               onDelete={handleDelete}
+              onUploadTargetedVersion={(opportunityId) =>
+                navigate(`/upload?resumeId=${resumeId}&targetOpportunityId=${opportunityId}`)
+              }
               isDeleting={deleteMutation.isPending}
             />
           ))}
@@ -492,15 +514,19 @@ function TargetOpportunityItem({
   opportunity,
   resumeId,
   versions,
+  links,
   onEdit,
   onDelete,
+  onUploadTargetedVersion,
   isDeleting,
 }: {
   opportunity: TargetOpportunity;
   resumeId: string;
   versions: ResumeVersion[];
+  links: TargetedVersionLink[];
   onEdit: (opportunity: TargetOpportunity) => void;
   onDelete: (opportunityId: string) => Promise<void>;
+  onUploadTargetedVersion: (opportunityId: string) => void;
   isDeleting: boolean;
 }) {
   const { language } = useLanguage();
@@ -513,6 +539,9 @@ function TargetOpportunityItem({
   );
   const createJobMutation = useCreateTargetedReviewJobMutation(resumeId, opportunity.id);
   const sourceVersion = versions.find((version) => version.id === opportunity.sourceResumeVersionId);
+  const linkedVersions = links
+    .map((link) => versions.find((version) => version.id === link.targetedResumeVersionId))
+    .filter((version): version is ResumeVersion => Boolean(version));
   const job = jobQuery.data ?? null;
   const review = latestReviewQuery.data ?? null;
   const targetValidation = validateTargetForm({
@@ -536,10 +565,25 @@ function TargetOpportunityItem({
         startError: 'Nao foi possivel iniciar a analise direcionada',
         failed: 'Analise direcionada falhou.',
         queued: 'Analise direcionada na fila',
+        complete: 'Analise direcionada concluida',
         start: 'Iniciar analise direcionada',
         retry: 'Tentar novamente',
+        uploadTargetedVersion: 'Enviar versao direcionada',
+        linkedVersions: 'Versoes direcionadas',
+        compareVersion: 'Comparar com alvo',
+        comparisonQueued: 'Comparacao na fila',
+        comparisonComplete: 'Comparacao concluida',
+        comparisonStarted: 'Comparacao iniciada',
+        comparisonError: 'Nao foi possivel iniciar a comparacao',
+        alignmentScore: 'Aderencia da versao',
+        addressed: 'Requisitos melhorados',
+        remaining: 'Edicoes restantes',
         completeTarget: 'Completar detalhes do alvo',
         needsBetterTarget: 'Adicione uma descricao real e requisitos especificos antes de iniciar a IA.',
+        targetStep: 'Alvo',
+        targetedVersionStep: 'Versao direcionada',
+        reviewStep: 'Revisao',
+        comparisonStep: 'Comparacao',
         edit: 'Editar alvo',
         delete: 'Apagar alvo',
         deleteTitle: 'Apagar alvo?',
@@ -559,10 +603,25 @@ function TargetOpportunityItem({
         startError: 'Unable to start targeted review',
         failed: 'Targeted review failed.',
         queued: 'Targeted review queued',
+        complete: 'Targeted review complete',
         start: 'Start targeted review',
         retry: 'Retry targeted review',
+        uploadTargetedVersion: 'Upload targeted version',
+        linkedVersions: 'Targeted versions',
+        compareVersion: 'Compare with target',
+        comparisonQueued: 'Comparison queued',
+        comparisonComplete: 'Comparison complete',
+        comparisonStarted: 'Comparison started',
+        comparisonError: 'Unable to start comparison',
+        alignmentScore: 'Version alignment',
+        addressed: 'Improved requirements',
+        remaining: 'Remaining edits',
         completeTarget: 'Complete target details',
         needsBetterTarget: 'Add a real description and specific requirements before starting AI.',
+        targetStep: 'Target',
+        targetedVersionStep: 'Targeted version',
+        reviewStep: 'Review',
+        comparisonStep: 'Comparison',
         edit: 'Edit target',
         delete: 'Delete target',
         deleteTitle: 'Delete target?',
@@ -582,6 +641,27 @@ function TargetOpportunityItem({
       });
     }
   }
+
+  function reviewActionLabel() {
+    if (job?.status === 'DONE') {
+      return copy.complete;
+    }
+    if (job && job.status !== 'FAILED') {
+      return copy.queued;
+    }
+    if (!targetValidation.isValid) {
+      return copy.completeTarget;
+    }
+    return job?.status === 'FAILED' ? copy.retry : copy.start;
+  }
+
+  const reviewStepState = getJobStepState(job?.status, !targetValidation.isValid);
+  const targetSteps: WorkflowStep[] = [
+    { label: copy.targetStep, state: targetValidation.isValid ? 'complete' : 'active' },
+    { label: copy.targetedVersionStep, state: linkedVersions.length > 0 ? 'complete' : 'pending' },
+    { label: copy.reviewStep, state: reviewStepState },
+    { label: copy.comparisonStep, state: linkedVersions.length > 0 ? 'active' : 'pending' },
+  ];
 
   return (
     <div className="rounded-lg border bg-background p-3">
@@ -647,7 +727,27 @@ function TargetOpportunityItem({
         </div>
       </div>
 
+      <TargetWorkflowSteps steps={targetSteps} />
+
       {review && <TargetedReviewSummary review={review} labels={copy} />}
+
+      {linkedVersions.length > 0 && (
+        <div className="mt-3 rounded-md border bg-muted/30 p-2">
+          <p className="text-xs font-semibold uppercase text-muted-foreground">{copy.linkedVersions}</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {linkedVersions.map((version) => (
+              <LinkedTargetedVersion
+                key={version.id}
+                labels={copy}
+                opportunityId={opportunity.id}
+                resumeId={resumeId}
+                reviewStepState={reviewStepState}
+                version={version}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {!targetValidation.isValid && (
         <p className="mt-3 rounded-md border border-amber-200 bg-amber-50 p-2 text-xs text-amber-900">
@@ -678,8 +778,196 @@ function TargetOpportunityItem({
         disabled={createJobMutation.isPending || hasTerminalJob || !targetValidation.isValid}
       >
         {createJobMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        {hasTerminalJob ? copy.queued : targetValidation.isValid ? (job?.status === 'FAILED' ? copy.retry : copy.start) : copy.completeTarget}
+        {reviewActionLabel()}
       </Button>
+      <Button
+        className="mt-2 w-full"
+        size="sm"
+        variant="outline"
+        onClick={() => onUploadTargetedVersion(opportunity.id)}
+      >
+        <Upload className="mr-2 h-4 w-4" />
+        {copy.uploadTargetedVersion}
+      </Button>
+    </div>
+  );
+}
+
+function getJobStepState(status: TargetedReviewJobStatus | undefined, blocked: boolean): WorkflowStepState {
+  if (blocked) {
+    return 'pending';
+  }
+  if (!status) {
+    return 'active';
+  }
+  if (status === 'DONE') {
+    return 'complete';
+  }
+  if (status === 'FAILED') {
+    return 'failed';
+  }
+  return 'active';
+}
+
+function TargetWorkflowSteps({ steps, compact = false }: { steps: WorkflowStep[]; compact?: boolean }) {
+  return (
+    <ol className={`mt-3 grid grid-cols-4 gap-1 ${compact ? 'mb-2' : ''}`}>
+      {steps.map((step) => (
+        <li key={step.label} className="min-w-0">
+          <div className="flex items-center gap-1.5">
+            <StepIcon state={step.state} />
+            <span className="truncate text-[11px] font-medium text-muted-foreground">{step.label}</span>
+          </div>
+          <div className={`mt-1 h-1 rounded-full ${stepBarClassName(step.state)}`} />
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+function StepIcon({ state }: { state: WorkflowStepState }) {
+  if (state === 'complete') {
+    return <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-600" />;
+  }
+  if (state === 'failed') {
+    return <XCircle className="h-3.5 w-3.5 shrink-0 text-destructive" />;
+  }
+  return <Circle className={`h-3.5 w-3.5 shrink-0 ${state === 'active' ? 'fill-primary text-primary' : 'text-muted-foreground/60'}`} />;
+}
+
+function stepBarClassName(state: WorkflowStepState) {
+  if (state === 'complete') {
+    return 'bg-emerald-500';
+  }
+  if (state === 'active') {
+    return 'bg-primary';
+  }
+  if (state === 'failed') {
+    return 'bg-destructive';
+  }
+  return 'bg-muted';
+}
+
+function LinkedTargetedVersion({
+  labels,
+  opportunityId,
+  resumeId,
+  reviewStepState,
+  version,
+}: {
+  labels: {
+    compareVersion: string;
+    comparisonQueued: string;
+    comparisonComplete: string;
+    comparisonStarted: string;
+    comparisonError: string;
+    alignmentScore: string;
+    addressed: string;
+    remaining: string;
+    targetStep: string;
+    targetedVersionStep: string;
+    reviewStep: string;
+    comparisonStep: string;
+  };
+  opportunityId: string;
+  resumeId: string;
+  reviewStepState: WorkflowStepState;
+  version: ResumeVersion;
+}) {
+  const { toast } = useToast();
+  const jobQuery = useLatestTargetedComparisonJobQuery(resumeId, opportunityId, version.id);
+  const comparisonQuery = useLatestTargetedComparisonQuery(
+    resumeId,
+    opportunityId,
+    version.id,
+    jobQuery.data?.status === 'DONE'
+  );
+  const createMutation = useCreateTargetedComparisonJobMutation(resumeId, opportunityId, version.id);
+  const job = jobQuery.data ?? null;
+  const comparison = comparisonQuery.data ?? null;
+  const hasTerminalJob = Boolean(job && job.status !== 'FAILED');
+
+  async function handleCompare() {
+    try {
+      await createMutation.mutateAsync();
+      toast({ title: labels.comparisonStarted });
+    } catch {
+      toast({ variant: 'destructive', title: labels.comparisonError });
+    }
+  }
+
+  function comparisonActionLabel() {
+    if (job?.status === 'DONE') {
+      return labels.comparisonComplete;
+    }
+    if (job && job.status !== 'FAILED') {
+      return labels.comparisonQueued;
+    }
+    return labels.compareVersion;
+  }
+
+  const versionSteps: WorkflowStep[] = [
+    { label: labels.targetStep, state: 'complete' },
+    { label: labels.targetedVersionStep, state: 'complete' },
+    { label: labels.reviewStep, state: reviewStepState },
+    { label: labels.comparisonStep, state: getJobStepState(job?.status, false) },
+  ];
+
+  return (
+    <div className="w-full rounded-md border bg-background p-2">
+      <TargetWorkflowSteps steps={versionSteps} compact />
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <Badge variant="outline">v{version.versionNumber}</Badge>
+        {job && <Badge variant={job.status === 'FAILED' ? 'destructive' : 'secondary'}>{STATUS_LABELS[job.status]}</Badge>}
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={handleCompare}
+          disabled={createMutation.isPending || hasTerminalJob}
+        >
+          {createMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {comparisonActionLabel()}
+        </Button>
+      </div>
+      {job?.status === 'FAILED' && (
+        <p className="mt-2 text-xs text-destructive">{job.errorDetail}</p>
+      )}
+      {comparison && <TargetedComparisonSummary comparison={comparison} labels={labels} />}
+    </div>
+  );
+}
+
+function TargetedComparisonSummary({
+  comparison,
+  labels,
+}: {
+  comparison: TargetedComparisonDTO;
+  labels: {
+    alignmentScore: string;
+    addressed: string;
+    remaining: string;
+  };
+}) {
+  return (
+    <div className="mt-2 space-y-2 border-t pt-2">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-xs font-medium">{labels.alignmentScore}</p>
+        <Badge>{comparison.alignmentScore ?? 'N/A'}</Badge>
+      </div>
+      <p className="text-xs text-muted-foreground">{comparison.summary}</p>
+      <TargetedReviewSection title={labels.addressed} items={comparison.addressedRequirements.map((item) => (
+        <span>
+          <span className="font-medium">{item.requirement}</span>
+          <span className="text-muted-foreground"> - {item.evidence.join('; ')}</span>
+        </span>
+      ))} />
+      <TargetedReviewSection title={labels.remaining} items={comparison.remainingChanges.map((item) => (
+        <span>
+          <span className="font-medium">{item.section}</span>
+          <span className="text-muted-foreground"> - {item.change}</span>
+        </span>
+      ))} />
     </div>
   );
 }

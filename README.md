@@ -14,6 +14,8 @@ Writing a strong resume is its own skill. The product helps candidates make thei
 
 - upload a resume in Portuguese or English
 - receive structured AI feedback tied to that exact version
+- capture target opportunities such as jobs, public exams, scholarships, promotions, or career-change targets
+- run targeted resume-vs-opportunity reviews without replacing the original resume
 - upload revised versions and compare progress over time
 - keep feedback, comments, and shared review links attached to the resume workflow
 
@@ -30,19 +32,21 @@ It solves three practical problems:
 - `Review context loss`: feedback, comments, and file versions often drift apart
 - `Weak iteration visibility`: most tools can review a file, but cannot explain progress between versions
 - `Low-quality collaboration`: external reviewers need a simpler, controlled way to preview and comment without joining the full account workflow
+- `Weak opportunity targeting`: candidates often need to adapt a resume to a specific vacancy or exam without inventing unsupported experience
 
-## The impact this creates
+## User Workflow
 
-The platform changes the user experience from one-off resume review to evidence-based iteration.
+The frontend supports a versioned resume review workflow.
 
-That creates product impact in a few ways:
+Implemented behavior:
 
-- users can see both the current AI review and how the latest version compares to the previous one
-- improvements, unresolved issues, and new regressions become explicit
-- reviewers can comment in context on the version actually under discussion
-- version history stays structured, which makes resume iteration more disciplined and less chaotic
+- Users can see the current AI review and the comparison with the previous version.
+- Progress output separates improvements, unchanged issues, and new issues.
+- Target opportunity reviews separate matched, weak, and missing requirements before a candidate creates a targeted version.
+- Reviewers can comment on the version under discussion.
+- Version history keeps uploads, AI outputs, comments, targets, and share links in one workflow.
 
-In short, the product is designed to help job seekers improve faster because the system tracks not only what is wrong, but what changed.
+The UI distinguishes current-version feedback, version-to-version progress, and target-specific alignment instead of showing all AI output as one generic review.
 
 ## Featured
 
@@ -63,6 +67,7 @@ The current app supports:
 - AI feedback generation with async job polling
 - language-aware AI feedback for Portuguese and English resume workflows
 - AI progress comparison between resume versions
+- target opportunity capture and targeted resume-vs-opportunity reviews
 - recruiter-style feedback display with summary, strengths, and improvements
 - share link creation, revocation, expiration, and usage limits
 - version-specific comments
@@ -71,15 +76,18 @@ The current app supports:
 
 ## Product model
 
-The product makes two different AI promises and keeps them separate in the UI:
+The UI presents three AI artifact types separately:
 
 1. `AI Feedback for the current version`
-   This answers: “Is this version good?”
+   Reviews one resume version.
 
 2. `Progress since the previous version`
-   This answers: “Did this version improve compared to the last one?”
+   Compares one resume version with the previous version.
 
-That distinction is central to the product. The goal is not only to analyze resumes, but to support better iteration over time.
+3. `Targeted review for a specific opportunity`
+   Compares a source resume version with a stored target opportunity.
+
+These are separate backend contracts and separate UI states.
 
 ## Tech Stack
 
@@ -104,6 +112,7 @@ The codebase is organized by responsibility:
 - `src/components/ai-feedback` modularized AI feedback presentation components
 - `src/components/resume-details` modularized resume details page components
 - `src/features` feature hooks and orchestration logic
+- `src/features/target-opportunities` target opportunity query hooks and mutation orchestration
 - `src/store` Redux store, slices, and typed hooks
 - `src/services` API client and service layer
 - `src/contexts` app-wide providers and compatibility wrappers
@@ -170,10 +179,26 @@ For version-to-version comparison, the backend also returns progress data:
 }
 ```
 
-The frontend uses these two responses differently:
+For targeted resume-vs-opportunity review, the backend returns:
+
+```ts
+{
+  summary: string;
+  fitScore: number | null;
+  matchedRequirements: Array<{ requirement: string; evidence: string[]; confidence: string }>;
+  weakRequirements: Array<{ requirement: string; currentEvidence: string; recommendedFix: string }>;
+  missingRequirements: Array<{ requirement: string; candidateAction: string }>;
+  recommendedChanges: Array<{ section: string; change: string; rationale: string }>;
+  positioningAdvice: string[];
+  integrityWarnings: string[];
+}
+```
+
+The frontend uses these responses differently:
 
 - feedback explains the quality of the current version
 - progress explains what changed between the current version and the previous one
+- targeted review explains fit against a concrete opportunity and protects evidence integrity
 
 ## Environment Variables
 
@@ -264,6 +289,7 @@ Important feature hooks:
 - non-`FormData` requests are sent as JSON
 - preview and file endpoints may use direct URLs instead of standard JSON fetch flows
 - API failures are mapped into a normalized frontend error shape
+- target opportunity, targeted review, feedback, progress, share-link, and comment flows all go through `resume-api`
 - AI provider selection, Azure OpenAI support, and Microsoft IQ / Foundry IQ grounding are backend concerns; the frontend continues to call `resume-api` through the stable REST contract.
 
 ## Authentication Notes
@@ -286,7 +312,7 @@ Supported auth flows:
 - landing and about pages explain the problem and the workflow
 - dashboard shows searchable and pinnable resume workflows
 - upload page supports new resumes and additional versions
-- resume details page combines AI review, progress comparison, preview, version history, comments, and share links
+- resume details page combines AI review, progress comparison, target opportunities, preview, version history, comments, and share links
 - shared resume page supports external review through tokenized access
 
 ## Project Notes

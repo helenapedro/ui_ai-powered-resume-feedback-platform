@@ -23,6 +23,29 @@ export function useCreateTargetOpportunityMutation(resumeId: string | undefined)
   });
 }
 
+export function useTargetedVersionLinksQuery(resumeId: string | undefined) {
+  return useQuery({
+    queryKey: queryKeys.resumes.targetedVersionLinks(resumeId ?? ''),
+    queryFn: () => targetOpportunityService.getTargetedVersionLinks(resumeId!),
+    enabled: Boolean(resumeId),
+  });
+}
+
+export function useLinkTargetedVersionMutation(resumeId: string | undefined) {
+  return useInvalidatingMutation({
+    mutationFn: ({ opportunityId, versionId }: { opportunityId: string; versionId: string }) =>
+      targetOpportunityService.linkTargetedVersion(resumeId!, opportunityId, versionId),
+    getQueryKeys: () =>
+      resumeId
+        ? [
+            queryKeys.resumes.detail(resumeId),
+            queryKeys.resumes.targetedVersionLinks(resumeId),
+            queryKeys.resumes.targetOpportunities(resumeId),
+          ]
+        : [],
+  });
+}
+
 export function useUpdateTargetOpportunityMutation(resumeId: string | undefined) {
   return useInvalidatingMutation({
     mutationFn: ({ opportunityId, request }: { opportunityId: string; request: UpdateTargetOpportunityRequest }) =>
@@ -45,6 +68,7 @@ export function useDeleteTargetOpportunityMutation(resumeId: string | undefined)
       resumeId
         ? [
             queryKeys.resumes.targetOpportunities(resumeId),
+            queryKeys.resumes.targetedVersionLinks(resumeId),
             queryKeys.resumes.targetedReviewJob(resumeId, opportunityId),
             queryKeys.resumes.targetedReview(resumeId, opportunityId),
           ]
@@ -90,6 +114,58 @@ export function useCreateTargetedReviewJobMutation(resumeId: string | undefined,
         ? [
             queryKeys.resumes.targetedReviewJob(resumeId, opportunityId),
             queryKeys.resumes.targetedReview(resumeId, opportunityId),
+          ]
+        : [],
+  });
+}
+
+export function useLatestTargetedComparisonJobQuery(
+  resumeId: string | undefined,
+  opportunityId: string | undefined,
+  versionId: string | undefined
+) {
+  return useQuery({
+    queryKey: queryKeys.resumes.targetedComparisonJob(resumeId ?? '', opportunityId ?? '', versionId ?? ''),
+    queryFn: () => targetOpportunityService.getLatestTargetedComparisonJob(resumeId!, opportunityId!, versionId!),
+    enabled: Boolean(resumeId && opportunityId && versionId),
+    retry: (failureCount, error) => {
+      if (error instanceof ApiError && error.status === 404) {
+        return false;
+      }
+      return failureCount < 2;
+    },
+    refetchInterval: (query) => {
+      const status = query.state.data?.status;
+      return status === 'PENDING' || status === 'PROCESSING' ? POLL_INTERVAL : false;
+    },
+  });
+}
+
+export function useLatestTargetedComparisonQuery(
+  resumeId: string | undefined,
+  opportunityId: string | undefined,
+  versionId: string | undefined,
+  enabled: boolean
+) {
+  return useQuery({
+    queryKey: queryKeys.resumes.targetedComparison(resumeId ?? '', opportunityId ?? '', versionId ?? ''),
+    queryFn: () => targetOpportunityService.getLatestTargetedComparison(resumeId!, opportunityId!, versionId!),
+    enabled: Boolean(resumeId && opportunityId && versionId && enabled),
+  });
+}
+
+export function useCreateTargetedComparisonJobMutation(
+  resumeId: string | undefined,
+  opportunityId: string | undefined,
+  versionId: string | undefined
+) {
+  return useInvalidatingMutation({
+    mutationFn: () => targetOpportunityService.createTargetedComparisonJob(resumeId!, opportunityId!, versionId!),
+    getQueryKeys: () =>
+      resumeId && opportunityId && versionId
+        ? [
+            queryKeys.resumes.targetedComparisonJob(resumeId, opportunityId, versionId),
+            queryKeys.resumes.targetedComparison(resumeId, opportunityId, versionId),
           ]
         : [],
   });

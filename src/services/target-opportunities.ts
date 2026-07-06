@@ -2,6 +2,9 @@ import { apiClient } from '@/services/api-client';
 import type {
   CreateTargetOpportunityRequest,
   TargetOpportunity,
+  TargetedComparisonDTO,
+  TargetedComparisonJobDTO,
+  TargetedVersionLink,
   TargetedReviewDTO,
   TargetedReviewJobDTO,
   UpdateTargetOpportunityRequest,
@@ -34,6 +37,20 @@ export const targetOpportunityService = {
     return apiClient.delete<void>(`/resumes/${resumeId}/target-opportunities/${opportunityId}`);
   },
 
+  async getTargetedVersionLinks(resumeId: string): Promise<TargetedVersionLink[]> {
+    return apiClient.get<TargetedVersionLink[]>(`/resumes/${resumeId}/target-opportunities/links`);
+  },
+
+  async linkTargetedVersion(
+    resumeId: string,
+    opportunityId: string,
+    versionId: string
+  ): Promise<TargetedVersionLink> {
+    return apiClient.post<TargetedVersionLink>(
+      `/resumes/${resumeId}/target-opportunities/${opportunityId}/versions/${versionId}/link`
+    );
+  },
+
   async createTargetedReviewJob(resumeId: string, opportunityId: string): Promise<TargetedReviewJobDTO> {
     return apiClient.post<TargetedReviewJobDTO>(
       `/resumes/${resumeId}/target-opportunities/${opportunityId}/reviews`
@@ -49,6 +66,36 @@ export const targetOpportunityService = {
   async getLatestTargetedReview(resumeId: string, opportunityId: string): Promise<TargetedReviewDTO> {
     return apiClient.get<TargetedReviewDTO>(
       `/resumes/${resumeId}/target-opportunities/${opportunityId}/reviews/latest`
+    );
+  },
+
+  async createTargetedComparisonJob(
+    resumeId: string,
+    opportunityId: string,
+    versionId: string
+  ): Promise<TargetedComparisonJobDTO> {
+    return apiClient.post<TargetedComparisonJobDTO>(
+      `/resumes/${resumeId}/target-opportunities/${opportunityId}/versions/${versionId}/comparisons`
+    );
+  },
+
+  async getLatestTargetedComparisonJob(
+    resumeId: string,
+    opportunityId: string,
+    versionId: string
+  ): Promise<TargetedComparisonJobDTO> {
+    return apiClient.get<TargetedComparisonJobDTO>(
+      `/resumes/${resumeId}/target-opportunities/${opportunityId}/versions/${versionId}/comparisons/latest-job`
+    );
+  },
+
+  async getLatestTargetedComparison(
+    resumeId: string,
+    opportunityId: string,
+    versionId: string
+  ): Promise<TargetedComparisonDTO> {
+    return apiClient.get<TargetedComparisonDTO>(
+      `/resumes/${resumeId}/target-opportunities/${opportunityId}/versions/${versionId}/comparisons/latest`
     );
   },
 };
