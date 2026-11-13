@@ -14,6 +14,7 @@ import ResumeDetails from "./pages/ResumeDetails";
 import SharedResume from "./pages/SharedResume";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
+import CareerProfile from "./pages/CareerProfile";
 import NotFound from "./pages/NotFound";
 import LegalPage from "./pages/Legal";
 
@@ -71,6 +72,14 @@ function App() {
                     element={
                       <ProtectedRoute>
                         <Profile />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/career-profile"
+                    element={
+                      <ProtectedRoute>
+                        <CareerProfile />
                       </ProtectedRoute>
                     }
                   />

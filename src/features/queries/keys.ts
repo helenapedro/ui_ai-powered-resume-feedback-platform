@@ -26,4 +26,8 @@ export const queryKeys = {
     detail: (token: string) => ['shared-resume', token] as const,
     comments: (token: string) => ['shared-resume', token, 'comments'] as const,
   },
+  careerProfile: {
+    profile: ['career-profile'] as const,
+    session: (sessionId: string) => ['career-profile', 'sessions', sessionId] as const,
+  },
 };

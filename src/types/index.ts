@@ -297,3 +297,115 @@ export interface TargetedComparisonDTO {
   evidenceGains: string[];
   integrityWarnings: string[];
 }
+
+export type CareerSessionStatus =
+  | 'NOT_STARTED'
+  | 'IN_PROGRESS'
+  | 'AWAITING_CONFIRMATION'
+  | 'COMPLETED'
+  | 'CANCELLED';
+
+export type CareerMessageRole = 'USER' | 'AGENT';
+
+export type CareerMessageResponseType = 'MESSAGE' | 'FOLLOW_UP' | 'PROPOSAL';
+
+export type CareerProposalStatus = 'PENDING' | 'ACCEPTED' | 'EDITED' | 'REJECTED';
+
+export type CareerConfirmationDecision = 'ACCEPT' | 'EDIT' | 'REJECT';
+
+export type CareerProfileStatus = 'ACTIVE';
+
+export type CareerItemConfirmationStatus = 'CONFIRMED';
+
+export type CareerFactField = 'employer' | 'job_title' | 'start_date' | 'end_date' | 'responsibilities';
+
+export interface CareerSessionResponse {
+  sessionId: string;
+  profileId: string;
+  status: CareerSessionStatus;
+  sessionVersion: number;
+  createdAt: string;
+  updatedAt: string;
+  expiresAt: string;
+}
+
+export interface CareerMessageResponse {
+  messageId: string;
+  sequence: number;
+  role: CareerMessageRole;
+  responseType: CareerMessageResponseType;
+  content: string;
+  correlationId: string | null;
+  createdAt: string;
+}
+
+export interface CareerProposalResponse {
+  proposalId: string;
+  category: string;
+  facts: Record<string, string>;
+  confirmationStatus: CareerProposalStatus;
+}
+
+export interface CareerSessionDetailResponse {
+  sessionId: string;
+  profileId: string;
+  status: CareerSessionStatus;
+  sessionVersion: number;
+  createdAt: string;
+  updatedAt: string;
+  expiresAt: string;
+  messages: CareerMessageResponse[];
+  pendingProposal: CareerProposalResponse | null;
+  facts: Record<string, string>;
+}
+
+export interface CareerTurnResponse {
+  sessionId: string;
+  sessionVersion: number;
+  status: CareerSessionStatus;
+  type: CareerMessageResponseType;
+  assistantMessage: string;
+  requiresConfirmation: boolean;
+  proposal: CareerProposalResponse | null;
+}
+
+export interface CareerConfirmationResponse {
+  proposalId: string;
+  proposalStatus: CareerProposalStatus;
+  sessionStatus: CareerSessionStatus;
+  sessionVersion: number;
+  confirmedFacts: number;
+}
+
+export interface CareerProfileItemResponse {
+  itemId: string;
+  category: string;
+  fieldKey: string;
+  factValue: string;
+  confirmationStatus: CareerItemConfirmationStatus;
+  originProposalId: string;
+  createdAt: string;
+}
+
+export interface CareerProfileResponse {
+  profileId: string;
+  status: CareerProfileStatus;
+  items: CareerProfileItemResponse[];
+}
+
+export interface CareerSubmitTurnRequest {
+  message: string;
+  expectedSessionVersion: number;
+  idempotencyKey: string;
+}
+
+export interface CareerConfirmProposalRequest {
+  proposalId: string;
+  decision: CareerConfirmationDecision;
+  expectedSessionVersion: number;
+  editedFacts?: Record<string, string>;
+}
+
+export interface CareerCancelSessionRequest {
+  expectedSessionVersion: number;
+}
