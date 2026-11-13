@@ -144,7 +144,15 @@ type TranslationKey =
   | 'history.currentSuffix'
   | 'history.older'
   | 'history.preview'
-  | 'history.download';
+  | 'history.download'
+  | 'careerProfile.title'
+  | 'careerProfile.description'
+  | 'careerProfile.emptyTitle'
+  | 'careerProfile.emptyDescription'
+  | 'careerProfile.loadErrorTitle'
+  | 'careerProfile.loadErrorDescription'
+  | 'careerProfile.present'
+  | 'careerProfile.untitledExperience';
 
 const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
   en: {
@@ -290,6 +298,14 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     'history.older': 'Older versions',
     'history.preview': 'Preview',
     'history.download': 'Download',
+    'careerProfile.title': 'Career Profile',
+    'careerProfile.description': 'Work history confirmed through the career interview.',
+    'careerProfile.emptyTitle': 'No confirmed experience yet',
+    'careerProfile.emptyDescription': 'Complete a career interview to add confirmed work experience to your profile.',
+    'careerProfile.loadErrorTitle': 'Unable to load career profile',
+    'careerProfile.loadErrorDescription': 'Please try again.',
+    'careerProfile.present': 'Present',
+    'careerProfile.untitledExperience': 'Untitled experience',
   },
   pt: {
     'app.name': 'Resume Feedback',
@@ -434,6 +450,14 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     'history.older': 'Versoes antigas',
     'history.preview': 'Pre-visualizar',
     'history.download': 'Descarregar',
+    'careerProfile.title': 'Perfil de Carreira',
+    'careerProfile.description': 'Historico profissional confirmado atraves da entrevista de carreira.',
+    'careerProfile.emptyTitle': 'Ainda nao ha experiencia confirmada',
+    'careerProfile.emptyDescription': 'Completa uma entrevista de carreira para adicionar experiencia profissional confirmada ao teu perfil.',
+    'careerProfile.loadErrorTitle': 'Nao foi possivel carregar o perfil de carreira',
+    'careerProfile.loadErrorDescription': 'Tenta novamente.',
+    'careerProfile.present': 'Atual',
+    'careerProfile.untitledExperience': 'Experiencia sem titulo',
   },
 };
 
