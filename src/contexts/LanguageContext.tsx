@@ -202,6 +202,8 @@ export type TranslationKey =
   | 'careerInterview.completedNotice'
   | 'careerInterview.cancelledNotice'
   | 'careerInterview.viewProfile'
+  | 'careerInterview.viewProfilePanel'
+  | 'careerInterview.profilePanelTitle'
   | 'careerInterview.agentLabel'
   | 'careerInterview.youLabel';
 
@@ -412,6 +414,8 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     'careerInterview.completedNotice': 'This interview is complete.',
     'careerInterview.cancelledNotice': 'This interview was cancelled.',
     'careerInterview.viewProfile': 'View profile',
+    'careerInterview.viewProfilePanel': 'View profile so far',
+    'careerInterview.profilePanelTitle': 'Your profile so far',
     'careerInterview.agentLabel': 'Career Agent',
     'careerInterview.youLabel': 'You',
   },
@@ -623,6 +627,8 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     'careerInterview.completedNotice': 'Esta entrevista esta concluida.',
     'careerInterview.cancelledNotice': 'Esta entrevista foi cancelada.',
     'careerInterview.viewProfile': 'Ver perfil',
+    'careerInterview.viewProfilePanel': 'Ver o perfil ate agora',
+    'careerInterview.profilePanelTitle': 'O seu perfil ate agora',
     'careerInterview.agentLabel': 'Agente de Carreira',
     'careerInterview.youLabel': 'Tu',
   },
