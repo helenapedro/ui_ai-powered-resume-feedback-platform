@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useMemo, useState, type ReactNo
 
 export type AppLanguage = 'en' | 'pt';
 
-type TranslationKey =
+export type TranslationKey =
   | 'app.name'
   | 'nav.profile'
   | 'nav.signOut'
@@ -152,7 +152,58 @@ type TranslationKey =
   | 'careerProfile.loadErrorTitle'
   | 'careerProfile.loadErrorDescription'
   | 'careerProfile.present'
-  | 'careerProfile.untitledExperience';
+  | 'careerProfile.untitledExperience'
+  | 'careerInterview.title'
+  | 'careerInterview.description'
+  | 'careerInterview.emptyThread'
+  | 'careerInterview.sendPlaceholder'
+  | 'careerInterview.send'
+  | 'careerInterview.sending'
+  | 'careerInterview.retry'
+  | 'careerInterview.startErrorTitle'
+  | 'careerInterview.startErrorDescription'
+  | 'careerInterview.agentUnavailableTitle'
+  | 'careerInterview.agentUnavailableDescription'
+  | 'careerInterview.versionConflictTitle'
+  | 'careerInterview.versionConflictDescription'
+  | 'careerInterview.sessionErrorTitle'
+  | 'careerInterview.sessionErrorDescription'
+  | 'careerInterview.sessionExpiredTitle'
+  | 'careerInterview.sessionExpiredDescription'
+  | 'careerInterview.cancel'
+  | 'careerInterview.cancelTitle'
+  | 'careerInterview.cancelDescription'
+  | 'careerInterview.cancelConfirm'
+  | 'careerInterview.keepGoing'
+  | 'careerInterview.proposalTitle'
+  | 'careerInterview.proposalDescription'
+  | 'careerInterview.accept'
+  | 'careerInterview.edit'
+  | 'careerInterview.reject'
+  | 'careerInterview.saveEdited'
+  | 'careerInterview.confirming'
+  | 'careerInterview.editHint'
+  | 'careerInterview.factNotProvided'
+  | 'careerInterview.fieldEmployer'
+  | 'careerInterview.fieldJobTitle'
+  | 'careerInterview.fieldStartDate'
+  | 'careerInterview.fieldEndDate'
+  | 'careerInterview.fieldResponsibilities'
+  | 'careerInterview.learnedTitle'
+  | 'careerInterview.learnedEmpty'
+  | 'careerInterview.confirmedTitle'
+  | 'careerInterview.confirmedEmpty'
+  | 'careerInterview.progressConfirmed'
+  | 'careerInterview.statusNotStarted'
+  | 'careerInterview.statusInProgress'
+  | 'careerInterview.statusAwaitingConfirmation'
+  | 'careerInterview.statusCompleted'
+  | 'careerInterview.statusCancelled'
+  | 'careerInterview.completedNotice'
+  | 'careerInterview.cancelledNotice'
+  | 'careerInterview.viewProfile'
+  | 'careerInterview.agentLabel'
+  | 'careerInterview.youLabel';
 
 const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
   en: {
@@ -306,6 +357,63 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     'careerProfile.loadErrorDescription': 'Please try again.',
     'careerProfile.present': 'Present',
     'careerProfile.untitledExperience': 'Untitled experience',
+    'careerInterview.title': 'Career Interview',
+    'careerInterview.description':
+      'Answer a few questions about your work history. Confirm each proposal before it joins your profile.',
+    'careerInterview.emptyThread':
+      'Start by telling the agent about your most recent job.',
+    'careerInterview.sendPlaceholder': 'Describe your work experience...',
+    'careerInterview.send': 'Send',
+    'careerInterview.sending': 'Sending...',
+    'careerInterview.retry': 'Retry',
+    'careerInterview.startErrorTitle': 'Unable to start the interview',
+    'careerInterview.startErrorDescription': 'Please try again.',
+    'careerInterview.agentUnavailableTitle': 'The career agent is unavailable',
+    'careerInterview.agentUnavailableDescription':
+      'Your message was kept. Try again in a moment.',
+    'careerInterview.versionConflictTitle': 'The interview was updated',
+    'careerInterview.versionConflictDescription':
+      'Showing the latest state. Review it and continue.',
+    'careerInterview.sessionErrorTitle': 'Something went wrong',
+    'careerInterview.sessionErrorDescription': 'Please try again.',
+    'careerInterview.sessionExpiredTitle': 'Session expired',
+    'careerInterview.sessionExpiredDescription': 'Please log in again to continue the interview.',
+    'careerInterview.cancel': 'Cancel interview',
+    'careerInterview.cancelTitle': 'Cancel this interview?',
+    'careerInterview.cancelDescription':
+      'Your confirmed experience stays on your profile. The unfinished conversation is discarded.',
+    'careerInterview.cancelConfirm': 'Yes, cancel',
+    'careerInterview.keepGoing': 'Keep going',
+    'careerInterview.proposalTitle': 'Review this proposal',
+    'careerInterview.proposalDescription':
+      'Confirm the details before they join your profile.',
+    'careerInterview.accept': 'Accept',
+    'careerInterview.edit': 'Edit',
+    'careerInterview.reject': 'Reject',
+    'careerInterview.saveEdited': 'Save changes',
+    'careerInterview.confirming': 'Saving...',
+    'careerInterview.editHint': 'All five fields are required.',
+    'careerInterview.factNotProvided': 'Not provided',
+    'careerInterview.fieldEmployer': 'Employer',
+    'careerInterview.fieldJobTitle': 'Job title',
+    'careerInterview.fieldStartDate': 'Start date',
+    'careerInterview.fieldEndDate': 'End date',
+    'careerInterview.fieldResponsibilities': 'Responsibilities',
+    'careerInterview.learnedTitle': 'What we learned so far',
+    'careerInterview.learnedEmpty': 'Nothing learned yet. Answer the first question to begin.',
+    'careerInterview.confirmedTitle': 'Confirmed experience',
+    'careerInterview.confirmedEmpty': 'No confirmed experience yet.',
+    'careerInterview.progressConfirmed': '{count} confirmed',
+    'careerInterview.statusNotStarted': 'Not started',
+    'careerInterview.statusInProgress': 'In progress',
+    'careerInterview.statusAwaitingConfirmation': 'Awaiting confirmation',
+    'careerInterview.statusCompleted': 'Completed',
+    'careerInterview.statusCancelled': 'Cancelled',
+    'careerInterview.completedNotice': 'This interview is complete.',
+    'careerInterview.cancelledNotice': 'This interview was cancelled.',
+    'careerInterview.viewProfile': 'View profile',
+    'careerInterview.agentLabel': 'Career Agent',
+    'careerInterview.youLabel': 'You',
   },
   pt: {
     'app.name': 'Resume Feedback',
@@ -458,6 +566,65 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     'careerProfile.loadErrorDescription': 'Tenta novamente.',
     'careerProfile.present': 'Atual',
     'careerProfile.untitledExperience': 'Experiencia sem titulo',
+    'careerInterview.title': 'Entrevista de Carreira',
+    'careerInterview.description':
+      'Responde a algumas perguntas sobre o teu historico profissional. Confirma cada proposta antes de entrar no teu perfil.',
+    'careerInterview.emptyThread':
+      'Comeca por contar ao agente sobre o teu emprego mais recente.',
+    'careerInterview.sendPlaceholder': 'Descreve a tua experiencia profissional...',
+    'careerInterview.send': 'Enviar',
+    'careerInterview.sending': 'A enviar...',
+    'careerInterview.retry': 'Tentar novamente',
+    'careerInterview.startErrorTitle': 'Nao foi possivel iniciar a entrevista',
+    'careerInterview.startErrorDescription': 'Tenta novamente.',
+    'careerInterview.agentUnavailableTitle': 'O agente de carreira esta indisponivel',
+    'careerInterview.agentUnavailableDescription':
+      'A tua mensagem foi guardada. Tenta novamente daqui a pouco.',
+    'careerInterview.versionConflictTitle': 'A entrevista foi atualizada',
+    'careerInterview.versionConflictDescription':
+      'A mostrar o estado mais recente. Reve e continua.',
+    'careerInterview.sessionErrorTitle': 'Algo correu mal',
+    'careerInterview.sessionErrorDescription': 'Tenta novamente.',
+    'careerInterview.sessionExpiredTitle': 'Sessao expirada',
+    'careerInterview.sessionExpiredDescription':
+      'Inicia sessao novamente para continuar a entrevista.',
+    'careerInterview.cancel': 'Cancelar entrevista',
+    'careerInterview.cancelTitle': 'Cancelar esta entrevista?',
+    'careerInterview.cancelDescription':
+      'A tua experiencia confirmada fica no teu perfil. A conversa por terminar e descartada.',
+    'careerInterview.cancelConfirm': 'Sim, cancelar',
+    'careerInterview.keepGoing': 'Continuar',
+    'careerInterview.proposalTitle': 'Reve esta proposta',
+    'careerInterview.proposalDescription':
+      'Confirma os detalhes antes de entrarem no teu perfil.',
+    'careerInterview.accept': 'Aceitar',
+    'careerInterview.edit': 'Editar',
+    'careerInterview.reject': 'Rejeitar',
+    'careerInterview.saveEdited': 'Guardar alteracoes',
+    'careerInterview.confirming': 'A guardar...',
+    'careerInterview.editHint': 'Os cinco campos sao obrigatorios.',
+    'careerInterview.factNotProvided': 'Nao indicado',
+    'careerInterview.fieldEmployer': 'Empregador',
+    'careerInterview.fieldJobTitle': 'Cargo',
+    'careerInterview.fieldStartDate': 'Data de inicio',
+    'careerInterview.fieldEndDate': 'Data de fim',
+    'careerInterview.fieldResponsibilities': 'Responsabilidades',
+    'careerInterview.learnedTitle': 'O que aprendemos ate agora',
+    'careerInterview.learnedEmpty':
+      'Ainda nao aprendemos nada. Responde a primeira pergunta para comecar.',
+    'careerInterview.confirmedTitle': 'Experiencia confirmada',
+    'careerInterview.confirmedEmpty': 'Ainda nao ha experiencia confirmada.',
+    'careerInterview.progressConfirmed': '{count} confirmadas',
+    'careerInterview.statusNotStarted': 'Nao iniciada',
+    'careerInterview.statusInProgress': 'Em curso',
+    'careerInterview.statusAwaitingConfirmation': 'A espera de confirmacao',
+    'careerInterview.statusCompleted': 'Concluida',
+    'careerInterview.statusCancelled': 'Cancelada',
+    'careerInterview.completedNotice': 'Esta entrevista esta concluida.',
+    'careerInterview.cancelledNotice': 'Esta entrevista foi cancelada.',
+    'careerInterview.viewProfile': 'Ver perfil',
+    'careerInterview.agentLabel': 'Agente de Carreira',
+    'careerInterview.youLabel': 'Tu',
   },
 };
 
