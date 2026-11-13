@@ -1,8 +1,14 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Loader2, PanelBottom } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from '@/components/ui/drawer';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,6 +33,7 @@ import { groupCareerProfileItems } from '@/lib/career-profile';
 export default function CareerInterview() {
   const { t } = useLanguage();
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
+  const [isProfileSheetOpen, setIsProfileSheetOpen] = useState(false);
   const interview = useCareerInterview();
 
   const confirmedCount = groupCareerProfileItems(interview.profile?.items ?? []).length;
@@ -49,9 +56,9 @@ export default function CareerInterview() {
           : interview.actionError?.message || t('careerInterview.sessionErrorDescription');
 
   return (
-    <div className="min-h-screen bg-muted/40">
+    <div className="min-h-dvh bg-muted/40">
       <Header />
-      <main className="mx-auto max-w-[1440px] px-4 py-10">
+      <main className="mx-auto max-w-[1440px] px-4 py-6 sm:py-10">
         <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-2">
             <h1 className="text-2xl font-bold">{t('careerInterview.title')}</h1>
@@ -60,35 +67,47 @@ export default function CareerInterview() {
               <CareerInterviewProgress confirmedCount={confirmedCount} status={interview.status} />
             ) : null}
           </div>
-          {interview.sessionId && !interview.isTerminal ? (
-            <AlertDialog open={isCancelDialogOpen} onOpenChange={setIsCancelDialogOpen}>
-              <AlertDialogTrigger asChild>
-                <Button variant="outline" disabled={interview.isCancelling}>
-                  {t('careerInterview.cancel')}
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>{t('careerInterview.cancelTitle')}</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    {t('careerInterview.cancelDescription')}
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>{t('careerInterview.keepGoing')}</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={() => {
-                      interview.cancelSession();
-                      setIsCancelDialogOpen(false);
-                    }}
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                  >
-                    {t('careerInterview.cancelConfirm')}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          ) : null}
+          <div className="flex flex-wrap items-center gap-2">
+            {interview.detail ? (
+              <Button
+                variant="outline"
+                className="xl:hidden"
+                onClick={() => setIsProfileSheetOpen(true)}
+              >
+                <PanelBottom className="mr-2 h-4 w-4" />
+                {t('careerInterview.viewProfilePanel')}
+              </Button>
+            ) : null}
+            {interview.sessionId && !interview.isTerminal ? (
+              <AlertDialog open={isCancelDialogOpen} onOpenChange={setIsCancelDialogOpen}>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" disabled={interview.isCancelling}>
+                    {t('careerInterview.cancel')}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>{t('careerInterview.cancelTitle')}</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {t('careerInterview.cancelDescription')}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>{t('careerInterview.keepGoing')}</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => {
+                        interview.cancelSession();
+                        setIsCancelDialogOpen(false);
+                      }}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      {t('careerInterview.cancelConfirm')}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            ) : null}
+          </div>
         </div>
 
         {interview.actionError ? (
@@ -126,7 +145,7 @@ export default function CareerInterview() {
           <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_440px]">
             <div className="min-w-0">
               <Card>
-                <CardContent className="space-y-6 p-6">
+                <CardContent className="space-y-6 p-4 sm:p-6">
                   {interview.isTerminal ? (
                     <Alert>
                       <AlertTitle>
@@ -167,7 +186,7 @@ export default function CareerInterview() {
               </Card>
             </div>
 
-            <aside className="space-y-4 xl:sticky xl:top-28 xl:max-h-[calc(100vh-8rem)] xl:self-start xl:overflow-y-auto xl:pr-1">
+            <aside className="hidden space-y-4 xl:sticky xl:top-28 xl:max-h-[calc(100vh-8rem)] xl:block xl:self-start xl:overflow-y-auto xl:pr-1">
               <CareerProfilePanel
                 facts={interview.detail?.facts ?? {}}
                 profile={interview.profile}
@@ -176,6 +195,26 @@ export default function CareerInterview() {
             </aside>
           </div>
         )}
+
+        {/*
+          Mobile layout (below xl): the side panel is hidden and the same
+          profile facts live in a bottom sheet instead, so the conversation
+          stays full width. The web split screen above xl is unchanged.
+        */}
+        <Drawer open={isProfileSheetOpen} onOpenChange={setIsProfileSheetOpen}>
+          <DrawerContent className="max-h-[85dvh]">
+            <DrawerHeader>
+              <DrawerTitle>{t('careerInterview.profilePanelTitle')}</DrawerTitle>
+            </DrawerHeader>
+            <div className="overflow-y-auto px-4 pb-6">
+              <CareerProfilePanel
+                facts={interview.detail?.facts ?? {}}
+                profile={interview.profile}
+                isLoadingProfile={interview.isProfileLoading}
+              />
+            </div>
+          </DrawerContent>
+        </Drawer>
       </main>
     </div>
   );
