@@ -8,7 +8,7 @@ Frontend application for a version-aware resume review workflow.
 
 ## Why this project exists
 
-Resume Feedback Platform came from conversations with talented, qualified people who asked for help planning their careers. Their experience, technical ability, and potential were real, but their resumes often did not communicate that value clearly enough to recruiters.
+Resume Feedback Platform came from conversations with talented, qualified people who asked for help planning their careers. Their experience, technical ability, and potential were real, but their resume often did not convey that value clearly enough.
 
 Writing a strong resume is its own skill. The product helps candidates make their professional value more visible through a structured improvement loop:
 
@@ -89,19 +89,36 @@ The UI presents three AI artifact types separately:
 
 These are separate backend contracts and separate UI states.
 
+## Frontend Scope
+
+This repository contains the React frontend for the resume feedback platform. It communicates with the separate `resume-api` service for authentication, resume data, AI review jobs, comments, and share links; it does not run the API or AI processing itself.
+
 ## Tech Stack
 
-- React 18
-- TypeScript
+- React 18 and TypeScript
 - Vite 5
 - React Router 6
-- Redux Toolkit + React Redux
-- TanStack Query
-- Tailwind CSS
-- shadcn/ui + Radix UI
-- React Hook Form
-- Zod
-- react-pdf
+- TanStack Query for API-backed data, caching, mutations, and polling
+- Tailwind CSS, shadcn/ui, and Radix UI
+- React Hook Form and Zod
+- `react-pdf` for resume previews
+
+## UI Architecture
+
+The app separates route composition, feature orchestration, presentation, and backend communication:
+
+- `src/pages` contains route-level screens.
+- `src/features` contains feature hooks and query orchestration.
+- `src/components` contains reusable and feature-specific UI.
+- `src/services` contains the API client and REST service modules.
+- `src/contexts` contains app-wide authentication and language providers.
+- `src/types` contains shared API and UI contracts.
+
+Typical data flow:
+
+`page → feature hook/query → service → resume-api`
+
+Feature hooks pass the resulting data and actions to presentation components. For example, `useResumeDetailsPage` coordinates resume, comment, and share-link data for `ResumeDetails`; AI and target-opportunity query hooks poll their respective jobs while they are pending or processing.
 
 ## Application Structure
 
@@ -113,13 +130,12 @@ The codebase is organized by responsibility:
 - `src/components/resume-details` modularized resume details page components
 - `src/features` feature hooks and orchestration logic
 - `src/features/target-opportunities` target opportunity query hooks and mutation orchestration
-- `src/store` Redux store, slices, and typed hooks
 - `src/services` API client and service layer
 - `src/contexts` app-wide providers and compatibility wrappers
 - `src/lib` small shared utilities
 - `src/types` shared TypeScript contracts
 
-## UI Architecture
+## UI Architecture Notes
 
 The UI layer is intentionally split across route screens, feature orchestration, and reusable presentation components.
 
@@ -133,7 +149,7 @@ Typical flow:
 
 1. a route component in `src/pages` renders the screen shell
 2. the page or feature component calls a hook from `src/features`
-3. that hook coordinates Redux actions, queries, and service calls
+3. that hook coordinates queries and service calls
 4. resulting data is passed into focused presentational components in `src/components`
 
 For deeper UI conventions, see [docs/ui-architecture.md](docs/ui-architecture.md).
@@ -200,7 +216,13 @@ The frontend uses these responses differently:
 - progress explains what changed between the current version and the previous one
 - targeted review explains fit against a concrete opportunity and protects evidence integrity
 
-## Environment Variables
+## State and Data Flow
+
+TanStack Query manages API-backed data, including resume lists and details, comments, share links, AI feedback, and target-opportunity reviews. React context provides app-wide authentication and language state; local component state handles transient UI interactions such as selected previews and open dialogs.
+
+The frontend requests AI feedback and comparisons through the `resume-api` REST contract. AI providers, job processing, storage, and persistence are backend responsibilities.
+
+## API Configuration
 
 Create a `.env` file in the project root:
 
@@ -210,13 +232,15 @@ VITE_GOOGLE_CLIENT_ID=your_google_client_id
 VITE_EMBED_ALLOWED_PARENT_ORIGINS=https://your-personal-site.com
 ```
 
-Notes:
+- `VITE_API_URL` is optional; when omitted, the app uses `https://resumefeedback-api.hmpedro.com`.
+- `VITE_GOOGLE_CLIENT_ID` is needed for Google sign-in.
+- `VITE_EMBED_ALLOWED_PARENT_ORIGINS` is optional and is used to configure Google sign-in when the app is embedded.
 
-- `VITE_API_URL` is optional. If omitted, the app defaults to `https://resumefeedback-api.hmpedro.com`
-- if `VITE_API_URL` ends with `/api`, the frontend normalizes it automatically
-- `VITE_GOOGLE_CLIENT_ID` is required for Google sign in
-- `VITE_EMBED_ALLOWED_PARENT_ORIGINS` is optional, but recommended when this app is embedded in an iframe and Google sign in should work from that parent site
-- see [docs/embedding.md](docs/embedding.md) for iframe hosting headers and embed examples
+The API client adds the stored bearer token to authenticated requests and sends JSON for non-file requests. Resume upload and version upload use `FormData`. See [Embedding](docs/embedding.md) for iframe hosting requirements.
+
+## Authentication
+
+The frontend supports email/password registration and sign-in, plus Google sign-in. It persists the auth token in `localStorage`, reconstructs user state from the token, and uses `ProtectedRoute` to guard account pages. Authentication and authorization are ultimately enforced by the backend API.
 
 ## Local Development
 
@@ -267,46 +291,6 @@ npm run lint
 }
 ```
 
-## State and Data Flow
-
-The app currently uses both Redux Toolkit and TanStack Query:
-
-- Redux manages auth, upload flow, resume details, comments, share links, and AI feedback job state
-- TanStack Query is used for resume list fetching and newer API-backed query flows
-- local component state handles transient UI-only behavior
-
-Important feature hooks:
-
-- `src/features/upload/useUploadPage.ts`
-- `src/features/resume-details/useResumeDetailsPage.ts`
-- `src/features/ai/useAiFeedback.ts`
-- `src/features/ai/useAiProgress.ts`
-
-## API Integration Notes
-
-- `src/services/api-config.ts` normalizes the backend base URL
-- `src/services/api-client.ts` injects the JWT token from `localStorage`
-- non-`FormData` requests are sent as JSON
-- preview and file endpoints may use direct URLs instead of standard JSON fetch flows
-- API failures are mapped into a normalized frontend error shape
-- target opportunity, targeted review, feedback, progress, share-link, and comment flows all go through `resume-api`
-- AI provider selection, Azure OpenAI support, and Microsoft IQ / Foundry IQ grounding are backend concerns; the frontend continues to call `resume-api` through the stable REST contract.
-
-## Authentication Notes
-
-Current auth behavior:
-
-- JWT access token is stored in `localStorage`
-- the frontend reconstructs user state from the token payload
-- `ProtectedRoute` guards authenticated pages
-- `AuthProvider` exposes a compatibility layer for the rest of the app
-
-Supported auth flows:
-
-- register with email/password
-- sign in with email/password
-- sign in with Google
-
 ## Current UX Areas
 
 - landing and about pages explain the problem and the workflow
@@ -318,9 +302,10 @@ Supported auth flows:
 ## Project Notes
 
 - local storage is currently used for auth token persistence and pinned resume preferences
+- this is a frontend-only repository; the backend API and AI jobs are expected to exist elsewhere
 
 ## Related Docs
 
 - `docs/featured.html` for the LinkedIn embed page
-- `docs/frontend-handoff.local.md` for backend integration and local handoff notes
 - `docs/ui-architecture.md` for UI-layer structure, boundaries, and conventions
+- `docs/embedding.md` for iframe hosting and Google sign-in embed configuration
