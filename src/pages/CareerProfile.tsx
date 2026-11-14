@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Briefcase, Loader2 } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { CareerExperienceCard } from '@/components/career-profile/CareerExperienceCard';
@@ -60,6 +61,9 @@ export default function CareerProfile() {
               <Briefcase className="h-8 w-8 text-muted-foreground" />
               <p className="font-medium">{t('careerProfile.emptyTitle')}</p>
               <p className="text-sm text-muted-foreground">{t('careerProfile.emptyDescription')}</p>
+              <Button asChild className="mt-2">
+                <Link to="/career-profile/interview">{t('careerProfile.startInterview')}</Link>
+              </Button>
             </CardContent>
           </Card>
         ) : (

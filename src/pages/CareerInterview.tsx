@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Loader2, PanelBottom } from 'lucide-react';
+import { ArrowLeft, Loader2, PanelBottom } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
@@ -59,6 +59,14 @@ export default function CareerInterview() {
     <div className="min-h-dvh bg-muted/40">
       <Header />
       <main className="mx-auto max-w-[1440px] px-4 py-6 sm:py-10">
+        <div className="mb-4">
+          <Button asChild variant="ghost" size="sm">
+            <Link to="/career-profile">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              {t('careerInterview.backToProfile')}
+            </Link>
+          </Button>
+        </div>
         <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-2">
             <h1 className="text-2xl font-bold">{t('careerInterview.title')}</h1>
