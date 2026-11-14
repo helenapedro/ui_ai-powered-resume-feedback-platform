@@ -3,6 +3,7 @@ import type {
   CareerCancelSessionRequest,
   CareerConfirmationResponse,
   CareerConfirmProposalRequest,
+  CareerExperienceResponse,
   CareerProfileResponse,
   CareerResumeImportRequest,
   CareerResumeImportResponse,
@@ -10,6 +11,7 @@ import type {
   CareerSessionResponse,
   CareerSubmitTurnRequest,
   CareerTurnResponse,
+  CareerUpdateExperienceRequest,
 } from '@/types';
 
 export const careerProfileService = {
@@ -47,5 +49,15 @@ export const careerProfileService = {
     request: CareerResumeImportRequest,
   ): Promise<CareerResumeImportResponse> {
     return apiClient.post<CareerResumeImportResponse>('/career-profile/imports', request);
+  },
+
+  async updateExperience(
+    originProposalId: string,
+    request: CareerUpdateExperienceRequest,
+  ): Promise<CareerExperienceResponse> {
+    return apiClient.patch<CareerExperienceResponse>(
+      `/career-profile/experiences/${originProposalId}`,
+      request,
+    );
   },
 };

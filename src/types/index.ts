@@ -385,6 +385,7 @@ export interface CareerProfileItemResponse {
   confirmationStatus: CareerItemConfirmationStatus;
   originProposalId: string;
   createdAt: string;
+  updatedAt: string | null;
 }
 
 export interface CareerProfileResponse {
@@ -419,4 +420,13 @@ export interface CareerResumeImportResponse {
   sessionId: string | null;
   proposalId: string | null;
   created: boolean;
+}
+
+export interface CareerUpdateExperienceRequest {
+  facts: Record<string, string>;
+}
+
+export interface CareerExperienceResponse {
+  originProposalId: string;
+  items: CareerProfileItemResponse[];
 }

@@ -8,6 +8,7 @@ import type {
   CareerConfirmProposalRequest,
   CareerResumeImportRequest,
   CareerSubmitTurnRequest,
+  CareerUpdateExperienceRequest,
 } from '@/types';
 
 export function useCareerProfileQuery() {
@@ -42,6 +43,14 @@ export function useImportResumeToCareerProfileMutation() {
   return useMutation({
     mutationFn: (request: CareerResumeImportRequest) =>
       careerProfileService.importFromResume(request),
+  });
+}
+
+export function useUpdateCareerExperienceMutation(originProposalId: string) {
+  return useInvalidatingMutation({
+    mutationFn: (request: CareerUpdateExperienceRequest) =>
+      careerProfileService.updateExperience(originProposalId, request),
+    getQueryKeys: () => [queryKeys.careerProfile.profile],
   });
 }
 

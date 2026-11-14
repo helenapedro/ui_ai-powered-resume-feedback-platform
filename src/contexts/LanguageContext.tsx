@@ -162,6 +162,10 @@ export type TranslationKey =
   | 'careerProfile.loadErrorDescription'
   | 'careerProfile.present'
   | 'careerProfile.untitledExperience'
+  | 'careerProfile.edited'
+  | 'careerProfile.saving'
+  | 'careerProfile.editErrorTitle'
+  | 'careerProfile.editErrorDescription'
   | 'careerInterview.title'
   | 'careerInterview.description'
   | 'careerInterview.emptyThread'
@@ -380,6 +384,10 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     'careerProfile.loadErrorDescription': 'Please try again.',
     'careerProfile.present': 'Present',
     'careerProfile.untitledExperience': 'Untitled experience',
+    'careerProfile.edited': 'Edited',
+    'careerProfile.saving': 'Saving...',
+    'careerProfile.editErrorTitle': 'Unable to save changes',
+    'careerProfile.editErrorDescription': 'Please try again.',
     'careerInterview.title': 'Career Interview',
     'careerInterview.description':
       'Answer a few questions about your work history. Confirm each proposal before it joins your profile.',
@@ -603,6 +611,10 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     'careerProfile.loadErrorDescription': 'Tenta novamente.',
     'careerProfile.present': 'Atual',
     'careerProfile.untitledExperience': 'Experiencia sem titulo',
+    'careerProfile.edited': 'Editado',
+    'careerProfile.saving': 'A guardar...',
+    'careerProfile.editErrorTitle': 'Nao foi possivel guardar as alteracoes',
+    'careerProfile.editErrorDescription': 'Tenta novamente.',
     'careerInterview.title': 'Entrevista de Carreira',
     'careerInterview.description':
       'Responde a algumas perguntas sobre o teu historico profissional. Confirma cada proposta antes de entrar no teu perfil.',
