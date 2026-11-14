@@ -25,7 +25,7 @@ export function AiFeedback({ resumeId, versionId, versionNumber, versions }: AiF
     versionId,
     versionNumber > 1
   );
-  const { job, feedback, isFeedbackUnavailable, isLoading, feedbackError, isRegenerating, handleRegenerate } = reviewState;
+  const { job, feedback, isFeedbackUnavailable, isFeedbackLoading, isLoading, feedbackError, isRegenerating, handleRegenerate } = reviewState;
   const baselineVersionNumber = versions.find(
     (version) => version.id === reviewState.progress?.baselineResumeVersionId
   )?.versionNumber;
@@ -138,6 +138,8 @@ export function AiFeedback({ resumeId, versionId, versionNumber, versions }: AiF
         <FeedbackCompletedView feedback={feedback} versionNumber={versionNumber} />
       )}
 
+      {!feedback && job.status === 'DONE' && isFeedbackLoading && <FeedbackLoadingState />}
+
       {!feedback && job.status === 'DONE' && isFeedbackUnavailable && (
         <FeedbackMessageState
           eyebrow={t('feedback.pendingEyebrow')}
@@ -146,7 +148,7 @@ export function AiFeedback({ resumeId, versionId, versionNumber, versions }: AiF
         />
       )}
 
-      {!feedback && job.status === 'DONE' && !feedbackError && !isFeedbackUnavailable && (
+      {!feedback && job.status === 'DONE' && !feedbackError && !isFeedbackUnavailable && !isFeedbackLoading && (
         <FeedbackMessageState
           eyebrow={t('feedback.emptyEyebrow')}
           title={t('feedback.emptyTitle')}
