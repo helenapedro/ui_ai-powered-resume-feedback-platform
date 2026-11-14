@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Briefcase, Loader2 } from 'lucide-react';
+import { Briefcase, Loader2, Upload } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { CareerExperienceCard } from '@/components/career-profile/CareerExperienceCard';
 import { Button } from '@/components/ui/button';
@@ -61,9 +61,17 @@ export default function CareerProfile() {
               <Briefcase className="h-8 w-8 text-muted-foreground" />
               <p className="font-medium">{t('careerProfile.emptyTitle')}</p>
               <p className="text-sm text-muted-foreground">{t('careerProfile.emptyDescription')}</p>
-              <Button asChild className="mt-2">
-                <Link to="/career-profile/interview">{t('careerProfile.startInterview')}</Link>
-              </Button>
+              <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
+                <Button asChild variant="outline">
+                  <Link to="/upload">
+                    <Upload className="mr-2 h-4 w-4" />
+                    {t('careerProfile.uploadCv')}
+                  </Link>
+                </Button>
+                <Button asChild>
+                  <Link to="/career-profile/interview">{t('careerProfile.startInterview')}</Link>
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ) : (

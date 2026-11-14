@@ -5,6 +5,7 @@ import { useInvalidatingMutation } from '@/features/queries/useInvalidatingMutat
 import type {
   CareerCancelSessionRequest,
   CareerConfirmProposalRequest,
+  CareerResumeImportRequest,
   CareerSubmitTurnRequest,
 } from '@/types';
 
@@ -26,6 +27,13 @@ export function useCareerSessionQuery(sessionId: string | null) {
 export function useCreateCareerSessionMutation() {
   return useMutation({
     mutationFn: () => careerProfileService.createSession(),
+  });
+}
+
+export function useImportResumeToCareerProfileMutation() {
+  return useMutation({
+    mutationFn: (request: CareerResumeImportRequest) =>
+      careerProfileService.importFromResume(request),
   });
 }
 

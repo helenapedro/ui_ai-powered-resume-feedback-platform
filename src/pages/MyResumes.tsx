@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { ResumeCard, ResumeCardSkeleton } from '@/components/ResumeCard';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +10,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/useAuth';
 import { getPinnedResumeIds, togglePinnedResumeId } from '@/lib/pinned-resumes';
 import { useResumesQuery } from '@/features/resumes/queries';
+import { useImportResumeToCareerProfileMutation } from '@/features/career-profile/queries';
+import { ApiError } from '@/services/api-errors';
 import type { ResumeSummary } from '@/types';
 import { Calendar, FileText, Pin, Plus, Search, Upload } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -18,10 +20,13 @@ import { useLanguage } from '@/contexts/LanguageContext';
 export default function MyResumes() {
   const [pinnedResumeIds, setPinnedResumeIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [importingResumeId, setImportingResumeId] = useState<string | null>(null);
+  const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
   const { t } = useLanguage();
   const { data: resumes = [], isLoading, error } = useResumesQuery();
+  const importResumeMutation = useImportResumeToCareerProfileMutation();
 
   useEffect(() => {
     if (error) {
@@ -66,6 +71,57 @@ export default function MyResumes() {
     }
 
     setPinnedResumeIds(togglePinnedResumeId(user.id, resumeId));
+  };
+
+  const handleBuildCareerProfile = (resumeId: string) => {
+    setImportingResumeId(resumeId);
+    importResumeMutation.mutate(
+      { resumeId },
+      {
+        onSuccess: (result) => {
+          setImportingResumeId(null);
+          if (result.proposalId && result.sessionId) {
+            navigate(`/career-profile/interview?sessionId=${result.sessionId}`);
+          } else if (result.proposalId) {
+            navigate('/career-profile/interview');
+          } else {
+            navigate('/career-profile');
+          }
+        },
+        onError: (mutationError) => {
+          setImportingResumeId(null);
+          const status = mutationError instanceof ApiError ? mutationError.status : null;
+          if (status === 409) {
+            toast({
+              variant: 'destructive',
+              title: t('careerProfile.importConflictTitle'),
+              description: t('careerProfile.importConflictDescription'),
+            });
+          } else if (status === 422) {
+            toast({
+              variant: 'destructive',
+              title: t('careerProfile.importUnreadableTitle'),
+              description:
+                mutationError instanceof Error && mutationError.message
+                  ? mutationError.message
+                  : t('careerProfile.importUnreadableDescription'),
+            });
+          } else if (status === 502 || status === 503) {
+            toast({
+              variant: 'destructive',
+              title: t('careerInterview.agentUnavailableTitle'),
+              description: t('careerInterview.agentUnavailableDescription'),
+            });
+          } else {
+            toast({
+              variant: 'destructive',
+              title: t('careerProfile.importErrorTitle'),
+              description: t('careerProfile.importErrorDescription'),
+            });
+          }
+        },
+      },
+    );
   };
 
   const pinnedResumes = filteredResumes.filter((resume) => pinnedResumeIds.includes(resume.id));
@@ -164,6 +220,8 @@ export default function MyResumes() {
                     resumes={pinnedResumes}
                     pinnedResumeIds={pinnedResumeIds}
                     onTogglePin={handleTogglePin}
+                    onBuildCareerProfile={handleBuildCareerProfile}
+                    importingResumeId={importingResumeId}
                   />
                 </WorkflowSection>
               )}
@@ -182,6 +240,8 @@ export default function MyResumes() {
                     resumes={mainSectionResumes}
                     pinnedResumeIds={pinnedResumeIds}
                     onTogglePin={handleTogglePin}
+                    onBuildCareerProfile={handleBuildCareerProfile}
+                    importingResumeId={importingResumeId}
                   />
                 </WorkflowSection>
               )}
@@ -243,9 +303,11 @@ interface ResumeGridProps {
   resumes: ResumeSummary[];
   pinnedResumeIds: string[];
   onTogglePin: (resumeId: string) => void;
+  onBuildCareerProfile: (resumeId: string) => void;
+  importingResumeId: string | null;
 }
 
-function ResumeGrid({ resumes, pinnedResumeIds, onTogglePin }: ResumeGridProps) {
+function ResumeGrid({ resumes, pinnedResumeIds, onTogglePin, onBuildCareerProfile, importingResumeId }: ResumeGridProps) {
   return (
     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {resumes.map((resume) => (
@@ -255,6 +317,8 @@ function ResumeGrid({ resumes, pinnedResumeIds, onTogglePin }: ResumeGridProps) 
           showActions
           isPinned={pinnedResumeIds.includes(resume.id)}
           onTogglePin={onTogglePin}
+          onBuildCareerProfile={onBuildCareerProfile}
+          isBuildingCareerProfile={importingResumeId === resume.id}
         />
       ))}
     </div>

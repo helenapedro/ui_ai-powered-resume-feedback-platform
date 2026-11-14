@@ -151,6 +151,13 @@ export type TranslationKey =
   | 'careerProfile.emptyTitle'
   | 'careerProfile.emptyDescription'
   | 'careerProfile.startInterview'
+  | 'careerProfile.uploadCv'
+  | 'careerProfile.importConflictTitle'
+  | 'careerProfile.importConflictDescription'
+  | 'careerProfile.importUnreadableTitle'
+  | 'careerProfile.importUnreadableDescription'
+  | 'careerProfile.importErrorTitle'
+  | 'careerProfile.importErrorDescription'
   | 'careerProfile.loadErrorTitle'
   | 'careerProfile.loadErrorDescription'
   | 'careerProfile.present'
@@ -358,8 +365,17 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     'careerProfile.title': 'Career Profile',
     'careerProfile.description': 'Work history confirmed through the career interview.',
     'careerProfile.emptyTitle': 'No confirmed experience yet',
-    'careerProfile.emptyDescription': 'Complete a career interview to add confirmed work experience to your profile.',
+    'careerProfile.emptyDescription': 'Upload a CV to build your profile from it, or complete a career interview to add confirmed work experience to your profile.',
     'careerProfile.startInterview': 'Start interview',
+    'careerProfile.uploadCv': 'Upload a CV',
+    'careerProfile.importConflictTitle': 'Finish or cancel your open interview first',
+    'careerProfile.importConflictDescription':
+      'There is already an open career interview. Finish or cancel it before building your profile from a CV.',
+    'careerProfile.importUnreadableTitle': 'This CV could not be read',
+    'careerProfile.importUnreadableDescription':
+      'The CV text could not be read, or it is missing information the profile needs. Try the career interview instead.',
+    'careerProfile.importErrorTitle': 'Unable to build your profile from this CV',
+    'careerProfile.importErrorDescription': 'Please try again.',
     'careerProfile.loadErrorTitle': 'Unable to load career profile',
     'careerProfile.loadErrorDescription': 'Please try again.',
     'careerProfile.present': 'Present',
@@ -572,8 +588,17 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     'careerProfile.title': 'Perfil de Carreira',
     'careerProfile.description': 'Historico profissional confirmado atraves da entrevista de carreira.',
     'careerProfile.emptyTitle': 'Ainda nao ha experiencia confirmada',
-    'careerProfile.emptyDescription': 'Completa uma entrevista de carreira para adicionar experiencia profissional confirmada ao teu perfil.',
+    'careerProfile.emptyDescription': 'Carrega um CV para criar o teu perfil a partir dele, ou completa uma entrevista de carreira para adicionar experiencia profissional confirmada ao teu perfil.',
     'careerProfile.startInterview': 'Comecar entrevista',
+    'careerProfile.uploadCv': 'Carregar um CV',
+    'careerProfile.importConflictTitle': 'Termina ou cancela primeiro a tua entrevista aberta',
+    'careerProfile.importConflictDescription':
+      'Ja existe uma entrevista de carreira aberta. Termina-a ou cancela-a antes de criares o teu perfil a partir de um CV.',
+    'careerProfile.importUnreadableTitle': 'Nao foi possivel ler este CV',
+    'careerProfile.importUnreadableDescription':
+      'Nao foi possivel ler o texto do CV, ou faltam informacoes de que o perfil precisa. Experimenta a entrevista de carreira.',
+    'careerProfile.importErrorTitle': 'Nao foi possivel criar o teu perfil a partir deste CV',
+    'careerProfile.importErrorDescription': 'Tenta novamente.',
     'careerProfile.loadErrorTitle': 'Nao foi possivel carregar o perfil de carreira',
     'careerProfile.loadErrorDescription': 'Tenta novamente.',
     'careerProfile.present': 'Atual',
