@@ -21,6 +21,7 @@ export function useAiFeedbackQuery(resumeId: string, versionId: string, enabled:
     queryKey: queryKeys.resumes.aiFeedback(resumeId, versionId),
     queryFn: () => aiService.getFeedback(resumeId, versionId),
     enabled: Boolean(resumeId && versionId && enabled),
+    retry: false,
   });
 }
 

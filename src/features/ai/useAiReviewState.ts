@@ -24,6 +24,7 @@ export function useAiReviewState(resumeId: string, versionId: string, hasPreviou
   const regenerateMutation = useRegenerateAiFeedbackMutation(resumeId, versionId);
 
   const isFeedbackUnavailable = feedbackQuery.error instanceof ApiError && feedbackQuery.error.status === 404;
+  const isFeedbackLoading = feedbackQuery.isLoading || feedbackQuery.isFetching;
   const isProgressUnavailable = progressQuery.error instanceof ApiError && progressQuery.error.status === 404;
   const isProgressPending = hasPreviousVersion && (job?.status === 'PENDING' || job?.status === 'PROCESSING');
 
@@ -95,6 +96,7 @@ export function useAiReviewState(resumeId: string, versionId: string, hasPreviou
     feedback: feedbackQuery.data ?? null,
     progress: progressQuery.data ?? null,
     isFeedbackUnavailable,
+    isFeedbackLoading,
     isProgressUnavailable,
     isProgressPending,
     isLoading: jobQuery.isLoading && !job,
