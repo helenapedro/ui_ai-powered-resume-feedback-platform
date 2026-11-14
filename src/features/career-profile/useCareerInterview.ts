@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { ApiError } from '@/services/api-errors';
 import {
   useCancelCareerSessionMutation,
@@ -54,7 +55,13 @@ function classifyError(error: unknown): CareerInterviewActionErrorKind {
  * merged locally because they carry no facts map.
  */
 export function useCareerInterview() {
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [searchParams] = useSearchParams();
+  // A resume import lands here with ?sessionId= so the interview opens
+  // the import session (zero messages, pending proposal) instead of
+  // starting a fresh session. Without the parameter the page behaves
+  // exactly as before and starts a new session on mount.
+  const initialSessionId = searchParams.get('sessionId');
+  const [sessionId, setSessionId] = useState<string | null>(initialSessionId);
   const [draft, setDraftState] = useState<string>(() => {
     try {
       return window.sessionStorage.getItem(DRAFT_STORAGE_KEY) ?? '';
@@ -94,10 +101,10 @@ export function useCareerInterview() {
   }, []);
 
   useEffect(() => {
-    if (startAttemptedRef.current) return;
+    if (startAttemptedRef.current || initialSessionId) return;
     startAttemptedRef.current = true;
     startSession();
-  }, [startSession]);
+  }, [startSession, initialSessionId]);
 
   const detail: CareerSessionDetailResponse | undefined = sessionQuery.data;
   const sessionVersion = detail?.sessionVersion ?? 0;

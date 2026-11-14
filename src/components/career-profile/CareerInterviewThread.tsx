@@ -35,11 +35,25 @@ export function CareerInterviewThread({
   const showCardAtEnd = pendingProposal !== null && proposalMessageIndex === -1;
 
   if (sorted.length === 0) {
+    // An import session arrives with zero messages and a pending proposal:
+    // the proposal card is the whole review surface, so it must render
+    // even though there is no conversation yet.
+    if (pendingProposal === null) {
+      return (
+        <div className="flex flex-1 items-center justify-center px-4 py-16">
+          <p className="max-w-md text-center text-sm text-muted-foreground">
+            {t('careerInterview.emptyThread')}
+          </p>
+        </div>
+      );
+    }
     return (
-      <div className="flex flex-1 items-center justify-center px-4 py-16">
-        <p className="max-w-md text-center text-sm text-muted-foreground">
-          {t('careerInterview.emptyThread')}
-        </p>
+      <div className="space-y-4">
+        <CareerProposalCard
+          proposal={pendingProposal}
+          isConfirming={isConfirming}
+          onConfirm={onConfirm}
+        />
       </div>
     );
   }

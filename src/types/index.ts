@@ -409,3 +409,14 @@ export interface CareerConfirmProposalRequest {
 export interface CareerCancelSessionRequest {
   expectedSessionVersion: number;
 }
+
+export interface CareerResumeImportRequest {
+  resumeId: string;
+  versionId?: string;
+}
+
+export interface CareerResumeImportResponse {
+  sessionId: string | null;
+  proposalId: string | null;
+  created: boolean;
+}

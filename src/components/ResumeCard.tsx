@@ -3,7 +3,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { FileText, Calendar, Eye, Pin, Upload, ArrowRight } from 'lucide-react';
+import { FileText, Calendar, Eye, Pin, Upload, ArrowRight, Briefcase, Loader2 } from 'lucide-react';
 import type { ResumeSummary } from '@/types';
 import { format } from 'date-fns';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -13,9 +13,18 @@ interface ResumeCardProps {
   showActions?: boolean;
   isPinned?: boolean;
   onTogglePin?: (resumeId: string) => void;
+  onBuildCareerProfile?: (resumeId: string) => void;
+  isBuildingCareerProfile?: boolean;
 }
 
-export function ResumeCard({ resume, showActions, isPinned = false, onTogglePin }: ResumeCardProps) {
+export function ResumeCard({
+  resume,
+  showActions,
+  isPinned = false,
+  onTogglePin,
+  onBuildCareerProfile,
+  isBuildingCareerProfile = false,
+}: ResumeCardProps) {
   const { language } = useLanguage();
   const copy = language === 'pt'
     ? {
@@ -27,6 +36,8 @@ export function ResumeCard({ resume, showActions, isPinned = false, onTogglePin 
         pin: 'Fixar no topo',
         open: 'Abrir',
         addVersion: 'Adicionar versao',
+        buildCareerProfile: 'Criar perfil de carreira a partir deste CV',
+        buildCareerProfileNoVersion: 'Adiciona uma versao ativa para criar o perfil de carreira a partir deste CV',
       }
     : {
         untitled: 'Untitled resume',
@@ -37,6 +48,8 @@ export function ResumeCard({ resume, showActions, isPinned = false, onTogglePin 
         pin: 'Pin to top',
         open: 'Open',
         addVersion: 'Add version',
+        buildCareerProfile: 'Build career profile from this CV',
+        buildCareerProfileNoVersion: 'Add an active version to build the career profile from this CV',
       };
 
   return (
@@ -94,6 +107,22 @@ export function ResumeCard({ resume, showActions, isPinned = false, onTogglePin 
             <Link to={`/upload?resumeId=${resume.id}`}>
               <Upload className="h-4 w-4" />
             </Link>
+          </Button>
+        )}
+        {showActions && onBuildCareerProfile && (
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            title={resume.currentVersionId ? copy.buildCareerProfile : copy.buildCareerProfileNoVersion}
+            disabled={!resume.currentVersionId || isBuildingCareerProfile}
+            onClick={() => onBuildCareerProfile(resume.id)}
+          >
+            {isBuildingCareerProfile ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Briefcase className="h-4 w-4" />
+            )}
           </Button>
         )}
       </CardFooter>

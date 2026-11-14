@@ -4,6 +4,8 @@ import type {
   CareerConfirmationResponse,
   CareerConfirmProposalRequest,
   CareerProfileResponse,
+  CareerResumeImportRequest,
+  CareerResumeImportResponse,
   CareerSessionDetailResponse,
   CareerSessionResponse,
   CareerSubmitTurnRequest,
@@ -39,5 +41,11 @@ export const careerProfileService = {
 
   async getProfile(): Promise<CareerProfileResponse> {
     return apiClient.get<CareerProfileResponse>('/career-profile');
+  },
+
+  async importFromResume(
+    request: CareerResumeImportRequest,
+  ): Promise<CareerResumeImportResponse> {
+    return apiClient.post<CareerResumeImportResponse>('/career-profile/imports', request);
   },
 };
