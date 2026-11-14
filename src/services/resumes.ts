@@ -74,7 +74,39 @@ export const resumeService = {
     return URL.createObjectURL(pdfBlob);
   },
 
+  async resolveVersionDownloadUrl(resumeId: string, versionId: string): Promise<string> {
+    const response = await apiClient.get<{ url: string }>(`/resumes/${resumeId}/versions/${versionId}/download-url`);
+
+    if (!response.url) {
+      throw new Error('Download URL was not returned.');
+    }
+
+    return response.url;
+  },
+
   async downloadVersion(resumeId: string, versionId: string, token: string, filename = 'resume.pdf'): Promise<void> {
+    try {
+      const downloadUrl = await resumeService.resolveVersionDownloadUrl(resumeId, versionId);
+
+      if (!downloadUrl.startsWith(API_BASE_URL)) {
+        // Presigned storage URL (S3): a top-level navigation is not subject
+        // to CORS, and the URL's attachment disposition makes the browser
+        // download it with the stored filename.
+        const link = document.createElement('a');
+
+        link.href = downloadUrl;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        return;
+      }
+    } catch {
+      // The download-url endpoint is not deployed yet, or resolving failed:
+      // fall through to the fetch path below.
+    }
+
     const response = await fetch(buildApiUrl(`/resumes/${resumeId}/versions/${versionId}/download`), {
       method: 'GET',
       headers: {
