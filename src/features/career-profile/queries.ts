@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { careerProfileService } from '@/services/career-profile';
+import { userService } from '@/services/users';
 import { queryKeys } from '@/features/queries/keys';
 import { useInvalidatingMutation } from '@/features/queries/useInvalidatingMutation';
 import type {
@@ -12,6 +13,13 @@ export function useCareerProfileQuery() {
   return useQuery({
     queryKey: queryKeys.careerProfile.profile,
     queryFn: () => careerProfileService.getProfile(),
+  });
+}
+
+export function useCurrentUserQuery() {
+  return useQuery({
+    queryKey: queryKeys.currentUser,
+    queryFn: () => userService.getMe(),
   });
 }
 

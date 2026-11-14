@@ -5,7 +5,7 @@ import { Header } from '@/components/Header';
 import { CareerExperienceCard } from '@/components/career-profile/CareerExperienceCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { useCareerProfileQuery } from '@/features/career-profile/queries';
+import { useCareerProfileQuery, useCurrentUserQuery } from '@/features/career-profile/queries';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { groupCareerProfileItems } from '@/lib/career-profile';
@@ -14,6 +14,7 @@ export default function CareerProfile() {
   const { t } = useLanguage();
   const { toast } = useToast();
   const { data, isLoading, error, refetch } = useCareerProfileQuery();
+  const { data: currentUser } = useCurrentUserQuery();
 
   useEffect(() => {
     if (error) {
@@ -37,6 +38,10 @@ export default function CareerProfile() {
   }
 
   const experiences = groupCareerProfileItems(data?.items ?? []);
+  // The account holder's name comes from the account, never from the
+  // interview. When fullName is missing or blank, show nothing for the
+  // name rather than inventing one.
+  const displayName = currentUser?.fullName?.trim() || null;
 
   return (
     <div className="min-h-screen bg-muted/40">
@@ -44,6 +49,7 @@ export default function CareerProfile() {
       <main className="container max-w-3xl py-10 px-4">
         <div className="mb-8 space-y-2">
           <h1 className="text-2xl font-bold">{t('careerProfile.title')}</h1>
+          {displayName ? <p className="text-lg font-medium">{displayName}</p> : null}
           <p className="text-sm text-muted-foreground">{t('careerProfile.description')}</p>
         </div>
 
