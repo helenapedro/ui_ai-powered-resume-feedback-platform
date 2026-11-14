@@ -30,4 +30,5 @@ export const queryKeys = {
     profile: ['career-profile'] as const,
     session: (sessionId: string) => ['career-profile', 'sessions', sessionId] as const,
   },
+  currentUser: ['current-user'] as const,
 };
