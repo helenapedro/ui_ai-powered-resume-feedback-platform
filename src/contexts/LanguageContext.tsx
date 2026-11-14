@@ -5,6 +5,7 @@ export type AppLanguage = 'en' | 'pt';
 export type TranslationKey =
   | 'app.name'
   | 'nav.profile'
+  | 'nav.careerProfile'
   | 'nav.signOut'
   | 'nav.signIn'
   | 'nav.about'
@@ -149,6 +150,7 @@ export type TranslationKey =
   | 'careerProfile.description'
   | 'careerProfile.emptyTitle'
   | 'careerProfile.emptyDescription'
+  | 'careerProfile.startInterview'
   | 'careerProfile.loadErrorTitle'
   | 'careerProfile.loadErrorDescription'
   | 'careerProfile.present'
@@ -202,6 +204,7 @@ export type TranslationKey =
   | 'careerInterview.completedNotice'
   | 'careerInterview.cancelledNotice'
   | 'careerInterview.viewProfile'
+  | 'careerInterview.backToProfile'
   | 'careerInterview.viewProfilePanel'
   | 'careerInterview.profilePanelTitle'
   | 'careerInterview.agentLabel'
@@ -211,6 +214,7 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
   en: {
     'app.name': 'Resume Feedback',
     'nav.profile': 'Profile',
+    'nav.careerProfile': 'Career Profile',
     'nav.signOut': 'Sign out',
     'nav.signIn': 'Sign in',
     'nav.about': 'About',
@@ -355,6 +359,7 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     'careerProfile.description': 'Work history confirmed through the career interview.',
     'careerProfile.emptyTitle': 'No confirmed experience yet',
     'careerProfile.emptyDescription': 'Complete a career interview to add confirmed work experience to your profile.',
+    'careerProfile.startInterview': 'Start interview',
     'careerProfile.loadErrorTitle': 'Unable to load career profile',
     'careerProfile.loadErrorDescription': 'Please try again.',
     'careerProfile.present': 'Present',
@@ -414,6 +419,7 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     'careerInterview.completedNotice': 'This interview is complete.',
     'careerInterview.cancelledNotice': 'This interview was cancelled.',
     'careerInterview.viewProfile': 'View profile',
+    'careerInterview.backToProfile': 'Back to career profile',
     'careerInterview.viewProfilePanel': 'View profile so far',
     'careerInterview.profilePanelTitle': 'Your profile so far',
     'careerInterview.agentLabel': 'Career Agent',
@@ -422,6 +428,7 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
   pt: {
     'app.name': 'Resume Feedback',
     'nav.profile': 'Perfil',
+    'nav.careerProfile': 'Perfil de Carreira',
     'nav.signOut': 'Sair',
     'nav.signIn': 'Entrar',
     'nav.about': 'Sobre',
@@ -566,6 +573,7 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     'careerProfile.description': 'Historico profissional confirmado atraves da entrevista de carreira.',
     'careerProfile.emptyTitle': 'Ainda nao ha experiencia confirmada',
     'careerProfile.emptyDescription': 'Completa uma entrevista de carreira para adicionar experiencia profissional confirmada ao teu perfil.',
+    'careerProfile.startInterview': 'Comecar entrevista',
     'careerProfile.loadErrorTitle': 'Nao foi possivel carregar o perfil de carreira',
     'careerProfile.loadErrorDescription': 'Tenta novamente.',
     'careerProfile.present': 'Atual',
@@ -627,6 +635,7 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     'careerInterview.completedNotice': 'Esta entrevista esta concluida.',
     'careerInterview.cancelledNotice': 'Esta entrevista foi cancelada.',
     'careerInterview.viewProfile': 'Ver perfil',
+    'careerInterview.backToProfile': 'Voltar ao perfil de carreira',
     'careerInterview.viewProfilePanel': 'Ver o perfil ate agora',
     'careerInterview.profilePanelTitle': 'O seu perfil ate agora',
     'careerInterview.agentLabel': 'Agente de Carreira',

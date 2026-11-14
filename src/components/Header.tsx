@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FileText, Menu, User, LogOut, ChevronRight, Info, LogIn } from 'lucide-react';
+import { FileText, Menu, User, Briefcase, LogOut, ChevronRight, Info, LogIn } from 'lucide-react';
 import { useAuth } from '@/contexts/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
@@ -52,6 +52,15 @@ export function Header() {
               >
                 <User className="h-4 w-4" />
                 <span>{t('nav.profile')}</span>
+                <ChevronRight className="h-3.5 w-3.5 opacity-70" />
+              </Link>
+              <Link
+                to="/career-profile"
+                className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                title={t('nav.careerProfile')}
+              >
+                <Briefcase className="h-4 w-4" />
+                <span>{t('nav.careerProfile')}</span>
                 <ChevronRight className="h-3.5 w-3.5 opacity-70" />
               </Link>
               <Button variant="ghost" size="sm" onClick={handleLogout}>
@@ -110,6 +119,14 @@ export function Header() {
                     >
                       <User className="h-4 w-4" />
                       <span>{t('nav.profile')}</span>
+                    </Link>
+                    <Link
+                      to="/career-profile"
+                      className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      <Briefcase className="h-4 w-4" />
+                      <span>{t('nav.careerProfile')}</span>
                     </Link>
                     <Button variant="ghost" size="sm" onClick={handleLogout} className="justify-start">
                       <LogOut className="h-4 w-4 mr-2" />
