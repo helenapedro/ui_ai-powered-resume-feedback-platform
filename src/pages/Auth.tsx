@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { FileText, Mail, ArrowLeft, Settings, BrainCircuit, Eye, History, Share2, Sparkles } from 'lucide-react';
+import { FileText, Mail, ArrowLeft, Settings, BrainCircuit, Eye, History, Share2, Sparkles, Briefcase } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -121,6 +121,10 @@ export default function Auth() {
         previewDescription: 'Preview, download, comentarios e historico ficam juntos.',
         shareTitle: 'Partilha controlada',
         shareDescription: 'Crie links de revisao, controle acesso e revogue quando necessario.',
+        careerTitle: 'Crie o seu perfil de carreira',
+        careerDescription: 'Ainda nao tem um CV? Responda a algumas perguntas e o agente cria o seu perfil por si.',
+        careerIntro: 'Ainda nao tem um CV? ',
+        careerIntroSuffix: '.',
       }
     : {
         badge: 'AI Resume Review with Version Tracking',
@@ -145,13 +149,24 @@ export default function Auth() {
         previewDescription: 'Preview, download, comments, and version history stay together.',
         shareTitle: 'Controlled sharing',
         shareDescription: 'Create review links, control access, and revoke them when needed.',
+        careerTitle: 'Build your career profile',
+        careerDescription: 'No resume yet? Answer a few questions and the agent builds your profile for you.',
+        careerIntro: 'No resume yet? ',
+        careerIntroSuffix: ' instead.',
       };
 
-  const aboutItems = [
+  // The route guard drops the destination for logged-out visitors, but the
+  // Auth page honours ?redirect= on every sign-in path, so a logged-out
+  // visitor signs in and lands on the interview, while a signed-in visitor
+  // goes straight there.
+  const careerTarget = isAuthenticated ? '/career-profile/interview' : '/?redirect=/career-profile/interview';
+
+  const aboutItems: { icon: typeof Sparkles; title: string; description: string; to?: string }[] = [
     { icon: Sparkles, title: copy.feedbackTitle, description: copy.feedbackDescription },
     { icon: History, title: copy.progressTitle, description: copy.progressDescription },
     { icon: Eye, title: copy.previewTitle, description: copy.previewDescription },
     { icon: Share2, title: copy.shareTitle, description: copy.shareDescription },
+    { icon: Briefcase, title: copy.careerTitle, description: copy.careerDescription, to: careerTarget },
   ];
 
   return (
@@ -175,6 +190,14 @@ export default function Auth() {
 
                 <p className="max-w-3xl text-2xl leading-9 text-muted-foreground">
                   {copy.intro}
+                </p>
+
+                <p className="max-w-3xl text-lg leading-7 text-muted-foreground">
+                  {copy.careerIntro}
+                  <Link to={careerTarget} className="font-medium text-primary hover:underline">
+                    {copy.careerTitle}
+                  </Link>
+                  {copy.careerIntroSuffix}
                 </p>
               </div>
 
@@ -338,12 +361,19 @@ export default function Auth() {
 
             <section id="about-mobile" className="rounded-lg border bg-background p-4 shadow-sm lg:hidden">
               <div className="grid gap-2">
-                {aboutItems.map((item) => (
-                  <div key={item.title} className="flex items-center gap-2 rounded-md border bg-muted/20 p-3">
-                    <item.icon className="h-4 w-4 shrink-0 text-primary" />
-                    <p className="text-sm font-medium text-foreground">{item.title}</p>
-                  </div>
-                ))}
+                {aboutItems.map((item) =>
+                  item.to ? (
+                    <Link key={item.title} to={item.to} className="flex items-center gap-2 rounded-md border bg-muted/20 p-3">
+                      <item.icon className="h-4 w-4 shrink-0 text-primary" />
+                      <p className="text-sm font-medium text-foreground">{item.title}</p>
+                    </Link>
+                  ) : (
+                    <div key={item.title} className="flex items-center gap-2 rounded-md border bg-muted/20 p-3">
+                      <item.icon className="h-4 w-4 shrink-0 text-primary" />
+                      <p className="text-sm font-medium text-foreground">{item.title}</p>
+                    </div>
+                  ),
+                )}
               </div>
             </section>
           </div>
@@ -352,12 +382,19 @@ export default function Auth() {
 
         <footer id="about" className="hidden border-t bg-background px-8 py-4 lg:block">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-muted-foreground">
-            {aboutItems.map((item) => (
-              <span key={item.title} className="flex items-center gap-2 whitespace-nowrap">
-                <item.icon className="h-4 w-4 text-primary" />
-                {item.title}
-              </span>
-            ))}
+            {aboutItems.map((item) =>
+              item.to ? (
+                <Link key={item.title} to={item.to} className="flex items-center gap-2 whitespace-nowrap font-medium text-primary hover:underline">
+                  <item.icon className="h-4 w-4 text-primary" />
+                  {item.title}
+                </Link>
+              ) : (
+                <span key={item.title} className="flex items-center gap-2 whitespace-nowrap">
+                  <item.icon className="h-4 w-4 text-primary" />
+                  {item.title}
+                </span>
+              ),
+            )}
           </div>
           <LegalLinks className="mt-3" />
         </footer>
