@@ -13,7 +13,7 @@ import { useResumesQuery } from '@/features/resumes/queries';
 import { useImportResumeToCareerProfileMutation } from '@/features/career-profile/queries';
 import { ApiError } from '@/services/api-errors';
 import type { ResumeSummary } from '@/types';
-import { Calendar, FileText, Pin, Plus, Search, Upload } from 'lucide-react';
+import { Briefcase, Calendar, FileText, Pin, Plus, Search, Upload } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -201,6 +201,8 @@ export default function MyResumes() {
               description={t('resumes.emptyDescription')}
               actionLabel={t('resumes.emptyAction')}
               actionHref="/upload"
+              secondaryActionLabel={t('resumes.emptySecondaryAction')}
+              secondaryActionHref="/career-profile/interview"
             />
           ) : filteredResumes.length === 0 ? (
             <EmptyState
@@ -331,21 +333,43 @@ interface EmptyStateProps {
   description: string;
   actionLabel?: string;
   actionHref?: string;
+  secondaryActionLabel?: string;
+  secondaryActionHref?: string;
 }
 
-function EmptyState({ icon: Icon, title, description, actionLabel, actionHref }: EmptyStateProps) {
+function EmptyState({
+  icon: Icon,
+  title,
+  description,
+  actionLabel,
+  actionHref,
+  secondaryActionLabel,
+  secondaryActionHref,
+}: EmptyStateProps) {
   return (
     <div className="rounded-lg border bg-background py-20 text-center shadow-sm">
       <Icon className="mx-auto mb-4 h-14 w-14 text-muted-foreground" />
       <h2 className="mb-2 text-xl font-semibold">{title}</h2>
       <p className="mx-auto mb-6 max-w-md text-muted-foreground">{description}</p>
-      {actionLabel && actionHref && (
-        <Button asChild>
-          <Link to={actionHref}>
-            <Plus className="mr-2 h-4 w-4" />
-            {actionLabel}
-          </Link>
-        </Button>
+      {((actionLabel && actionHref) || (secondaryActionLabel && secondaryActionHref)) && (
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          {actionLabel && actionHref && (
+            <Button asChild>
+              <Link to={actionHref}>
+                <Plus className="mr-2 h-4 w-4" />
+                {actionLabel}
+              </Link>
+            </Button>
+          )}
+          {secondaryActionLabel && secondaryActionHref && (
+            <Button asChild variant="outline">
+              <Link to={secondaryActionHref}>
+                <Briefcase className="mr-2 h-4 w-4" />
+                {secondaryActionLabel}
+              </Link>
+            </Button>
+          )}
+        </div>
       )}
     </div>
   );
