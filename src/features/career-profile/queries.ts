@@ -54,6 +54,13 @@ export function useUpdateCareerExperienceMutation(originProposalId: string) {
   });
 }
 
+export function useTranscribeCareerAudioMutation(sessionId: string) {
+  return useMutation({
+    mutationFn: ({ audio, filename }: { audio: Blob; filename: string }) =>
+      careerProfileService.transcribeAudio(sessionId, audio, filename),
+  });
+}
+
 export function useSubmitCareerTurnMutation(sessionId: string) {
   return useInvalidatingMutation({
     mutationFn: (request: CareerSubmitTurnRequest) =>

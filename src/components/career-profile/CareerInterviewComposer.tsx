@@ -1,8 +1,12 @@
-import { Send } from 'lucide-react';
+import { Loader2, Mic, Send, Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { CAREER_INTERVIEW_MAX_MESSAGE_LENGTH } from '@/features/career-profile/useCareerInterview';
+import {
+  CAREER_INTERVIEW_MAX_MESSAGE_LENGTH,
+  CAREER_VOICE_MAX_RECORD_SECONDS,
+  type CareerVoiceStatus,
+} from '@/features/career-profile/useCareerInterview';
 
 interface CareerInterviewComposerProps {
   value: string;
@@ -10,6 +14,17 @@ interface CareerInterviewComposerProps {
   onSend: (value: string) => void;
   disabled: boolean;
   isSending: boolean;
+  isRecording: boolean;
+  recordingSeconds: number;
+  isTranscribing: boolean;
+  voiceStatus: CareerVoiceStatus;
+  onToggleRecording: () => void;
+}
+
+function formatRecordingTime(totalSeconds: number): string {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
 export function CareerInterviewComposer({
@@ -18,9 +33,15 @@ export function CareerInterviewComposer({
   onSend,
   disabled,
   isSending,
+  isRecording,
+  recordingSeconds,
+  isTranscribing,
+  voiceStatus,
+  onToggleRecording,
 }: CareerInterviewComposerProps) {
   const { t } = useLanguage();
   const canSend = value.trim().length > 0 && !disabled && !isSending;
+  const canUseVoice = voiceStatus === 'ready' && !disabled && !isTranscribing;
 
   const handleSend = () => {
     if (!canSend) return;
@@ -47,11 +68,54 @@ export function CareerInterviewComposer({
         <span className="text-xs text-muted-foreground">
           {value.length} / {CAREER_INTERVIEW_MAX_MESSAGE_LENGTH}
         </span>
-        <Button onClick={handleSend} disabled={!canSend} size="sm">
-          <Send className="mr-2 h-4 w-4" />
-          {isSending ? t('careerInterview.sending') : t('careerInterview.send')}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant={isRecording ? 'destructive' : 'outline'}
+            onClick={onToggleRecording}
+            disabled={!canUseVoice && !isRecording}
+            size="sm"
+            aria-label={
+              isRecording
+                ? t('careerInterview.voiceStopRecording')
+                : t('careerInterview.voiceMic')
+            }
+          >
+            {isRecording ? (
+              <Square className="mr-2 h-4 w-4" />
+            ) : (
+              <Mic className="mr-2 h-4 w-4" />
+            )}
+            {isRecording
+              ? t('careerInterview.voiceStopRecording')
+              : t('careerInterview.voiceMic')}
+          </Button>
+          <Button onClick={handleSend} disabled={!canSend} size="sm">
+            <Send className="mr-2 h-4 w-4" />
+            {isSending ? t('careerInterview.sending') : t('careerInterview.send')}
+          </Button>
+        </div>
       </div>
+      {isRecording ? (
+        <p className="text-xs text-muted-foreground" role="status">
+          <span className="mr-2 inline-block h-2 w-2 rounded-full bg-destructive" />
+          {t('careerInterview.voiceRecording')} {formatRecordingTime(recordingSeconds)} /{' '}
+          {formatRecordingTime(CAREER_VOICE_MAX_RECORD_SECONDS)}
+        </p>
+      ) : null}
+      {isTranscribing ? (
+        <p className="flex items-center gap-2 text-xs text-muted-foreground" role="status">
+          <Loader2 className="h-3 w-3 animate-spin" />
+          {t('careerInterview.voiceTranscribing')}
+        </p>
+      ) : null}
+      {voiceStatus !== 'ready' && !isRecording && !isTranscribing ? (
+        <p className="text-xs text-muted-foreground">
+          {voiceStatus === 'denied'
+            ? t('careerInterview.voiceUnavailableDenied')
+            : t('careerInterview.voiceUnavailableUnsupported')}
+        </p>
+      ) : null}
     </div>
   );
 }

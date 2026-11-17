@@ -45,7 +45,11 @@ export default function CareerInterview() {
         ? t('careerInterview.agentUnavailableTitle')
         : interview.actionError?.kind === 'auth'
           ? t('careerInterview.sessionExpiredTitle')
-          : t('careerInterview.sessionErrorTitle');
+          : interview.actionError?.kind === 'input'
+            ? t('careerInterview.voiceInputErrorTitle')
+            : interview.actionError?.kind === 'voice'
+              ? t('careerInterview.voiceRepeatTitle')
+              : t('careerInterview.sessionErrorTitle');
   const actionErrorDescription =
     interview.actionError?.kind === 'conflict'
       ? t('careerInterview.versionConflictDescription')
@@ -53,7 +57,11 @@ export default function CareerInterview() {
         ? t('careerInterview.agentUnavailableDescription')
         : interview.actionError?.kind === 'auth'
           ? t('careerInterview.sessionExpiredDescription')
-          : interview.actionError?.message || t('careerInterview.sessionErrorDescription');
+          : interview.actionError?.kind === 'input'
+            ? t('careerInterview.voiceInputErrorDescription')
+            : interview.actionError?.kind === 'voice'
+              ? t('careerInterview.voiceRepeatDescription')
+              : interview.actionError?.message || t('careerInterview.sessionErrorDescription');
 
   return (
     <div className="min-h-dvh bg-muted/40">
@@ -189,6 +197,11 @@ export default function CareerInterview() {
                     onSend={interview.send}
                     disabled={!interview.sessionId || interview.isTerminal}
                     isSending={interview.isSending || interview.isRetrying}
+                    isRecording={interview.isRecording}
+                    recordingSeconds={interview.recordingSeconds}
+                    isTranscribing={interview.isTranscribing}
+                    voiceStatus={interview.voiceStatus}
+                    onToggleRecording={interview.toggleRecording}
                   />
                 </CardContent>
               </Card>

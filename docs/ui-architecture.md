@@ -264,3 +264,47 @@ As the frontend grows, prefer:
 - small feature folders when a module becomes visually or behaviorally complex
 
 The aim is not maximal abstraction. The aim is readable, maintainable code with clear ownership.
+
+## Career interview voice mode
+
+The interview composer offers voice input as an optional mode per turn.
+There is no per-session toggle: the user presses the mic button, grants
+browser permission, and speaks. The behavior, in one place:
+
+- Draft-first. A recording is transcribed and the transcript lands in the
+  composer as an editable draft in the existing sessionStorage draft. The
+  user reviews and edits it before sending it with the existing send
+  action, so the idempotency key, the 4000 character limit, and the
+  conflict and agent error handling all apply unchanged. A transcript is
+  never auto-sent.
+- Repeat and repair. An empty transcript shows a distinct repeat prompt
+  (ask the candidate to speak again), not the generic extraction-failure
+  text. A transcript that yields no usable facts falls back to the
+  existing focused follow-up, which the normal turn already produces.
+  A 400 from the transcribe proxy is a browser-input problem (empty,
+  unsupported, or oversize audio) and is shown as a correctable input
+  error, not an agent failure.
+- Playback. When a new assistant reply arrives, the frontend requests
+  synthesis for that reply text and plays it. Playback is best effort:
+  if it fails, the text is still there and no error blocks the
+  interview. Only the latest reply is synthesized, never the whole
+  history, and never again on refetch.
+- Wiring. `useCareerInterview` owns the voice state (recording,
+  transcribing, playback) and the transcribe/synthesize calls; the
+  composer stays presentational and the service owns HTTP. Synthesis
+  uses a small binary fetch because the shared apiClient parses every
+  response as JSON. The session language comes from session detail, the
+  single source of truth; the client never passes a language to the
+  proxies, Java passes the locked language server side.
+- Privacy. No audio is stored anywhere: recordings live in memory until
+  transcription, and synthesized audio lives in a revoked object URL.
+- Known limits. The repo has no test runner, so verification is a clean
+  production build plus a real-browser click test, never the build alone.
+  Recording duration is a browser stop at 120 seconds plus the server
+  cap (120 s / 10 MB); there is no server-side duration check.
+- Deploy. Merging to main automatically deploys to Hostinger, so the
+  live site at feedback.hmpedro.com picks up the merge. The deploy lives
+  outside this repo: there is no deploy workflow, config, or script here,
+  and the README covers build and preview only. After a merge, confirm
+  the feature is actually live on the site before telling anyone it is
+  ready to test.

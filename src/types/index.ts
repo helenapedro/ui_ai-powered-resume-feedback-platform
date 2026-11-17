@@ -357,6 +357,7 @@ export interface CareerSessionDetailResponse {
   messages: CareerMessageResponse[];
   pendingProposal: CareerProposalResponse | null;
   facts: Record<string, string>;
+  language: string | null;
 }
 
 export interface CareerTurnResponse {
@@ -367,6 +368,16 @@ export interface CareerTurnResponse {
   assistantMessage: string;
   requiresConfirmation: boolean;
   proposal: CareerProposalResponse | null;
+  language: string | null;
+}
+
+export interface CareerTranscribeAudioResponse {
+  transcript: string;
+  language: string | null;
+}
+
+export interface CareerSynthesizeAudioRequest {
+  text: string;
 }
 
 export interface CareerConfirmationResponse {

@@ -1,4 +1,7 @@
 import { apiClient } from './api';
+import { buildApiUrl } from './api-config';
+import { parseApiError, throwApiError } from './api-errors';
+import { sessionService } from './session';
 import type {
   CareerCancelSessionRequest,
   CareerConfirmationResponse,
@@ -10,6 +13,8 @@ import type {
   CareerSessionDetailResponse,
   CareerSessionResponse,
   CareerSubmitTurnRequest,
+  CareerSynthesizeAudioRequest,
+  CareerTranscribeAudioResponse,
   CareerTurnResponse,
   CareerUpdateExperienceRequest,
 } from '@/types';
@@ -59,5 +64,54 @@ export const careerProfileService = {
       `/career-profile/experiences/${originProposalId}`,
       request,
     );
+  },
+
+  async transcribeAudio(
+    sessionId: string,
+    audio: Blob,
+    filename: string,
+  ): Promise<CareerTranscribeAudioResponse> {
+    const formData = new FormData();
+    formData.append('audio', audio, filename);
+    return apiClient.post<CareerTranscribeAudioResponse>(
+      `/career-profile/sessions/${sessionId}/audio/transcribe`,
+      formData,
+    );
+  },
+
+  /**
+   * Synthesizes one assistant reply as speech. The shared apiClient parses
+   * every response as JSON, so it cannot return audio bytes; this is a small
+   * binary fetch for the synthesize proxy only. The caller owns playback and
+   * treats any failure as best effort: the text reply stays on screen.
+   */
+  async synthesizeAudio(
+    sessionId: string,
+    request: CareerSynthesizeAudioRequest,
+  ): Promise<ArrayBuffer> {
+    const token = sessionService.getToken();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Accept: 'audio/mpeg',
+    };
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+    const response = await fetch(
+      buildApiUrl(`/career-profile/sessions/${sessionId}/audio/synthesize`),
+      {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(request),
+      },
+    );
+    if (!response.ok) {
+      const errorData = await parseApiError(
+        response,
+        `/career-profile/sessions/${sessionId}/audio/synthesize`,
+      );
+      throwApiError(response, errorData);
+    }
+    return response.arrayBuffer();
   },
 };

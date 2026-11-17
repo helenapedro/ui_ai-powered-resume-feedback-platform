@@ -219,7 +219,17 @@ export type TranslationKey =
   | 'careerInterview.viewProfilePanel'
   | 'careerInterview.profilePanelTitle'
   | 'careerInterview.agentLabel'
-  | 'careerInterview.youLabel';
+  | 'careerInterview.youLabel'
+  | 'careerInterview.voiceMic'
+  | 'careerInterview.voiceStopRecording'
+  | 'careerInterview.voiceRecording'
+  | 'careerInterview.voiceTranscribing'
+  | 'careerInterview.voiceUnavailableUnsupported'
+  | 'careerInterview.voiceUnavailableDenied'
+  | 'careerInterview.voiceRepeatTitle'
+  | 'careerInterview.voiceRepeatDescription'
+  | 'careerInterview.voiceInputErrorTitle'
+  | 'careerInterview.voiceInputErrorDescription';
 
 const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
   en: {
@@ -448,6 +458,20 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     'careerInterview.profilePanelTitle': 'Your profile so far',
     'careerInterview.agentLabel': 'Career Agent',
     'careerInterview.youLabel': 'You',
+    'careerInterview.voiceMic': 'Use voice',
+    'careerInterview.voiceStopRecording': 'Stop recording',
+    'careerInterview.voiceRecording': 'Recording',
+    'careerInterview.voiceTranscribing': 'Transcribing your recording...',
+    'careerInterview.voiceUnavailableUnsupported':
+      'Voice input is not available in this browser. You can still type your answer.',
+    'careerInterview.voiceUnavailableDenied':
+      'Microphone access was denied. Allow microphone access in your browser settings to use voice input, or type your answer.',
+    'careerInterview.voiceRepeatTitle': 'I could not hear that',
+    'careerInterview.voiceRepeatDescription':
+      'Please speak again, a little slower and closer to the microphone.',
+    'careerInterview.voiceInputErrorTitle': 'That recording could not be used',
+    'careerInterview.voiceInputErrorDescription':
+      'Try recording again, or type your answer instead.',
   },
   pt: {
     'app.name': 'Resume Feedback',
@@ -677,6 +701,20 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     'careerInterview.profilePanelTitle': 'O seu perfil ate agora',
     'careerInterview.agentLabel': 'Agente de Carreira',
     'careerInterview.youLabel': 'Tu',
+    'careerInterview.voiceMic': 'Usar voz',
+    'careerInterview.voiceStopRecording': 'Parar gravacao',
+    'careerInterview.voiceRecording': 'A gravar',
+    'careerInterview.voiceTranscribing': 'A transcrever a tua gravacao...',
+    'careerInterview.voiceUnavailableUnsupported':
+      'A entrada por voz nao esta disponivel neste navegador. Podes continuar a escrever a tua resposta.',
+    'careerInterview.voiceUnavailableDenied':
+      'O acesso ao microfone foi negado. Permite o acesso ao microfone nas definicoes do navegador para usares a entrada por voz, ou escreve a tua resposta.',
+    'careerInterview.voiceRepeatTitle': 'Nao consegui ouvir',
+    'careerInterview.voiceRepeatDescription':
+      'Fala outra vez, um pouco mais devagar e mais perto do microfone.',
+    'careerInterview.voiceInputErrorTitle': 'Nao foi possivel usar essa gravacao',
+    'careerInterview.voiceInputErrorDescription':
+      'Tenta gravar outra vez, ou escreve a tua resposta.',
   },
 };
 
