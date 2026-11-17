@@ -112,6 +112,7 @@ export type TranslationKey =
   | 'resumes.emptyTitle'
   | 'resumes.emptyDescription'
   | 'resumes.emptyAction'
+  | 'resumes.emptySecondaryAction'
   | 'resumes.noResultsTitle'
   | 'resumes.noResultsDescription'
   | 'resumes.pinned'
@@ -346,8 +347,10 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     'resumes.newestWorkflow': 'Newest workflow',
     'resumes.noneYet': 'None yet',
     'resumes.emptyTitle': 'You do not have any resume workflows yet',
-    'resumes.emptyDescription': 'Upload your first resume to start a version-aware feedback workflow.',
+    'resumes.emptyDescription':
+      'Upload your first resume to start a version-aware feedback workflow, or build a career profile if you do not have a resume yet.',
     'resumes.emptyAction': 'Upload Resume',
+    'resumes.emptySecondaryAction': 'Build your career profile',
     'resumes.noResultsTitle': 'No resume workflows found',
     'resumes.noResultsDescription': 'Try searching with a different title.',
     'resumes.pinned': 'Pinned',
@@ -594,8 +597,10 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     'resumes.newestWorkflow': 'Fluxo mais recente',
     'resumes.noneYet': 'Ainda nenhum',
     'resumes.emptyTitle': 'Ainda nao tem nenhum fluxo de CV',
-    'resumes.emptyDescription': 'Carregue o seu primeiro CV para iniciar um fluxo de feedback com versoes.',
+    'resumes.emptyDescription':
+      'Carregue o seu primeiro CV para iniciar um fluxo de feedback com versoes, ou crie o seu perfil de carreira se ainda nao tiver um CV.',
     'resumes.emptyAction': 'Carregar CV',
+    'resumes.emptySecondaryAction': 'Criar o meu perfil de carreira',
     'resumes.noResultsTitle': 'Nenhum fluxo encontrado',
     'resumes.noResultsDescription': 'Tente pesquisar com outro titulo.',
     'resumes.pinned': 'Fixados',
