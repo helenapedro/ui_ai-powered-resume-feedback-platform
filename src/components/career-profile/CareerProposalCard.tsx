@@ -51,6 +51,14 @@ export function CareerProposalCard({ proposal, isConfirming, onConfirm }: Career
     setEditedFacts((current) => ({ ...current, [field]: value }));
   };
 
+  // The agent returns responsibilities as bullet formatted text, one
+  // "- " line per bullet. Split it into list items for display; a
+  // single line value still renders as a one item list.
+  const responsibilitiesItems = (proposal.facts.responsibilities ?? '')
+    .split('\n')
+    .map((line) => line.replace(/^-\s*/, '').trim())
+    .filter((line) => line.length > 0);
+
   return (
     <Card className="border-primary/40">
       <CardHeader className="pb-3">
@@ -109,7 +117,19 @@ export function CareerProposalCard({ proposal, isConfirming, onConfirm }: Career
                 <div key={field} className="grid grid-cols-[140px_1fr] gap-2 text-sm">
                   <dt className="text-muted-foreground">{t(FIELD_LABEL_KEYS[field])}</dt>
                   <dd className="whitespace-pre-line">
-                    {proposal.facts[field] || t('careerInterview.factNotProvided')}
+                    {field === 'responsibilities' ? (
+                      responsibilitiesItems.length > 0 ? (
+                        <ul className="list-disc space-y-1 pl-5">
+                          {responsibilitiesItems.map((item, index) => (
+                            <li key={index}>{item}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        t('careerInterview.factNotProvided')
+                      )
+                    ) : (
+                      proposal.facts[field] || t('careerInterview.factNotProvided')
+                    )}
                   </dd>
                 </div>
               ))}
