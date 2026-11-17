@@ -54,6 +54,13 @@ export function useUpdateCareerExperienceMutation(originProposalId: string) {
   });
 }
 
+export function useDeleteCareerExperienceMutation(originProposalId: string) {
+  return useInvalidatingMutation({
+    mutationFn: () => careerProfileService.deleteExperience(originProposalId),
+    getQueryKeys: () => [queryKeys.careerProfile.profile],
+  });
+}
+
 export function useTranscribeCareerAudioMutation(sessionId: string) {
   return useMutation({
     mutationFn: ({ audio, filename }: { audio: Blob; filename: string }) =>
