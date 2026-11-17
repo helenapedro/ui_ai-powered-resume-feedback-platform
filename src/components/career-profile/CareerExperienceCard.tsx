@@ -1,13 +1,27 @@
 import { useState } from 'react';
-import { Briefcase, Pencil } from 'lucide-react';
+import { Briefcase, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useLanguage, type TranslationKey } from '@/contexts/LanguageContext';
 import { CAREER_FACT_FIELDS } from '@/features/career-profile/useCareerInterview';
-import { useUpdateCareerExperienceMutation } from '@/features/career-profile/queries';
+import {
+  useDeleteCareerExperienceMutation,
+  useUpdateCareerExperienceMutation,
+} from '@/features/career-profile/queries';
 import { useToast } from '@/hooks/use-toast';
 import type { CareerExperience } from '@/lib/career-profile';
 import type { CareerFactField } from '@/types';
@@ -51,6 +65,7 @@ export function CareerExperienceCard({ experience }: CareerExperienceCardProps) 
     factsFromExperience(experience),
   );
   const updateMutation = useUpdateCareerExperienceMutation(experience.originProposalId);
+  const deleteMutation = useDeleteCareerExperienceMutation(experience.originProposalId);
 
   // The backend rejects an edit with an incomplete set, so every field is
   // required in the form and all five are always submitted, even unchanged.
@@ -83,6 +98,21 @@ export function CareerExperienceCard({ experience }: CareerExperienceCardProps) 
         },
       },
     );
+  };
+
+  // Deletion is never optimistic: the card stays listed until the server
+  // confirms the delete and the profile query refetches. On failure the
+  // experience stays listed and the error is shown.
+  const confirmDelete = () => {
+    deleteMutation.mutate(undefined, {
+      onError: () => {
+        toast({
+          variant: 'destructive',
+          title: t('careerProfile.deleteErrorTitle'),
+          description: t('careerProfile.deleteErrorDescription'),
+        });
+      },
+    });
   };
 
   const hasDates = Boolean(experience.startDate || experience.endDate);
@@ -153,10 +183,41 @@ export function CareerExperienceCard({ experience }: CareerExperienceCardProps) 
                   <p className="text-xs text-muted-foreground">{t('careerProfile.edited')}</p>
                 ) : null}
               </div>
-              <Button size="sm" variant="outline" onClick={startEditing}>
-                <Pencil className="mr-2 h-4 w-4" />
-                {t('careerInterview.edit')}
-              </Button>
+              <div className="flex shrink-0 gap-2">
+                <Button size="sm" variant="outline" onClick={startEditing}>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  {t('careerInterview.edit')}
+                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button size="sm" variant="destructive" disabled={deleteMutation.isPending}>
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      {deleteMutation.isPending
+                        ? t('careerProfile.deleting')
+                        : t('details.delete')}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        {t('careerProfile.deleteExperienceTitle')}
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        {t('careerProfile.deleteExperienceDescription')}
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>{t('details.cancel')}</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={confirmDelete}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        {t('details.delete')}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             </div>
             {experience.responsibilities ? (
               <p className="mt-4 whitespace-pre-line text-sm text-muted-foreground">

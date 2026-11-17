@@ -166,6 +166,11 @@ export type TranslationKey =
   | 'careerProfile.saving'
   | 'careerProfile.editErrorTitle'
   | 'careerProfile.editErrorDescription'
+  | 'careerProfile.deleteExperienceTitle'
+  | 'careerProfile.deleteExperienceDescription'
+  | 'careerProfile.deleteErrorTitle'
+  | 'careerProfile.deleteErrorDescription'
+  | 'careerProfile.deleting'
   | 'careerInterview.title'
   | 'careerInterview.description'
   | 'careerInterview.emptyThread'
@@ -399,6 +404,12 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     'careerProfile.saving': 'Saving...',
     'careerProfile.editErrorTitle': 'Unable to save changes',
     'careerProfile.editErrorDescription': 'Please try again.',
+    'careerProfile.deleteExperienceTitle': 'Delete this experience?',
+    'careerProfile.deleteExperienceDescription':
+      'This action cannot be undone. The experience will be removed from your profile.',
+    'careerProfile.deleteErrorTitle': 'Unable to delete experience',
+    'careerProfile.deleteErrorDescription': 'Please try again.',
+    'careerProfile.deleting': 'Deleting...',
     'careerInterview.title': 'Career Interview',
     'careerInterview.description':
       'Answer a few questions about your work history. Confirm each proposal before it joins your profile.',
@@ -641,6 +652,12 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     'careerProfile.saving': 'A guardar...',
     'careerProfile.editErrorTitle': 'Nao foi possivel guardar as alteracoes',
     'careerProfile.editErrorDescription': 'Tenta novamente.',
+    'careerProfile.deleteExperienceTitle': 'Eliminar esta experiencia?',
+    'careerProfile.deleteExperienceDescription':
+      'Esta acao nao pode ser desfeita. A experiencia sera removida do teu perfil.',
+    'careerProfile.deleteErrorTitle': 'Nao foi possivel eliminar a experiencia',
+    'careerProfile.deleteErrorDescription': 'Tenta novamente.',
+    'careerProfile.deleting': 'A eliminar...',
     'careerInterview.title': 'Entrevista de Carreira',
     'careerInterview.description':
       'Responde a algumas perguntas sobre o teu historico profissional. Confirma cada proposta antes de entrar no teu perfil.',

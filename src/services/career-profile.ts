@@ -66,6 +66,10 @@ export const careerProfileService = {
     );
   },
 
+  async deleteExperience(originProposalId: string): Promise<void> {
+    return apiClient.delete<void>(`/career-profile/experiences/${originProposalId}`);
+  },
+
   async transcribeAudio(
     sessionId: string,
     audio: Blob,
