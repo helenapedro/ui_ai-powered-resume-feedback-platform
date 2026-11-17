@@ -199,6 +199,7 @@ export default function CareerInterview() {
                     isSending={interview.isSending || interview.isRetrying}
                     isRecording={interview.isRecording}
                     recordingSeconds={interview.recordingSeconds}
+                    isLiveTranscribing={interview.isLiveTranscribing}
                     isTranscribing={interview.isTranscribing}
                     voiceStatus={interview.voiceStatus}
                     onToggleRecording={interview.toggleRecording}
