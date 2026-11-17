@@ -61,6 +61,56 @@ function voiceFileName(mimeType: string): string {
   return VOICE_FILENAME_BY_MIME[base] ?? 'audio.webm';
 }
 
+/**
+ * Minimal Web Speech API surface for live transcription. The DOM lib does
+ * not declare SpeechRecognition, so only the members this slice uses are
+ * typed here instead of pulling in a dependency.
+ */
+interface SpeechRecognitionAlternativeLike {
+  transcript: string;
+}
+
+interface SpeechRecognitionResultLike {
+  isFinal: boolean;
+  length: number;
+  0: SpeechRecognitionAlternativeLike;
+}
+
+interface SpeechRecognitionEventLike extends Event {
+  resultIndex: number;
+  results: ArrayLike<SpeechRecognitionResultLike>;
+}
+
+interface SpeechRecognitionLike {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+}
+
+type SpeechRecognitionConstructor = new () => SpeechRecognitionLike;
+
+declare global {
+  interface Window {
+    SpeechRecognition?: SpeechRecognitionConstructor;
+    webkitSpeechRecognition?: SpeechRecognitionConstructor;
+  }
+}
+
+function speechRecognitionConstructor(): SpeechRecognitionConstructor | null {
+  if (typeof window === 'undefined') return null;
+  return window.SpeechRecognition ?? window.webkitSpeechRecognition ?? null;
+}
+
+/** Locale for live transcription: Portugal Portuguese, never Brazilian. */
+function liveTranscriptionLocale(sessionLanguage: string | null): string {
+  return sessionLanguage === 'pt' ? 'pt-PT' : 'en-US';
+}
+
 export interface CareerInterviewActionError {
   kind: CareerInterviewActionErrorKind;
   message: string;
@@ -113,6 +163,10 @@ export function useCareerInterview() {
   const [isRetrying, setIsRetrying] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
+  // True while the browser speech recognizer is feeding interim results
+  // into the draft. False when the browser has no SpeechRecognition: the
+  // recording still works, the transcript just lands after stop.
+  const [isLiveTranscribing, setIsLiveTranscribing] = useState(false);
   const [voiceStatus, setVoiceStatus] = useState<CareerVoiceStatus>(() =>
     typeof navigator !== 'undefined' &&
     typeof navigator.mediaDevices?.getUserMedia === 'function' &&
@@ -125,6 +179,17 @@ export function useCareerInterview() {
   // same text. A changed text is a new intent and gets a fresh key.
   const pendingSendRef = useRef<{ key: string; text: string } | null>(null);
   const startAttemptedRef = useRef(false);
+
+  // Live transcription pieces. The recognizer is separate from the
+  // MediaRecorder: it only fills the draft while recording, and the
+  // provider transcript still replaces the draft on stop.
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
+  // Draft text as it stood when recording started. Live results are
+  // always rendered as base plus live text, so a new interim result
+  // replaces the previous one instead of appending to it.
+  const liveBaseRef = useRef('');
+  const recognitionErrorRef = useRef(false);
+  const isRecordingRef = useRef(false);
 
   // Voice recording pieces. The MediaRecorder lives here, in the hook,
   // because the composer is presentational: props in, callbacks out.
@@ -279,9 +344,93 @@ export function useCareerInterview() {
     [sessionId, stopPlayback],
   );
 
+  /**
+   * Stops live transcription, if any. Never throws and never reports an
+   * error: a recognizer that cannot run is a silent fallback to the
+   * transcript-after-stop behavior.
+   */
+  const stopLiveTranscription = useCallback(() => {
+    const recognition = recognitionRef.current;
+    recognitionRef.current = null;
+    setIsLiveTranscribing(false);
+    if (!recognition) return;
+    recognition.onresult = null;
+    recognition.onerror = null;
+    recognition.onend = null;
+    try {
+      recognition.stop();
+    } catch {
+      // Already stopped; nothing to do.
+    }
+  }, []);
+
+  /**
+   * Starts browser speech recognition so the draft fills while the user
+   * speaks. Interim results included: each result rebuilds the draft as
+   * the text captured at recording start plus the live transcript, so a
+   * corrected interim result replaces the previous guess instead of
+   * appending to it. Any failure is silent: the provider transcript on
+   * stop is still the source of truth and still lands in the draft.
+   */
+  const startLiveTranscription = useCallback(
+    (sessionLanguage: string | null) => {
+      const Recognition = speechRecognitionConstructor();
+      if (!Recognition) return;
+      try {
+        const recognition = new Recognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = liveTranscriptionLocale(sessionLanguage);
+        recognitionErrorRef.current = false;
+        recognition.onresult = (event) => {
+          let liveText = '';
+          for (let i = 0; i < event.results.length; i += 1) {
+            const result = event.results[i];
+            if (result && result.length > 0) {
+              liveText += result[0].transcript;
+            }
+          }
+          const base = liveBaseRef.current;
+          const combined =
+            base && liveText ? `${base} ${liveText}` : `${base}${liveText}`;
+          setDraft(combined.slice(0, CAREER_INTERVIEW_MAX_MESSAGE_LENGTH));
+        };
+        // A failed recognizer must not spin: an error ends the attempt
+        // instead of restarting it, and the recording carries on.
+        recognition.onerror = () => {
+          recognitionErrorRef.current = true;
+        };
+        recognition.onend = () => {
+          if (!isRecordingRef.current || recognitionErrorRef.current) {
+            setIsLiveTranscribing(false);
+            return;
+          }
+          // Chrome can end recognition after a pause even with
+          // continuous mode on, so restart it while still recording.
+          try {
+            recognitionErrorRef.current = false;
+            recognition.start();
+          } catch {
+            setIsLiveTranscribing(false);
+          }
+        };
+        recognitionRef.current = recognition;
+        recognition.start();
+        setIsLiveTranscribing(true);
+      } catch {
+        // SpeechRecognition unavailable or refused: silent fallback.
+        recognitionRef.current = null;
+        setIsLiveTranscribing(false);
+      }
+    },
+    [setDraft],
+  );
+
   const stopRecording = useCallback(() => {
     const recorder = recorderRef.current;
     clearRecordingTimers();
+    stopLiveTranscription();
+    isRecordingRef.current = false;
     if (!recorder) {
       setIsRecording(false);
       return;
@@ -290,7 +439,7 @@ export function useCareerInterview() {
       recorder.stop();
     }
     setIsRecording(false);
-  }, [clearRecordingTimers]);
+  }, [clearRecordingTimers, stopLiveTranscription]);
 
   const startRecording = useCallback(() => {
     if (!sessionId || isTerminal || isRecording || transcribeMutation.isPending) return;
@@ -358,8 +507,11 @@ export function useCareerInterview() {
           );
         };
         recorder.start();
+        liveBaseRef.current = draft;
+        isRecordingRef.current = true;
         setRecordingSeconds(0);
         setIsRecording(true);
+        startLiveTranscription(detail?.language ?? null);
         recordingElapsedTimerRef.current = window.setInterval(() => {
           setRecordingSeconds((seconds) => seconds + 1);
         }, 1000);
@@ -382,7 +534,7 @@ export function useCareerInterview() {
           reportError(error, 'Unable to start recording.');
         }
       });
-  }, [sessionId, isTerminal, isRecording, transcribeMutation.isPending, voiceStatus, reportError, setDraft, stopRecording]);
+  }, [sessionId, isTerminal, isRecording, transcribeMutation.isPending, voiceStatus, reportError, setDraft, stopRecording, startLiveTranscription, draft, detail]);
 
   const toggleRecording = useCallback(() => {
     if (isRecording) {
@@ -412,10 +564,11 @@ export function useCareerInterview() {
     void playReply(latestAgent.content);
   }, [detail, playReply]);
 
-  // Never leave a recorder, a stream, or an audio URL behind.
+  // Never leave a recorder, a recognizer, a stream, or an audio URL behind.
   useEffect(() => {
     return () => {
       clearRecordingTimers();
+      stopLiveTranscription();
       const recorder = recorderRef.current;
       if (recorder && recorder.state !== 'inactive') {
         recorder.onstop = null;
@@ -424,7 +577,7 @@ export function useCareerInterview() {
       recorderStreamRef.current?.getTracks().forEach((track) => track.stop());
       stopPlayback();
     };
-  }, [clearRecordingTimers, stopPlayback]);
+  }, [clearRecordingTimers, stopPlayback, stopLiveTranscription]);
 
   const send = useCallback(
     (text: string) => {
@@ -530,6 +683,7 @@ export function useCareerInterview() {
     isRetrying,
     isRecording,
     recordingSeconds,
+    isLiveTranscribing,
     isTranscribing: transcribeMutation.isPending,
     voiceStatus,
     toggleRecording,

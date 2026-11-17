@@ -16,6 +16,7 @@ interface CareerInterviewComposerProps {
   isSending: boolean;
   isRecording: boolean;
   recordingSeconds: number;
+  isLiveTranscribing: boolean;
   isTranscribing: boolean;
   voiceStatus: CareerVoiceStatus;
   onToggleRecording: () => void;
@@ -35,6 +36,7 @@ export function CareerInterviewComposer({
   isSending,
   isRecording,
   recordingSeconds,
+  isLiveTranscribing,
   isTranscribing,
   voiceStatus,
   onToggleRecording,
@@ -101,6 +103,11 @@ export function CareerInterviewComposer({
           <span className="mr-2 inline-block h-2 w-2 rounded-full bg-destructive" />
           {t('careerInterview.voiceRecording')} {formatRecordingTime(recordingSeconds)} /{' '}
           {formatRecordingTime(CAREER_VOICE_MAX_RECORD_SECONDS)}
+        </p>
+      ) : null}
+      {isRecording && isLiveTranscribing ? (
+        <p className="text-xs text-muted-foreground" role="status">
+          {t('careerInterview.voiceLiveTranscribing')}
         </p>
       ) : null}
       {isTranscribing ? (

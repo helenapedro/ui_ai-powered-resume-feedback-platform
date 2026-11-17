@@ -277,6 +277,18 @@ browser permission, and speaks. The behavior, in one place:
   action, so the idempotency key, the 4000 character limit, and the
   conflict and agent error handling all apply unchanged. A transcript is
   never auto-sent.
+- Live transcription. While recording, the browser speech recognizer
+  (Web Speech API, interim results) fills the draft as the user speaks,
+  in the session language (pt-PT for Portuguese, en-US for English).
+  Each result rebuilds the draft as the text captured at recording start
+  plus the live transcript, so a corrected interim guess replaces the
+  previous one instead of appending to it. On stop, the provider
+  transcript still replaces the draft for accuracy: it stays the source
+  of truth, and the draft-first, never-auto-send behavior is unchanged.
+  When the browser has no SpeechRecognition, recording falls back
+  silently to the transcript-after-stop behavior, with no error and the
+  text field still usable. Editing the draft while recording is
+  overwritten by the next interim result, so edits belong after stop.
 - Repeat and repair. An empty transcript shows a distinct repeat prompt
   (ask the candidate to speak again), not the generic extraction-failure
   text. A transcript that yields no usable facts falls back to the
@@ -301,7 +313,11 @@ browser permission, and speaks. The behavior, in one place:
 - Known limits. The repo has no test runner, so verification is a clean
   production build plus a real-browser click test, never the build alone.
   Recording duration is a browser stop at 120 seconds plus the server
-  cap (120 s / 10 MB); there is no server-side duration check.
+  cap (120 s / 10 MB); there is no server-side duration check. Live
+  transcription depends on the browser speech service: headless
+  Chromium in the sandbox may not produce interim results, so the click
+  test reports honestly whether interim text appeared, and the real
+  browser check stays owed until Helena confirms it.
 - Deploy. Merging to main automatically deploys to Hostinger, so the
   live site at feedback.hmpedro.com picks up the merge. The deploy lives
   outside this repo: there is no deploy workflow, config, or script here,

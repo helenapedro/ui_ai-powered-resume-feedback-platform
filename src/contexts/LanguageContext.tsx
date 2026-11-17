@@ -223,6 +223,7 @@ export type TranslationKey =
   | 'careerInterview.voiceMic'
   | 'careerInterview.voiceStopRecording'
   | 'careerInterview.voiceRecording'
+  | 'careerInterview.voiceLiveTranscribing'
   | 'careerInterview.voiceTranscribing'
   | 'careerInterview.voiceUnavailableUnsupported'
   | 'careerInterview.voiceUnavailableDenied'
@@ -461,6 +462,7 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     'careerInterview.voiceMic': 'Use voice',
     'careerInterview.voiceStopRecording': 'Stop recording',
     'careerInterview.voiceRecording': 'Recording',
+    'careerInterview.voiceLiveTranscribing': 'Transcribing live as you speak...',
     'careerInterview.voiceTranscribing': 'Transcribing your recording...',
     'careerInterview.voiceUnavailableUnsupported':
       'Voice input is not available in this browser. You can still type your answer.',
@@ -704,6 +706,7 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     'careerInterview.voiceMic': 'Usar voz',
     'careerInterview.voiceStopRecording': 'Parar gravacao',
     'careerInterview.voiceRecording': 'A gravar',
+    'careerInterview.voiceLiveTranscribing': 'A transcrever em direto enquanto falas...',
     'careerInterview.voiceTranscribing': 'A transcrever a tua gravacao...',
     'careerInterview.voiceUnavailableUnsupported':
       'A entrada por voz nao esta disponivel neste navegador. Podes continuar a escrever a tua resposta.',
